@@ -1,5 +1,11 @@
 # Computational Chemistry — Agent Instructions
 
+> **Fork override (takes precedence over everything below).** In this fork, `research-orchestrator` is disabled.
+> - Never create or update a `.research/` directory, and never use its task DAG, gates, leases, claims, or heartbeats.
+> - The project's own files in the project root are the only record of project state: the project overview, the execution sheet, the calculation ledger, and the change log. Where any skill below says to use `research-orchestrator`, `.research/`, a gate, a lease, or a claim, record the same information in those files instead, in plain language.
+> - `procedures/research-orchestrator/references/model-structure-review.md` may still be read as a checklist for reviewing structures; it creates no state.
+> - Everything else in this collection (engine skills, `knowledge/`, error tables, validation rules) applies unchanged.
+
 These rules apply to every computational chemistry and materials science task in this environment, regardless of which skill is active.
 
 ## Routing
