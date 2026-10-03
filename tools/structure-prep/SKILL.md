@@ -21,6 +21,7 @@ conformers.
 | Need | Load or run |
 |---|---|
 | source, convert, build, or edit structures | `references/running.md` |
+| download from a database or choose among polymorphs | `references/running.md` ("Sourcing database structures") |
 | validate and release a candidate | `references/validation.md`; `scripts/audit_structure.py` |
 | review slab/surface/defect/adsorbate models | `procedures/research-orchestrator/references/model-structure-review.md` |
 | build slabs or enumerate adsorbate sites | `scripts/make_slab.py`; `scripts/place_adsorbate.py` |
@@ -57,8 +58,10 @@ conformers.
   `procedures/research-orchestrator/scripts/check_structure_generator_boundary.py
   --forbid-engine-inputs PATH/TO/SCRIPTS`; do not generate final engine/scheduler
   inputs or submit jobs in the same call path.
-- Preserve originals. Give database-derived structures their entry ID and every
-  derived structure a provenance trail.
+- Preserve originals. Give database-derived structures their entry ID, database
+  release, and a frozen local copy with `source.json`, and every derived structure a
+  provenance trail. Do not treat a predicted (`theoretical`) database entry as a known
+  phase.
 
 ## Handoff
 
