@@ -49,7 +49,7 @@ Key APIs and conventions:
   short multiple bond, TS guess, or constrained starting contact is kept, record
   that rationale.
 - **Defects/substitutions**: enumerate symmetry-distinct sites; choose by stated criterion or ask — never randomize for production.
-- **Sourcing structures from experiments**: XRD-matched phases resolve to database entries (Materials Project API, COD, ICSD if licensed); record the entry ID as provenance.
+- **Sourcing structures from databases**: follow "Sourcing database structures" below — source priority, what a Materials Project entry is, polymorph choice, and freezing the download with a `source.json` record.
 
 Scripts:
 
@@ -78,6 +78,68 @@ uv run scripts/dope_structure.py STRUCT --substitute-top Fe:Pt        # topmost 
 uv run scripts/dope_structure.py STRUCT --vacancy-top O               # surface O vacancy
 uv run scripts/dope_structure.py STRUCT --interstitial Na:0.5,0.5,0.45 # subsurface Na dopant (frac coords)
 uv run scripts/dope_structure.py STRUCT --substitute 17:Pt            # replace atom #17 (1-based) with Pt
+```
+
+## Sourcing database structures
+
+Read this before downloading any crystal structure. A database is an index and a
+downloader; which entry represents the phase is a scientific choice.
+
+**Source priority** (highest first):
+
+1. The source paper's own CIF, or the entry it deposited (ICSD/CCDC number in the
+   paper or SI).
+2. ICSD (licensed): experimentally determined structures.
+3. COD: open experimental structures; check the cited reference.
+4. Materials Project entries with `theoretical == False`. These are matched to
+   experimental entries; the matching ICSD IDs are listed in `database_IDs`.
+5. Predicted structures — Materials Project entries with `theoretical == True`, OQMD,
+   AFLOW, Alexandria, generative models. Use them only as labeled hypotheses
+   (`predicted`), never as "the" known phase.
+
+**What a Materials Project structure is, and is not:**
+
+- Relaxed with the database functional (PBE/PBE+U or r2SCAN, depending on entry and
+  release). Good as a starting geometry; not an experimental lattice constant. Take
+  reference lattice constants for validation from the experimental source.
+- Always ordered. An experimentally disordered phase (partial occupancies, mixed sites)
+  appears as one ordering chosen by the database. If the disorder matters, start from
+  the experimental CIF and enumerate orderings (see `errors.md`).
+- Versioned. Data and IDs change between releases; record the release.
+
+**Choosing among polymorphs** (one formula, several structures):
+
+1. Start from experimental evidence for the system being modeled — which phase is
+   observed at the relevant temperature, pressure, synthesis route, or in the sample or
+   interphase under study — not from `energy_above_hull`. Exclude high-pressure and
+   high-temperature forms unless those conditions are the subject.
+2. If several experimental polymorphs remain, relax all with the project settings and
+   compare. Differences of a few to a few tens of meV/atom are within typical
+   functional error for polymorph ordering: keep the observed phase and record the
+   computed difference instead of switching to the DFT minimum.
+3. A predicted structure enters only as an explicitly labeled hypothesis.
+4. Deduplicate candidates with `pymatgen.analysis.structure_matcher.StructureMatcher`
+   before calculating; databases often hold several entries for one structure.
+
+**Freeze, then compute.** Download once with a small script and never query a database
+at run time. For each structure keep, in the project's structures directory, the file
+as downloaded plus a `source.json` with: database; entry ID; database release (for
+Materials Project, `MPRester().get_database_version()`); retrieval date; the
+`theoretical` flag and linked ICSD IDs (Materials Project); space group with the
+`symprec` used; and the reason this entry was chosen over the alternatives. Relaxed,
+supercell, or doped structures go to new paths and point back to this record.
+
+**API keys.** Follow the secrets guardrail in `AGENTS.md`. `mp_api.client.MPRester()`
+reads `MP_API_KEY` from the environment; do not pass the key as an argument, print it,
+or write it to any file. A setup that keeps the key out of shell history and output
+(the user does this once):
+
+```bash
+mkdir -p ~/.config/mp && chmod 700 ~/.config/mp
+# put the key in ~/.config/mp/api_key with an editor, then:
+chmod 600 ~/.config/mp/api_key
+# in ~/.bashrc
+export MP_API_KEY="$(cat ~/.config/mp/api_key)"
 ```
 
 ## Molecules (RDKit)

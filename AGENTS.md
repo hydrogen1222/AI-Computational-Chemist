@@ -83,6 +83,7 @@ Do not skip preflight or validation. Propose the scientific answer strategy firs
 - **Preserve provenance**: keep input files, generated files, commands, job IDs, logs, and parsed outputs. Never report a numeric value without file provenance and units.
 - **Units**: eV, Å, fs/ps, K, GPa by default. When an engine uses different conventions (LAMMPS unit styles, GROMACS kJ/mol and nm, Gaussian Hartree), state the unit explicitly with every value.
 - **Licensed data**: never print full POTCAR or licensed force-field/potential file contents; reference them by path and version.
+- **Secrets**: never print, echo, log, or write API keys, tokens, or passwords — not to the terminal, reports, workflow files, job scripts, or commit messages. Let client libraries read them from the environment (for example `MP_API_KEY` for `mp_api.client.MPRester`), and check presence without revealing the value (`[ -n "$MP_API_KEY" ] && echo set`). If a secret has appeared in any output, tell the user so they can rotate it.
 - **Defaults are not endorsements**: numerical settings and templates in `tools/*/references/` are community starting points. Source settings or established group conventions win when reproducing or following them.
 
 ## Operation mode: semi-automatic by default, autonomous on request
