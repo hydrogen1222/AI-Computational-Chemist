@@ -74,7 +74,6 @@ tools/                         per-code skills - how each tool is operated
   catmap/                      microkinetic modeling, TOF maps, volcano plots
   lobster/                     LOBSTER COHP/COOP bonding analysis from VASP wavefunctions
   ovito/                       atomistic visualization and trajectory analysis
-  plotting/                    publication figures: shared style, figure folders with data + script + recipe
   hpc-submit/                  local / SSH / Slurm / PBS execution
   rsess/                       persistent remote shell sessions (tmux on the remote)
   report/                      assemble the near-submission .docx report / response package
