@@ -1,6 +1,6 @@
 ---
 name: research-orchestrator
-description: Define and maintain machine-readable research project state for multi-stage computational chemistry work. Use when a project needs task DAGs, artifact registries, decision logs, ready/blocked task checks, or structured handoff between cognitive roles and deterministic tool skills.
+description: DISABLED in this fork; do not use (see the fork override at the top of AGENTS.md). Originally: Define and maintain machine-readable research project state for multi-stage computational chemistry work. Use when a project needs task DAGs, artifact registries, decision logs, ready/blocked task checks, or structured handoff between cognitive roles and deterministic tool skills.
 ---
 
 # Research Orchestrator

@@ -4,6 +4,10 @@
 
 Look up the exact string from stdout/OUTCAR before changing anything. Apply ONE fix at a time and record it; shotgun changes destroy comparability.
 
+> **Fork rule:** never change `ISMEAR` or `SIGMA` on your own, not even temporarily. Smearing changes the energy, so a run that seems to need it stops and waits for the human. Every recipe below that suggests raising `SIGMA` is a suggestion to bring to the human, not a fix to apply.
+>
+> **Fork rule:** the `NELM` rule under "SCF won't converge", step 2, applies to every recipe in this file that sets `NELM=300`.
+
 ## Crash / abort messages
 
 | Message (grep target) | Likely cause | Fix |
@@ -36,10 +40,11 @@ Look up the exact string from stdout/OUTCAR before changing anything. Apply ONE 
 ## SCF won't converge (escalation ladder)
 
 1. **Sanity-check the structure first** (distances > 0.7 Å, sensible cell, no overlapping or exploded atoms) — most "SCF problems" are geometry problems. *(If you grepped to this file for `EDDDAV` / `ZHEGV` / `BRMIX` / `Sub-Space-Matrix` / "charge sloshing" / "not converging": do this rung **before** touching ALGO / mixing / SIGMA — a broken structure defeats every electronic fix.)*
-2. Early SCF stabilization can be one restart: set `NELM=300`, `NELMDL=-20` (delayed density update), switch to `ALGO=Normal` from Fast/VeryFast, and delete stale WAVECAR/CHGCAR when the prior wavefunction may be inconsistent.
+2. Early SCF stabilization can be one restart: `NELMDL=-20` (delayed density update), switch to `ALGO=Normal` from Fast/VeryFast, and delete stale WAVECAR/CHGCAR when the prior wavefunction may be inconsistent.
+   **Fork rule for `NELM`:** never raise `NELM` by default. First read the energy change `dE` of the last ~20 electronic steps in OSZICAR. Raise `NELM` only if `|dE|` is decreasing overall monotonically (one or two small bounces allowed). If it oscillates or stalls, do not raise `NELM`; change `ALGO` or the mixing parameters instead. If only the first ionic step hit `NELM` and later steps converge, it is not an error; just record it.
 3. For slab calculations, check whether dipole correction was enabled by habit: `LDIPOL=.TRUE.` with `IDIPOL=3` can make SCF much harder to converge. Unless the task needs a z-direction electrostatic-potential/work-function `LOCPOT` analysis or a deliberately documented dipole correction, remove it and restart from a clean charge density.
 4. Mixing: `AMIX=0.2 BMIX=0.0001` (slabs/magnetic add the `_MAG` pair).
-5. Smearing: temporarily larger `SIGMA` to converge, then restart tighter from that WAVECAR.
+5. ~~Smearing: temporarily larger `SIGMA` to converge, then restart tighter from that WAVECAR.~~ **Forbidden as a self-fix in this fork** (see the fork rule at the top): stop and ask the human instead.
 6. `ALGO=All` (damped, robust, slow) — production-acceptable last resort.
 7. Magnetic systems: converge nonmagnetic first, restart spin-polarized from its WAVECAR/CHGCAR; or constrain with reasonable MAGMOM and `ICHARG=1`.
 
