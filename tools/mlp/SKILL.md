@@ -15,6 +15,7 @@ Covers MLP-wide routing and legacy generic notes. DeePMD-kit/DPMD now lives in `
 | general MLP concepts, dataset design, symmetry/equivariance, program taxonomy | `knowledge/machine-learning-potentials.md` |
 | generic dataset contracts, provisional MACE notes, deployment, active-learning loop | `references/running.md` |
 | is this model production-ready? held-out errors, physics checks, distribution coverage | `references/validation.md` |
+| which pretrained/foundation checkpoint to use; adding a newly released model | `references/validation.md` ("Choosing among pretrained models") |
 | generic training failures or MACE fine-tuning problems | `references/errors.md` |
 | example contribution rules | `examples/README.md` |
 | external documentation for programs not covered by a dedicated tool skill | `references/resources.md` |
