@@ -7,7 +7,7 @@
 > - **Stop points end the round.** When a step ends in a review (by the user or another reviewer), the operator section lists only the actions up to the hand-off; do not list later steps or prepare the next round until the review is answered.
 > - **Transfers copy an explicit allowlist of project data** (inputs, outputs, logs, records), never virtual environments, caches, installed code, or model weights unless asked. A transfer script prints what it will copy and the total size before copying.
 > - `procedures/research-orchestrator/references/model-structure-review.md` may still be read as a checklist for reviewing structures; it creates no state.
-> - Every figure (plots, maps, structure images) follows `tools/plotting`: one folder per figure under the project's `figures/`, with copied data, `plot.py` and a README recipe. Where `knowledge/scientific-visualization.md` or the `report` figure rules differ (font size, panel assembly, colors), `plotting` wins.
+> - Every figure (plots, maps, structure images) follows the `plotting` skill from Stormy-drawing (https://github.com/hydrogen1222/Stormy-drawing), installed next to this collection in the same project (`/path/to/Stormy-drawing/install.sh` run in the project directory puts it in `.agents/skills/plotting`). One folder per figure under the project's `figures/`, with copied data, `plot.py` and a README recipe. Where `knowledge/scientific-visualization.md` or the `report` figure rules differ (font size, panel assembly, colors), `plotting` wins. If `plotting` is not installed, stop and ask Stormy to install it rather than improvising a style.
 > - Everything else in this collection (engine skills, `knowledge/`, error tables, validation rules) applies unchanged.
 
 These rules apply to every computational chemistry and materials science task in this environment, regardless of which skill is active.
@@ -37,7 +37,7 @@ The flat `knowledge/` library covers scientific formalism, interpretation, and p
 | VASPKIT: VASP helper inputs, KPOINTS/band paths, DOS/band/charge/work-function post-processing | `vaspkit` |
 | LOBSTER: COHP/COOP/ICOHP bonding analysis from a VASP wavefunction (projection, spilling checks) | `lobster` (science: `knowledge/bonding-analysis.md`) |
 | Microkinetic modeling, CatMAP, TOF/coverage maps, volcano plots | `catmap` |
-| Plots and figures: DOS, band structures, NEB barriers, RDF/MSD/Arrhenius, 2D maps, bar charts, figure folders, redrawing a figure | `plotting` |
+| Plots and figures: DOS, band structures, NEB barriers, RDF/MSD/Arrhenius, 2D maps, bar charts, figure folders, redrawing a figure | `plotting` (installed from Stormy-drawing) |
 | OVITO: atomistic rendering, structure classification, coordination/RDF, defect and trajectory analysis | `ovito` |
 | Drive a *remote* machine over a persistent shell (stateful commands, HPC interaction from another machine; not when the agent already runs on the target) | `rsess` |
 | Submit / monitor / recover jobs (local, SSH, Slurm, PBS) | `hpc-submit` |
@@ -63,7 +63,7 @@ Before writing a helper, builder, parser, figure, or fix, search `procedures/`, 
 | a charge, oxidation-state, or bonding claim is in scope | `knowledge/electronic-structure.md` (+ `bonding-analysis.md`) at *planning* time, not after the run |
 | an electrocatalytic step (OER/ORR/HER/CO₂RR/NRR) is the question | `knowledge/electrochemistry.md` — the decisive observable is usually the **CHE ΔG step diagram / limiting potential**, not a bare adsorption energy; compute the diagram |
 | building a slab, supercell, defect, or adsorbate | `tools/structure-prep` + `procedures/research-orchestrator/references/model-structure-review.md` — use builders, then literature/geometry critic gates before engine handoff |
-| making figures or writing final results | `tools/plotting` first (style, figure folders, checks), then `ovito`, `multiwfn`, or `report` as needed |
+| making figures or writing final results | the `plotting` skill (Stormy-drawing) first (style, figure folders, checks), then `ovito`, `multiwfn`, or `report` as needed |
 
 References are starting points to adapt. Source methods and established group conventions take precedence over repository defaults.
 
