@@ -54,6 +54,7 @@ procedures/                    orchestrators - how work is driven (agent skills)
   review-response/             flagship: manuscript + reviews -> validated response package
   comp-chem-workflow/          scientific lifecycle and cross-engine validation controller
   literature-to-calculation/   third-party paper / SI / report -> concrete calculation target
+  research-overview-storytelling/ how to write the human-readable project overview and long texts for the user
   research-orchestrator/       durable state: task DAG, gates, artifacts, leases/jobs, ready/blocked
 knowledge/                     tool-agnostic science + practice (flat reference library; not skills)
   machine-learning-potentials.md MLP concepts and cross-code comparison

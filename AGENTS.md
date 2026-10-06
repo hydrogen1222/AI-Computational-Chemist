@@ -37,6 +37,7 @@ The flat `knowledge/` library covers scientific formalism, interpretation, and p
 | Durable project state, task DAG, gates, artifacts, decisions/events | `research-orchestrator` |
 | Multi-stage, HPC, resume, benchmark, reproduction | `comp-chem-workflow` |
 | Extract a calculation from a third-party paper / SI / report | `literature-to-calculation` |
+| Write or revise the human-readable project overview (fixed five sections, glossary, section-only revisions) or any long text for the user | `research-overview-storytelling` |
 | Build/convert structures, slabs, supercells, defects, adsorbates, conformers, SMILES | `structure-prep` |
 | VASP: static, relax, DOS/bands/charge, adsorption, reaction, NEB | `vasp` |
 | CP2K: Quickstep GPW/GAPW, opt/cell-opt, MD/PIMD, DOS/bands/Molden/Multiwfn, DFT+U, hybrid/HFX, NEB | `cp2k` |

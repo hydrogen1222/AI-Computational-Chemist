@@ -5,7 +5,7 @@ How this collection is organized and how to extend it.
 ## Top-level taxonomy
 
 ```text
-procedures/   orchestrator skills: review-response, comp-chem-workflow, literature-to-calculation, research-orchestrator
+procedures/   orchestrator skills: review-response, comp-chem-workflow, literature-to-calculation, research-overview-storytelling, research-orchestrator
 tools/        per-code skills: vasp, cp2k, gaussian, orca, multiwfn, gromacs, lammps, mlp, deepmd, phonopy, vaspkit, catmap, lobster, ovito, structure-prep, hpc-submit, rsess, report
 knowledge/    tool-agnostic science + practice (flat reference library; NOT skills)
 ```
