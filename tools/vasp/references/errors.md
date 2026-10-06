@@ -7,6 +7,16 @@ Look up the exact string from stdout/OUTCAR before changing anything. Apply ONE 
 > **Fork rule:** never change `ISMEAR` or `SIGMA` on your own, not even temporarily. Smearing changes the energy, so a run that seems to need it stops and waits for the human. Every recipe below that suggests raising `SIGMA` is a suggestion to bring to the human, not a fix to apply.
 >
 > **Fork rule:** the `NELM` rule under "SCF won't converge", step 2, applies to every recipe in this file that sets `NELM=300`.
+>
+> **Fork rule: what an unattended agent may fix on its own.** Every fix gets one line in that calculation's ledger row: the exact error string, the change made, and the attempt number.
+>
+> | Level | Errors | What the agent does |
+> |---|---|---|
+> | Fix and record | `NSW` used up before convergence (continue from CONTCAR); ZBRENT; electronic steps not converging (follow the `NELM` rule below: `ALGO` or mixing first); EDDDAV / ZHEGV (delete WAVECAR, change `ALGO`); too few `NBANDS`; `NCORE` / `KPAR` problems; job killed by the wall-time limit or a node failure (resubmit) | fix and continue |
+> | Fix but flag | `ISYM` / `SYMPREC`; `POTIM`; `IBRION` | fix, continue, and list it in the ledger's *Status* section as "fixed, please check" |
+> | Stop | `check_distances.py` RED or a structure that flew apart; the chemistry changed (bonds broken or formed that the plan did not expect); any fix that would change `ENCUT`, k-points, functional, `ISMEAR`, `SIGMA`, or POTCARs; an NEB energy profile that is not one smooth barrier | stop that calculation and mark it "waiting for the user" |
+>
+> The same error on the same calculation is fixed at most **twice**; continuing from CONTCAR has its own limit of **three** continuations. After that, mark the calculation "waiting for the user" and keep running the calculations that do not depend on it.
 
 ## Crash / abort messages
 
