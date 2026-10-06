@@ -5,7 +5,7 @@ description: Use when writing or revising the human-readable project overview (�
 
 # 课题说明的写法
 
-课题说明是一个计算课题的**人类版正本**。执行用的参数和步骤另有一份执行说明，不写在这里。课题说明要让课题的主人随时能回答三件事：这个课题想回答什么，每一步为什么这样算，结果出来以后该怎么读。
+课题说明（文件 `00_project_overview.md`）是一个计算课题的**人类版正本**。执行用的参数和步骤另有一份执行说明（`01_execution_sheet.md`），不写在这里。项目根目录的全部固定文件见 `AGENTS.md` 里的 *Fixed project-root files*。课题说明要让课题的主人随时能回答三件事：这个课题想回答什么，每一步为什么这样算，结果出来以后该怎么读。
 
 ## 谁用这份 skill
 
@@ -53,7 +53,7 @@ description: Use when writing or revising the human-readable project overview (�
 
 ## 术语表
 
-课题开头和课题说明一起建一份术语表，markdown 表格，四列：
+课题开头和课题说明一起建一份术语表，文件名固定为 `05_glossary.md`，markdown 表格，四列：
 
 | 词 | 一句话意思 | 第一次出现在课题说明哪一节 | 哪天加的 |
 |---|---|---|---|
