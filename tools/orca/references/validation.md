@@ -30,6 +30,8 @@ termination or incomplete. What it reads and what each check means:
   or Multiwfn, even if ORCA continued.
 - **Optimization**: `THE OPTIMIZATION HAS CONVERGED` for an `Opt` job. "did not converge but reached
   the maximum number of optimization cycles" means restart from `<job>.xyz` (see `running.md`).
+- **Mode count**: after removing the six (linear: five) zero translation and rotation entries, the
+  number of vibrational modes must be 3N-6 (linear: 3N-5). Any other count is reported.
 - **Imaginary modes**: frequencies printed as negative values. A minimum has none. A small one
   (below about 50 cm-1 in magnitude) on a floppy cluster is usually numerical: tighten the
   optimization (`TightOpt`) and the grid (`DefGrid3`), then recompute. A large one means the structure
@@ -37,7 +39,12 @@ termination or incomplete. What it reads and what each check means:
 - **Spin contamination** (unrestricted runs): `<S**2>` should be within about 10 % of s(s+1),
   e.g. 0.75 for a doublet. A larger value is reported, not ignored.
 - **Energies**: `FINAL SINGLE POINT ENERGY` (electronic energy, Eh) and, after a frequency run,
-  the zero-point energy, total enthalpy and final Gibbs free energy. The script prints the lines it found.
+  the zero-point energy, total enthalpy and final Gibbs free energy. The script prints the lines it found,
+  together with the conditions H and G depend on: temperature, pressure, quasi-RRHO on or off, and
+  the point group with its symmetry number. A symmetric molecule run without symmetry shows C1 and
+  symmetry number 1, which overstates its rotational entropy by R ln σ. ORCA prints the rotational
+  entropy for symmetry numbers 1 to 12 in the same section; correct G with the right value or rerun
+  with the right symmetry number, and record which was done.
 
 ## Energy discipline
 

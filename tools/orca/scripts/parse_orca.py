@@ -7,8 +7,10 @@
 Usage: parse_orca.py JOB.out
 
 Reports: ORCA version, normal or error termination (with the error lines), SCF
-convergence messages, optimization status, final single point energy, imaginary
-frequencies, thermochemistry lines, and <S**2> for unrestricted runs.
+convergence messages, optimization status and cycle count, final single point energy,
+vibrational modes (count checked against 3N-6 or 3N-5, imaginary modes split into small
+and large), thermochemistry lines with the conditions they depend on (temperature,
+pressure, quasi-RRHO, point group and symmetry number), and <S**2> for unrestricted runs.
 
 Exit code: 0 = clean, 1 = finished with issues (unconverged SCF or optimization,
 imaginary modes, spin contamination), 2 = error termination or incomplete run.
@@ -80,13 +82,15 @@ def main():
     scf_ok = len(re.findall(r"SCF CONVERGED AFTER", text, re.I))
     scf_bad = [l.strip() for l in lines
                if re.search(r"not converged", l, re.I) and re.search(r"SCF|wavefunction", l, re.I)]
-    print(f"SCF: {scf_ok} converged cycle(s) reported")
+    print(f"SCF: {scf_ok} run(s) reported converged, {len(scf_bad)} not-converged message(s)")
     if scf_bad:
         issues.append("SCF not converged at least once: " + scf_bad[-1])
 
     if is_opt:
+        cycles = re.findall(r"GEOMETRY OPTIMIZATION CYCLE\s+(\d+)", text)
+        ncyc = int(cycles[-1]) if cycles else 0
         if "THE OPTIMIZATION HAS CONVERGED" in text:
-            print("Optimization: converged")
+            print(f"Optimization: converged after {ncyc} cycle(s)")
         elif re.search(r"did not converge but reached the\s+maximum number of optimization", text, re.I):
             issues.append("optimization hit the cycle limit; restart from <job>.xyz")
         else:
@@ -109,13 +113,39 @@ def main():
                     freqs.append(float(mf.group(1)))
                 elif freqs and not l.strip():
                     break
-        imag = [f for f in freqs if f < 0]
-        print(f"Frequencies: {len(freqs)} printed, {len(imag)} imaginary"
+        natoms = re.search(r"Number of atoms\s+\.+\s+(\d+)", text)
+        natoms = int(natoms.group(1)) if natoms else None
+        zero = [f for f in freqs if f == 0.0]
+        vib = [f for f in freqs if f != 0.0]
+        imag = [f for f in vib if f < 0]
+        small = [f for f in imag if f > -50]
+        print(f"Frequencies: {len(freqs)} printed, {len(zero)} zero (translation and rotation), "
+              f"{len(vib)} vibrational, {len(imag)} imaginary"
               + (f" ({', '.join(f'{f:.1f}' for f in imag)} cm-1)" if imag else ""))
+        if vib:
+            print(f"  lowest vibrational mode: {min(vib):.1f} cm-1")
         if not freqs:
             issues.append("frequency job but no frequencies found")
-        elif imag:
-            issues.append(f"{len(imag)} imaginary mode(s); a minimum has none")
+        elif natoms and natoms > 1 and len(vib) not in (3 * natoms - 6, 3 * natoms - 5):
+            issues.append(f"{len(vib)} vibrational modes for {natoms} atoms; expected "
+                          f"{3 * natoms - 6} (3N-6) or {3 * natoms - 5} (linear, 3N-5)")
+        if small:
+            issues.append(f"{len(small)} small imaginary mode(s) above -50 cm-1; usually numerical "
+                          "noise on a floppy structure: TightOpt and DefGrid3, then recompute")
+        if len(imag) > len(small):
+            issues.append(f"{len(imag) - len(small)} imaginary mode(s) at or below -50 cm-1; "
+                          "not a minimum: displace along the mode and re-optimize")
+        cond = []
+        for pat, fmt in ((r"^Temperature\s+\.+\s+(\S+ K)", "T = {}"),
+                         (r"^Pressure\s+\.+\s+(\S+ atm)", "p = {}"),
+                         (r"^Quasi RRHO\s+\.+\s+(\S+)", "quasi-RRHO {}"),
+                         (r"Point Group:\s*(\S+),", "point group {}"),
+                         (r"Symmetry Number:\s*(\d+)", "symmetry number {}")):
+            mc = re.findall(pat, text, re.M)
+            if mc:
+                cond.append(fmt.format(mc[-1]))
+        if cond:
+            print(f"  thermochemistry conditions: {', '.join(cond)}")
         for label in ("Zero point energy", "Total thermal energy", "Total enthalpy",
                       "Final Gibbs free energy"):
             found = [l.strip() for l in lines if l.strip().lower().startswith(label.lower())]
