@@ -41,6 +41,7 @@ The flat `knowledge/` library covers scientific formalism, interpretation, and p
 | VASP: static, relax, DOS/bands/charge, adsorption, reaction, NEB | `vasp` |
 | CP2K: Quickstep GPW/GAPW, opt/cell-opt, MD/PIMD, DOS/bands/Molden/Multiwfn, DFT+U, hybrid/HFX, NEB | `cp2k` |
 | Molecular QC: SP, opt, freq, thermochemistry, TS, IRC, solvent | `gaussian` |
+| ORCA 6: molecular and cluster SP, opt, freq, open-shell states; wavefunctions for Multiwfn (charges, conceptual DFT / Fukui functions) | `orca` |
 | Molecular wavefunction analysis: fchk/wfn/molden/cube, charges, spin density, MOs/NTOs, spectra, ESP/ELF/NCI/IRI | `multiwfn` |
 | Classical / reactive / MLP-driven MD | `lammps` |
 | DeePMD-kit / DPMD: dpdata, input.json, training, inference, model deviation, DPLibrary | `deepmd` |

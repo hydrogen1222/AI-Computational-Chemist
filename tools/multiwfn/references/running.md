@@ -13,6 +13,13 @@ formchk job.chk job.fchk
 Multiwfn job.fchk
 ```
 
+ORCA handoff (validate the ORCA run first with `tools/orca/scripts/parse_orca.py`):
+
+```bash
+orca_2mkl job -molden        # job.gbw -> job.molden.input
+Multiwfn job.molden.input
+```
+
 Use `.fchk` when possible: it carries basis and orbital coefficients in a portable text form. `.wfn`, `.wfx`, `.molden`, and cube/grid files are also acceptable when they contain the data required by the target analysis.
 
 ## Analysis routing
@@ -23,6 +30,7 @@ Use `.fchk` when possible: it carries basis and orbital coefficients in a portab
 | spin density | spin-density grid/cube analysis | for radicals, broken-symmetry singlets, open-shell localization |
 | atomic charges | population-analysis menu | prefer NPA/Hirshfeld/ADCH-style schemes over Mulliken for claims |
 | TD-DFT state assignment | NTO / hole-electron / transition-density analyses | use when Gaussian transition list is mixed |
+| Fukui function, dual descriptor, condensed Fukui, global reactivity indices | main function 22 (conceptual DFT) | three single points N, N+1, N-1 at one geometry; follow `references/conceptual-dft.md` |
 | UV/ECD spectrum plotting | load TD log(s) or weighted list if supported | record broadening and conformer weights |
 | ESP/ELF/LOL/NCI/IRI/AIM | scalar-field or topology analysis | record function, grid, isovalue/cutoff, color convention |
 | VMD rendering | export cube files and VMD script/path | record isovalue, sign convention, and state/orbital |

@@ -19,6 +19,7 @@ Multiwfn validates nothing about the upstream calculation. Start by checking the
 | spin density | open-shell or broken-symmetry state verified; sign convention and isovalue recorded |
 | MO/NTO figure | orbital/state index, occupation/transition, isovalue, and phase/color convention recorded |
 | TD spectrum | state list, oscillator/rotatory strengths, broadening, conformer weights recorded |
+| conceptual DFT (Fukui, dual descriptor, global indices) | three states at one geometry and level; each condensed Fukui sums to 1; EA sign and hardness convention stated (`references/conceptual-dft.md`) |
 | ESP/ELF/LOL/NCI/IRI/AIM | scalar function, grid/cutoff/isovalue, and interpretation limit stated |
 | cube/VMD figure | cube type, isovalue, color sign, camera/render path, and source file recorded |
 

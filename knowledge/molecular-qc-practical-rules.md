@@ -1,6 +1,6 @@
 # Molecular QC Practical Rules
 
-> Covers: tool-agnostic method-choice rules for finite-molecule quantum chemistry — how to avoid common wrong-but-runnable calculations. Gaussian-specific syntax lives in `tools/gaussian/references/`.
+> Covers: tool-agnostic method-choice rules for finite-molecule quantum chemistry — how to avoid common wrong-but-runnable calculations. Gaussian-specific syntax lives in `tools/gaussian/references/`, ORCA-specific syntax in `tools/orca/references/`.
 
 This is not a textbook and not a universal protocol. Source-paper settings, group conventions, and validated benchmarks override these defaults.
 

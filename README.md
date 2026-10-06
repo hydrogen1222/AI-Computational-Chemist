@@ -64,6 +64,7 @@ tools/                         per-code skills - how each tool is operated
   vasp/                        static, relax, electronic, reaction/NEB, CHE/VASPsol/VASPsol++ electrochemistry
   cp2k/                        Quickstep GPW/GAPW, opt/cell-opt, MD, electronic analysis
   gaussian/                    molecular QC: SP, opt, freq, TS, IRC, solvation
+  orca/                        ORCA 6 molecular/cluster QC and wavefunctions for Multiwfn
   multiwfn/                    molecular wavefunction analysis, charges, orbitals/NTOs, spectra
   gromacs/                     biomolecular, liquid, membrane, ligand, MARTINI, and GROMACS analysis workflows
   lammps/                      classical / reactive / MLP-driven MD
