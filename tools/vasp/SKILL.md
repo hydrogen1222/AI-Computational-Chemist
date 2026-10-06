@@ -20,6 +20,7 @@ description: Prepare, validate, run, and troubleshoot VASP DFT calculations for 
 |---|---|
 | build static/relax/reaction inputs and choose global policies | `references/running.md` |
 | preflight, parse, and judge convergence | `scripts/check_inputs.py`; `scripts/parse_vasp.py`; `references/validation.md` |
+| fork checks: locked settings before submission, too-close atoms before and after relaxation, same settings before combining energies | `scripts/check_locked_params.py`; `scripts/check_distances.py`; `scripts/compare_settings.py`; `references/locked-parameters.md` |
 | match crashes, warnings, or convergence failures | `references/errors.md` |
 | DOS, bands, PDOS, and d-band analysis | `references/dos-band.md`; `tools/vaspkit/references/dos-band.md`; `knowledge/electronic-structure.md` |
 | charge, Bader, spin, partial charge, work function, ELF, or fields | `references/electronic-analysis.md`; `references/volumetric-visualization.md`; `scripts/bader_summary.py`; `tools/vaspkit/references/electronic-analysis.md` |

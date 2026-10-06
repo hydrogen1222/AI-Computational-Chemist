@@ -88,9 +88,23 @@ def managed_agents_text() -> str:
     return f"{MANAGED_START}\n{source_agents_text()}\n{MANAGED_END}\n"
 
 
+def disabled_skills(root: Path) -> set[str]:
+    """Skill names this fork does not install (FORK_DISABLED_SKILLS.txt)."""
+    path = root / "FORK_DISABLED_SKILLS.txt"
+    if not path.is_file():
+        return set()
+    names = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        name = line.split("#", 1)[0].strip()
+        if name:
+            names.add(name)
+    return names
+
+
 def skill_sources() -> dict[str, Path]:
     sources: dict[str, Path] = {}
     root = collection_root()
+    disabled = disabled_skills(root)
     for parent in ("procedures", "tools"):
         base = root / parent
         if not base.is_dir():
@@ -102,6 +116,8 @@ def skill_sources() -> dict[str, Path]:
                 f"cannot inspect skill sources under {base}: {exc}"
             ) from exc
         for candidate in candidates:
+            if candidate.name in disabled:
+                continue
             if (candidate / "SKILL.md").is_file():
                 sources.setdefault(candidate.name, candidate)
     return sources
