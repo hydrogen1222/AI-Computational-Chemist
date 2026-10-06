@@ -505,7 +505,7 @@ copy_collection() {
     return 1
   fi
   run mkdir -p "$_dest"
-  for item in aicc procedures tools knowledge AGENTS.md STRUCTURE.md README.md; do
+  for item in aicc procedures tools knowledge AGENTS.md STRUCTURE.md README.md FORK_DISABLED_SKILLS.txt; do
     [ -e "$REPO_DIR/$item" ] || continue
     run cp -R "$REPO_DIR/$item" "$_dest/$item"
   done
@@ -546,6 +546,12 @@ for root, _dirs, files in os.walk(base):
             changed += 1
 print("  rewrote refs in %d markdown file(s)" % changed)
 PY
+}
+
+# is_disabled <skill-name> : true if the fork lists the skill in FORK_DISABLED_SKILLS.txt.
+is_disabled() {
+  [ -f "$REPO_DIR/FORK_DISABLED_SKILLS.txt" ] || return 1
+  sed -e 's/#.*//' -e 's/[[:space:]]//g' "$REPO_DIR/FORK_DISABLED_SKILLS.txt" | grep -qx "$1"
 }
 
 # install_skill_into <src-skill-dir> <discovery-dir> : symlink (or copy) one skill.
@@ -598,6 +604,10 @@ install_to_cwd() {
     [ -f "$skill_dir/SKILL.md" ] || continue
     name="$(basename "$skill_dir")"
     parent="$(basename "$(dirname "$skill_dir")")"
+    if is_disabled "$name"; then
+      printf '  skip %s (listed in FORK_DISABLED_SKILLS.txt)\n' "$name"
+      continue
+    fi
     if install_skill_into "$collection_dir/$parent/$name" "$skills_dir"; then
       count=$((count + 1))
     fi
@@ -667,6 +677,10 @@ for skill_dir in "$REPO_DIR"/procedures/* "$REPO_DIR"/tools/*; do
   [ -f "$skill_dir/SKILL.md" ] || continue
   name="$(basename "$skill_dir")"
   parent="$(basename "$(dirname "$skill_dir")")"
+  if is_disabled "$name"; then
+    printf '  skip %s (listed in FORK_DISABLED_SKILLS.txt)\n' "$name"
+    continue
+  fi
   if install_skill_into "$collection_dir/$parent/$name" "$TARGET_DIR"; then
     installed=$((installed + 1))
   fi

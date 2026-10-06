@@ -1,0 +1,6 @@
+# Skills this fork does not install (one name per line; lines starting with # are ignored).
+# The folders stay in the repository so upstream updates still merge cleanly;
+# delete a name here and reinstall to bring a skill back.
+catmap
+gromacs
+report

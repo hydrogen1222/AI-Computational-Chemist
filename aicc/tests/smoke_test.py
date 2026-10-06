@@ -352,11 +352,21 @@ def aicc_cli_flow() -> None:
                 "AICC_SOURCE": str(REPO_ROOT),
             }
         )
+        disabled_file = REPO_ROOT / "FORK_DISABLED_SKILLS.txt"
+        disabled = (
+            {
+                line.split("#", 1)[0].strip()
+                for line in disabled_file.read_text(encoding="utf-8").splitlines()
+            }
+            - {""}
+            if disabled_file.is_file()
+            else set()
+        )
         skill_sources = {
             skill_dir.name: skill_dir
             for parent in ("procedures", "tools")
             for skill_dir in sorted((REPO_ROOT / parent).iterdir())
-            if (skill_dir / "SKILL.md").is_file()
+            if (skill_dir / "SKILL.md").is_file() and skill_dir.name not in disabled
         }
 
         config_path = root / "codex" / "config.toml"
@@ -790,7 +800,7 @@ def aicc_cli_flow() -> None:
             )
 
         copy_project = root / "copy-project"
-        copied_skill = copy_project / ".agents" / "skills" / "catmap"
+        copied_skill = copy_project / ".agents" / "skills" / "vasp"
         copied_skill.mkdir(parents=True)
         run(
             [sys.executable, str(cli), "skill", "disable", "--scope", "local"],
@@ -1641,7 +1651,7 @@ def aicc_installer_flow() -> None:
             expect=1,
             env=env,
         )
-        if not (target / "catmap").is_dir():
+        if not (target / "vasp").is_dir():
             raise SystemExit("aicc skill disable removed a copy-mode skill")
 
     with tempfile.TemporaryDirectory(prefix="aicc-relative-") as tmpdir:
