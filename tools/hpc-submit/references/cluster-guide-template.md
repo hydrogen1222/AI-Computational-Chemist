@@ -74,6 +74,20 @@
 - Scratch variable/path:
 - Launcher/job script convention:
 
+### ORCA
+
+- Version and full path of the `orca` executable (parallel runs must call it by full path, never under `mpirun`):
+- Open MPI module or path that matches this ORCA build:
+- Cores and memory to use per job (`%pal nprocs`, `%maxcore` in MB per core; keep maxcore x nprocs <= 75 % of free memory):
+- Local scratch directory for running jobs:
+- `orca_2mkl` path (for Multiwfn):
+
+### Multiwfn
+
+- Version and executable path:
+- `settings.ini` location; ORCA and `orca_2mkl` paths set in it (yes/no):
+- Number of threads (`nthreads` in `settings.ini`):
+
 ### LAMMPS
 
 - Module/load command:

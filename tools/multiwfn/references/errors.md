@@ -13,6 +13,9 @@
 | TD/NTO state mismatch | wrong log/fchk pair or state index shifted | map state number to Gaussian output before analysis |
 | cube is blank or tiny | isovalue too high, wrong orbital/state, or wrong scalar | lower isovalue; verify cube type and index |
 | VMD colors/signs confusing | sign convention not recorded | explicitly define positive/negative colors and isosurface values |
+| ORCA Molden file not read or orbitals look wrong | Molden written from a different or unvalidated `.gbw`, or a different ORCA version | regenerate with `orca_2mkl job -molden` from the validated run's `.gbw` |
+| condensed Fukui values do not sum to 1 | N, N+1, N-1 files swapped, from different geometries, or from different levels | regenerate all three at one geometry and level; check file names against the manual |
+| N+1 (anion) calculation fails or EA comes out negative | anion SCF hard; extra electron unbound in a small basis | converge with SlowConv and a diffuse basis; report a negative EA next to every f+ value |
 | spectrum differs from expectation | missing conformers, wrong broadening, too few states, solvent mismatch | reproduce state list, weights, and broadening settings |
 
 ## Recovery rules
