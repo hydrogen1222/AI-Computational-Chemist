@@ -20,6 +20,7 @@ Use this skill when VASP data already exist or VASP helper inputs must be genera
 | Situation | Go to |
 |---|---|
 | configure VASPKIT, run interactively or non-interactively, choose task families | `references/running.md` |
+| preflight symmetry sanity check of a POSCAR | task 601; record the recognized space group only, and do not use it to auto-select `ISYM` |
 | preflight a directory before running VASPKIT; validate generated files and parsed outputs | `uv run scripts/check_vaspkit.py`, then `references/validation.md` |
 | automate one VASPKIT task across many directories | `uv run scripts/run_vaspkit_task.py`, then `references/running.md` |
 | DOS/band postprocessing: TDOS/PDOS, projected bands, d-band center, Fermi-level shift, adsorbate/surface orbital extraction | `references/dos-band.md`; pair with `tools/vasp/references/dos-band.md` |
@@ -38,6 +39,22 @@ Use this skill when VASP data already exist or VASP helper inputs must be genera
 4. Run VASPKIT in the target calculation directory so the generated VASP inputs belong to that calculation as real local files. For a new task, run it interactively first and record every menu choice. Use `run_vaspkit_task.py` only after the input sequence is known.
 5. Inspect and validate every generated `INCAR`, `KPOINTS`, structure-related file, and POTCAR mapping against the approved method and `locked_parameters.md`. Do not accept a value solely because VASPKIT generated it.
 6. Validate generated outputs with `validation.md`; record source files, task IDs, energy reference, and version.
+
+## Symmetry sanity check
+
+For routine VASP preparation in this fork, VASPKIT task 601 may be run before
+submission to record the space group recognized for the current `POSCAR`. This is a
+structure sanity check, not an INCAR generator for symmetry policy.
+
+- Record the recognized space group in the ledger or preparation record.
+- Do not automatically map P1/high symmetry to `ISYM=-1/0/2`; ordinary relax/static
+  calculations normally leave `ISYM` at VASP's default unless the approved method says
+  otherwise.
+- Magnetic order, SOC/noncollinear calculations, AIMD, and intended symmetry-breaking
+  studies require their own VASP symmetry policy.
+- Before automating task 601 on a local VASPKIT installation, confirm once that the
+  installed version does not overwrite or rewrite the source `POSCAR`. If its behavior
+  differs, run the check on a copy.
 
 ## Hard guardrails
 
