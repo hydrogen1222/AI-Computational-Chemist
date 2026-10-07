@@ -6,15 +6,15 @@ Look up the exact string from stdout/OUTCAR before changing anything. Apply ONE 
 
 > **Fork rule:** never change `ISMEAR` or `SIGMA` on your own, not even temporarily. Smearing changes the energy, so a run that seems to need it stops and waits for the human. Every recipe below that suggests raising `SIGMA` is a suggestion to bring to the human, not a fix to apply.
 >
-> **Fork rule:** the `NELM` rule under "SCF won't converge", step 2, applies to every recipe in this file that sets `NELM=300`.
+> **Fork rule:** the `NELM` rule under "SCF won't converge", step 2, overrides every older recipe in this file that mentions very large `NELM` values. In unattended routine relax/static recovery, inspect recent electronic `dE` first; if `|dE|` is still decreasing overall, increase only as needed, normally 60 -> 100 and at most about 120. If the SCF oscillates, stalls, or diverges, do not raise `NELM` further.
 >
 > **Fork rule: what an unattended agent may fix on its own.** Every fix gets one line in that calculation's ledger row: the exact error string, the change made, and the attempt number.
 >
 > | Level | Errors | What the agent does |
 > |---|---|---|
-> | Fix and record | `NSW` used up before convergence (continue from CONTCAR); ZBRENT; electronic steps not converging (follow the `NELM` rule below: `ALGO` or mixing first); EDDDAV / ZHEGV (delete WAVECAR, change `ALGO`); too few `NBANDS`; `NCORE` / `KPAR` problems; job killed by the wall-time limit or a node failure (resubmit) | fix and continue |
-> | Fix but flag | `ISYM` / `SYMPREC`; `POTIM`; `IBRION` | fix, continue, and list it in the ledger's *Status* section as "fixed, please check" |
-> | Stop | `check_distances.py` RED or a structure that flew apart; the chemistry changed (bonds broken or formed that the plan did not expect); any fix that would change `ENCUT`, k-points, functional, `ISMEAR`, `SIGMA`, or POTCARs; an NEB energy profile that is not one smooth barrier | stop that calculation and mark it "waiting for the user" |
+> | Fix and record | `NSW` used up with a healthy relaxation trajectory (continue from CONTCAR with the same scientific settings); electronic steps hit `NELM` while recent `|dE|` is still decreasing overall; stale/incompatible WAVECAR or CHGCAR; `NCORE` / `KPAR` problems; job killed by the wall-time limit or a node failure | apply only the prewritten recovery for this calculation type, record it, and continue |
+> | Fix but flag | a prewritten change of mixing parameters for an ordinary SCF problem; a prewritten ordinary-relax optimizer change after major has confirmed that the trajectory is still physically sane; symmetry handling that the approved method explicitly allows | fix only in the stated scenario, continue, and list it in the ledger's *Status* section as "fixed, please check" |
+> | Stop | `check_distances.py` RED or a structure that flew apart; an ordinary relaxation whose ionic trajectory oscillates, jumps in energy/force, or shows an unexpected structural reconstruction; chemistry changed in a way the roadmap did not anticipate; any fix that would change `ENCUT`, k-points, functional, `ISMEAR`, `SIGMA`, POTCARs, `EDIFFG`, or another scientific/acceptance criterion; NEB path discontinuity, bad image geometry, endpoint/mapping doubt, or an AIMD restart that would require changing the trajectory definition | stop the affected calculation and hand the evidence to major/SI |
 >
 > The same error on the same calculation is fixed at most **twice**; continuing from CONTCAR has its own limit of **three** continuations. After that, mark the calculation "waiting for the user" and keep running the calculations that do not depend on it.
 
@@ -39,7 +39,7 @@ Look up the exact string from stdout/OUTCAR before changing anything. Apply ONE 
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| ionic loop ends at `NSW` without `reached required accuracy` | not converged | restart from CONTCAR; near the minimum switch `IBRION=1`; if soft modes thrash, loosen the **force** criterion `EDIFFG` (e.g. `-0.03`) — *not* `EDIFF` (raising EDIFF loosens the electronic SCF and makes forces noisier) |
+| ionic loop ends at `NSW` without `reached required accuracy` | not converged | first inspect the ionic-step energy/force trend and the last structures. If the trajectory is healthy and still approaching the same minimum, continue from CONTCAR with the same convergence criterion. If it oscillates, jumps, or reconstructs unexpectedly, stop for major/SI review. Never loosen `EDIFFG` merely to manufacture convergence. |
 | SCF hits `NELM` every ionic step, or the final ionic/static step hits `NELM` | electronic convergence broken, final forces/energy unusable | fix SCF first (below) — do not trust the final number |
 | only the first ionic step hits `NELM`, later steps converge | rough starting density or difficult first geometry | record as a warning; if the final geometry/energy matters, restart from the later CONTCAR/WAVECAR with more SCF headroom and confirm the final step converges |
 | energy oscillates between ionic steps | `POTIM` too large or smearing too small | `POTIM=0.2`; for metals raise `SIGMA` within the `T*S` budget |
@@ -50,8 +50,8 @@ Look up the exact string from stdout/OUTCAR before changing anything. Apply ONE 
 ## SCF won't converge (escalation ladder)
 
 1. **Sanity-check the structure first** (distances > 0.7 Å, sensible cell, no overlapping or exploded atoms) — most "SCF problems" are geometry problems. *(If you grepped to this file for `EDDDAV` / `ZHEGV` / `BRMIX` / `Sub-Space-Matrix` / "charge sloshing" / "not converging": do this rung **before** touching ALGO / mixing / SIGMA — a broken structure defeats every electronic fix.)*
-2. Early SCF stabilization can be one restart: `NELMDL=-20` (delayed density update), switch to `ALGO=Normal` from Fast/VeryFast, and delete stale WAVECAR/CHGCAR when the prior wavefunction may be inconsistent.
-   **Fork rule for `NELM`:** never raise `NELM` by default. First read the energy change `dE` of the last ~20 electronic steps in OSZICAR. Raise `NELM` only if `|dE|` is decreasing overall monotonically (one or two small bounces allowed). If it oscillates or stalls, do not raise `NELM`; change `ALGO` or the mixing parameters instead. If only the first ionic step hit `NELM` and later steps converge, it is not an error; just record it.
+2. Routine jobs in this fork start from `ALGO=Normal`. Delete stale WAVECAR/CHGCAR only when they may be incompatible with the current run. 
+   **Fork rule for `NELM`:** never raise `NELM` by default. First read the energy change `dE` of the last ~20 electronic steps in OSZICAR. Raise `NELM` only if `|dE|` is decreasing overall (one or two small bounces allowed), normally from 60 to 100 and at most about 120 in unattended recovery. If it oscillates, stalls, or diverges, do not raise `NELM` further. If only the first ionic step hit `NELM` and later steps converge, record it as a warning rather than treating it as a failed trajectory.
 3. For slab calculations, check whether dipole correction was enabled by habit: `LDIPOL=.TRUE.` with `IDIPOL=3` can make SCF much harder to converge. Unless the task needs a z-direction electrostatic-potential/work-function `LOCPOT` analysis or a deliberately documented dipole correction, remove it and restart from a clean charge density.
 4. Mixing: `AMIX=0.2 BMIX=0.0001` (slabs/magnetic add the `_MAG` pair).
 5. ~~Smearing: temporarily larger `SIGMA` to converge, then restart tighter from that WAVECAR.~~ **Forbidden as a self-fix in this fork** (see the fork rule at the top): stop and ask the human instead.
