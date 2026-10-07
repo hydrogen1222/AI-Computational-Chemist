@@ -80,6 +80,27 @@ Total energy should not drift; drift ⇒ timestep too large, SCF too loose, prec
   site guide says otherwise. A short timing test pays off — AIMD is many similar SCF
   steps.
 
+## Unattended restart boundary
+
+AIMD is history-dependent statistical sampling. vice may recover only operational
+interruptions using the restart procedure already approved for that workflow. It may
+not change `POTIM`, target temperature, ensemble, thermostat, masses, sampling
+definition, or Hamiltonian-related settings merely to keep the run alive.
+
+At every restart boundary, record:
+
+- the last valid MD step before interruption;
+- the exact restart files/state used;
+- whether velocities and thermostat state were preserved or reinitialized;
+- temperature and energy behavior immediately before and after the restart.
+
+If the restart reinitializes velocities or otherwise breaks trajectory continuity, do
+not silently concatenate both segments for MSD, VACF, or other time-correlation
+analysis. Treat them as separate trajectories unless the approved analysis explicitly
+allows the restart treatment. If a stable continuation requires changing the timestep,
+thermostat, ensemble, or other trajectory-defining setting, stop and return the issue
+to major/SI.
+
 ## Trajectory validation (operation)
 
 ```bash
