@@ -11,6 +11,39 @@ Use this together with `running.md` for the underlying VASP settings and `valida
 - If the helper scripts are missing from the environment, consult/download VTST tools from https://theory.cm.utexas.edu/vtsttools/ after user approval.
 - Before submitting a TS job, record the exact VASP module and script module in the provenance notes.
 
+## Plain NEB and CI-NEB: how they relate
+
+Plain NEB and climbing-image NEB (CI-NEB) are not unrelated workflows. CI-NEB is a
+refinement of an NEB band for locating the saddle more accurately.
+
+- In ordinary NEB, intermediate images are optimized toward the minimum-energy path.
+  The spring force keeps images distributed along the path, while the physical force
+  perpendicular to the path relaxes them toward the path. The highest-energy image is
+  only the highest sampled point on that discretized band; it is not guaranteed to sit
+  exactly at the saddle.
+- In CI-NEB, the current highest-energy intermediate image becomes the climbing image.
+  Its spring force along the band is removed and the component of the true force along
+  the path is reversed, so that image is driven uphill along the path and downhill in
+  the perpendicular directions. When it converges on the intended local path, it
+  approaches the saddle point.
+
+A common conservative workflow is therefore:
+
+1. relax the two endpoints;
+2. generate and inspect a sensible image band;
+3. run plain NEB long enough that the band has become smooth and the highest-energy
+   region is already close to the saddle;
+4. enable climbing image and continue from those images to refine the saddle.
+
+CI-NEB can often be enabled from the beginning when the initial path is already good,
+so a plain-NEB stage is not a universal requirement. In this fork, however, whether a
+project uses plain NEB first or starts directly with CI-NEB is decided by SI/major in
+the approved workflow. vice does not enable `LCLIMB` on its own because doing so
+changes the optimization objective of the highest-energy image.
+
+For VTST-based VASP, `LCLIMB=.TRUE.` requires the appropriate VTST-enabled build.
+Stock VASP's standard NEB implementation does not provide the VTST `LCLIMB` tag.
+
 ## Method choice
 
 | Situation | Prefer |
@@ -102,6 +135,31 @@ When CI-NEB is infeasible (no converged endpoints, a saturated cluster, an uncle
 - **Always verify the constraint actually held**: after the run, measure the constrained distance/angle in `CONTCAR`/`XDATCAR` and confirm it equals the target at every step — never assume `ICONST` worked.
 - **Robust alternative if unsure:** a manual relaxed scan — a series of jobs, each with the two (or three) defining atoms frozen by **selective dynamics** at the target separation, relaxing everything else. The scan maximum is a TS *guess*; refine it with Dimer or CI-NEB.
 - A constrained-opt barrier is a path/thermodynamic estimate, **not a validated TS** — refine and confirm with a frequency calculation (exactly 1 imaginary mode along the reaction coordinate) when the claim matters.
+
+## Unattended recovery boundary
+
+NEB is path-dependent, so vice has much less recovery freedom than for an ordinary
+relaxation.
+
+vice may automatically continue an interrupted NEB/CI-NEB only when the interruption
+is operational (walltime, node failure, scheduler interruption) and the existing band
+still passes the structure/path sanity checks. Continue from the existing image
+structures with the same approved `IMAGES`, endpoints, atom mapping, `SPRING`,
+`LCLIMB`, optimizer, and convergence criteria.
+
+vice must stop and hand the evidence to major when any of these occurs:
+
+- endpoint identity or atom mapping is in doubt;
+- one image develops an abnormal short contact or obvious structural failure;
+- neighboring images become structurally discontinuous;
+- an image shows an unexplained energy/force jump inconsistent with the rest of the
+  band;
+- changing image count, interpolation, `SPRING`, `LCLIMB`, `IOPT/IBRION`, or the
+  force criterion appears necessary.
+
+A multi-peak NEB energy profile is **not by itself an error**. It can represent a real
+intermediate or a multi-step path. Flag discontinuity or bad geometry; leave the
+scientific interpretation of multiple barriers/intermediates to major/SI.
 
 ## Monitoring CI-NEB
 
