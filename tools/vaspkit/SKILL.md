@@ -5,7 +5,7 @@ description: Use VASPKIT to generate VASP helper inputs and post-process VASP ou
 
 # VASPKIT
 
-Use this skill when VASP data already exist or VASP helper inputs must be generated with VASPKIT. VASPKIT is an assistant around VASP; it does not replace the `vasp` skill's method selection, convergence checks, or provenance rules.
+Use this skill when VASP data already exist or VASP helper inputs must be generated with VASPKIT. In this fork, VASPKIT is the preferred routine helper for VASP input generation and common post-processing when it is installed and configured. It saves repetitive manual work; it does not replace the `vasp` skill's method selection, locked settings, convergence checks, or provenance rules.
 
 ## Required inputs
 
@@ -35,13 +35,14 @@ Use this skill when VASP data already exist or VASP helper inputs must be genera
 1. Use the `vasp` skill to confirm the upstream VASP run is technically valid.
 2. Read `running.md` for the relevant VASPKIT task family and required input files.
 3. Run `uv run scripts/check_vaspkit.py RUNDIR`; fix missing config, executable, or VASP files first.
-4. Run VASPKIT interactively for a new task; record every menu choice. Use `run_vaspkit_task.py` only after the input sequence is known.
-5. Validate generated outputs with `validation.md`; record source files, task IDs, energy reference, and version.
+4. Run VASPKIT in the target calculation directory so the generated VASP inputs belong to that calculation as real local files. For a new task, run it interactively first and record every menu choice. Use `run_vaspkit_task.py` only after the input sequence is known.
+5. Inspect and validate every generated `INCAR`, `KPOINTS`, structure-related file, and POTCAR mapping against the approved method and `locked_parameters.md`. Do not accept a value solely because VASPKIT generated it.
+6. Validate generated outputs with `validation.md`; record source files, task IDs, energy reference, and version.
 
 ## Hard guardrails
 
 - VASPKIT output is post-processing evidence, not proof that the upstream VASP run converged.
 - Do not use raw band/DOS axes without recording the energy zero: Fermi level, vacuum level, VBM, or user-provided reference.
 - For VASP-based free-energy corrections, prefer this VASPKIT skill as the practical post-processing route after the thermodynamic expression is written in the knowledge references. VASPKIT does not choose the model; it supplies frequency/gas-thermochemistry helper values with provenance.
-- Do not trust generated POTCAR files unless species order, functional, and potential mapping are independently checked.
+- Do not trust generated POTCAR files unless species order, functional, and potential mapping are independently checked. Keep the generated POTCAR in the private run directory when that helps the calculation remain self-contained; never commit it or package it into a public/shared handoff.
 - Do not commit manuals, POTCAR files, WAVECAR/CHGCAR-scale binaries, or bulky generated plot data.

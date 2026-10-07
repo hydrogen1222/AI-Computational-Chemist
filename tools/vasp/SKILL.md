@@ -34,6 +34,28 @@ description: Prepare, validate, run, and troubleshoot VASP DFT calculations for 
 | COHP/COOP bonding | `tools/lobster/SKILL.md`; `knowledge/bonding-analysis.md` |
 | scientific visualization or upstream documentation | `knowledge/scientific-visualization.md`; `references/resources.md` |
 
+## Local, inspectable run directories
+
+For this fork, a production VASP calculation should look like a calculation a human
+researcher can inspect directly. Put the actual inputs used for the run in the run
+directory itself: `POSCAR`, `INCAR`, `POTCAR`, an explicit `KPOINTS` when the chosen
+k-point policy uses one, and the submission script. Do not replace these with symlinks
+to shared templates or with settings that exist only inside a batch launcher.
+
+Automation is encouraged when it removes repetition. A helper may create many complete
+run directories in one pass. After generation, each directory must remain understandable
+and runnable without reading the helper's source code.
+
+When VASPKIT is installed and configured, prefer it for routine VASP input generation
+and routine VASP post-processing. Generate files inside the target run directory, then
+validate them here. VASPKIT's generated defaults are starting points, not method
+authority; the approved method fingerprint and `locked_parameters.md` still control.
+
+A locally generated licensed `POTCAR` may remain in the user's private run directory.
+Never commit it, print its full contents, or include it in a public/shared handoff
+archive. Record only allowed provenance such as potential labels, version/source path,
+and hashes where appropriate.
+
 ## Workflow
 
 1. Choose the task and load `references/running.md` plus the matching specialized

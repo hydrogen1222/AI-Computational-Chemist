@@ -6,10 +6,10 @@ description: Entry point and controller for computational chemistry and material
 # Computational Chemistry Workflow Controller
 
 Use this skill first for nontrivial computational work. It owns the **scientific
-lifecycle and cross-engine validation discipline**. It does not own durable project
-state or execution permissions (`research-orchestrator`), engine input/output details
-(the relevant tool skill), scheduler operation (`hpc-submit`), or publication assembly
-(`report`). Repository-wide rules in `AGENTS.md` always apply.
+lifecycle, workflow compilation, and cross-engine validation discipline**. Durable
+project state in this fork lives only in the fixed project-root files defined in
+`AGENTS.md`. Engine input/output details belong to the relevant tool skill and
+scheduler operation to `hpc-submit`.
 
 ## Entry decision
 
@@ -20,8 +20,44 @@ state or execution permissions (`research-orchestrator`), engine input/output de
 | Existing outputs | Use the producing engine skill's parser and analysis guidance. |
 | Third-party paper/SI/report | Start with `literature-to-calculation`. |
 | Manuscript plus reviewer comments | Start with `review-response`; it invokes this procedure for approved calculations. |
-| Multi-stage, HPC, resumable, or multi-owner project | Add `research-orchestrator` before execution. |
+| User supplies an existing workflow | Preserve its scientific intent, identify only the genuinely unresolved scientific choices, then compile it into user-readable work packages and executable calculation directories. |
+| Multi-stage, HPC, resumable, or multi-owner project | Use the fixed project-root files in `AGENTS.md`; do not create `.research/`. |
 | Existing job to resume or monitor | Reconcile durable state, scheduler state, logs, and parser verdicts; never resubmit blindly. |
+
+## Human-first workflow compilation
+
+For a new scientific project, do not jump from the user's first message directly to
+input files.
+
+1. **Task definition by SI.** Restate the scientific question in a few plain sentences,
+   list what is already decided, and surface at most one scientifically consequential
+   ambiguity at a time. Do not interrogate the user about routine engine details that
+   can be derived from project conventions or tool guidance.
+2. **Scientific roadmap by SI.** Break the task into a small number of scientific
+   subquestions. Each roadmap item states what it is trying to learn, why it belongs
+   at that point, and which earlier result it depends on. The roadmap stays
+   code-independent.
+3. **User approval.** The user sees and approves the scientific roadmap before major
+   expands it into execution.
+4. **Work packages by major.** Translate each approved roadmap item into a small number
+   of coherent work packages. A work package is one human-meaningful unit even when it
+   contains many cases, temperatures, configurations, or repeated calculations.
+5. **Execution detail by major/vice.** Only after the work packages are approved should
+   they be expanded into directories, scripts, submissions, monitoring, recovery, and
+   parsing.
+
+For each user-readable work package, keep the summary short and answer these fields in
+plain scientific language:
+
+- name;
+- purpose;
+- calculation objects;
+- what we will know when it is finished;
+- completion criterion;
+- next scientific use.
+
+Do not expose command-by-command execution detail in this summary. Low-level detail
+belongs in the execution sheet and calculation directories.
 
 ## Core decisions before input generation
 
@@ -76,9 +112,8 @@ uses accepted claims or visibly recorded limitations.
 | Situation | Open or run |
 |---|---|
 | Lifecycle states, validation ladder, comparison/reuse rules | `references/state-and-validation.md` |
-| Durable DAG, artifacts, gates, leases, permissions, recovery | `procedures/research-orchestrator/SKILL.md` |
 | Structure building and numerical checks | `tools/structure-prep/SKILL.md` |
-| Surface/defect/adsorbate review gate | `procedures/research-orchestrator/references/model-structure-review.md` |
+| Surface/defect/adsorbate model review checklist | `procedures/research-orchestrator/references/model-structure-review.md` (checklist only; no orchestrator state) |
 | Engine inputs, validation, parsing, and exact failure recovery | the selected engine's `SKILL.md`, `references/running.md`, `references/validation.md`, and `references/errors.md` |
 | Local/SSH/scheduler submission and monitoring | `tools/hpc-submit/SKILL.md` |
 | Literature-derived targets and method evidence | `procedures/literature-to-calculation/SKILL.md` |
@@ -88,17 +123,16 @@ uses accepted claims or visibly recorded limitations.
 
 ## Workflow handoff
 
-At a pause or handoff, record:
+At a pause or handoff, keep two views separate.
 
-```text
-Stage: <id> (<status>)
-Did: <what was actually executed/generated>
-Evidence: <files, job ids, log paths>
-Validation: <parser/checker verdict, command, exit status>
-Acceptance: <accepted by user/critic/orchestrator, or pending>
-Assumptions: <anything not user-confirmed>
-Next: <next stage or the single question blocking it>
-```
+The **user view** is short: current roadmap item, each work package as done/running/not
+started, the key result paths, any scientifically important anomaly, and the next user
+decision if one is needed. Runtime information such as job IDs or nodes may be shown
+below this summary when useful, but it must not bury the scientific status.
+
+The **agent view** records the execution facts needed to resume safely: what was
+generated or run, file paths, job IDs, parser/checker verdicts, assumptions, fixes, and
+the next executable action.
 
 ## Hard guardrails
 
