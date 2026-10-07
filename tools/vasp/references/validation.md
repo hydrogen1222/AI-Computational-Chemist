@@ -34,6 +34,26 @@ For a new executable, queue template, module, POTCAR location, or script-generat
 
 Selective dynamics: if the slab is supposed to have fixed layers, open POSCAR and confirm the `F F F` flags survived structure handling — they are easy to lose in conversions.
 
+### Geometry sanity before submission
+
+Run `tools/vasp/scripts/check_distances.py` before spending walltime on a generated
+structure. Geometry sanity has higher scientific priority than a merely complete input
+set: a missing file usually stops the job, while a bad structure can run and produce a
+misleading result.
+
+Interpret the default thresholds as warning screens, not universal bond-length laws:
+
+- **RED:** a pair below `0.7 × (r_cov,i + r_cov,j)`. This is an emergency collision
+  screen. Stop before submission and report the atom pair, distance, and POSCAR path.
+- **YELLOW:** an element-pair contact at least 15 % shorter than the corresponding
+  contact in the trusted project reference. This is a project-relative anomaly. Record
+  the pair and distance and inspect it before continuing.
+
+The 15 % threshold is an engineering warning threshold, not a physical constant.
+Intended bond formation, bond breaking, intercalation, reaction intermediates, and
+transition paths can legitimately trigger YELLOW; in those cases the warning means
+that the short contact must be inspected and documented, not automatically rejected.
+
 ## Post-run
 
 Run `uv run scripts/parse_vasp.py RUNDIR` — exits 0 only for a finished, converged run; reports energy, max force, magnetization, and known error strings. (`uv run` guarantees a modern interpreter; the cluster's system python may be too old.) For a fixed-bottom slab, add `--free-only`: it reads the CONTCAR/POSCAR selective-dynamics flags and reports the max force over the *unconstrained* atoms only — the frozen bottom otherwise dominates and a converged minimum can look unconverged.

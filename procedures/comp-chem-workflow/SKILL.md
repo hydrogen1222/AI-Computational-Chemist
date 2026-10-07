@@ -121,6 +121,25 @@ uses accepted claims or visibly recorded limitations.
 | Interim synthesis and final deliverables | `tools/report/SKILL.md` and `tools/report/references/validation.md` |
 | Scientific interpretation | the relevant flat `knowledge/*.md` reference |
 
+## Scientific anomaly handoff to SI
+
+When major encounters an unexpected result that needs scientific judgment, do not dump
+the raw project tree into SI and do not pre-bias the review with a preferred scientific
+interpretation. Give SI enough detail to independently check the issue:
+
+- what happened, in plain scientific language;
+- the exact calculation directory;
+- the exact source file(s) for the reported numbers or structures;
+- the comparison/reference case and its path;
+- what is unusual relative to the other cases or the approved roadmap;
+- the single scientific question SI needs to decide.
+
+major may recommend an **execution action** such as pausing dependent calculations,
+preserving a directory, or continuing unaffected work. It does not recommend the
+scientific answer. SI interprets the evidence. If SI proposes a change to the approved
+scope, method, cost, or scientific roadmap, the user approves it before major rewrites
+the executable workflow.
+
 ## Workflow handoff
 
 At a pause or handoff, keep two views separate.
@@ -133,6 +152,12 @@ below this summary when useful, but it must not bury the scientific status.
 The **agent view** records the execution facts needed to resume safely: what was
 generated or run, file paths, job IDs, parser/checker verdicts, assumptions, fixes, and
 the next executable action.
+
+Every user-facing handoff ends with `接下来：` and a concrete action. State who acts
+next, what they receive or inspect, and what they should do. For example, major names
+the exact calculation directories and project files vice should execute; vice names
+the ledger/results it returns to major; SI names the roadmap section major should
+compile next.
 
 ## Hard guardrails
 
