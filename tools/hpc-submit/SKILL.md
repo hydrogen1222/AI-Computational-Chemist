@@ -41,6 +41,23 @@ Use this scheduler gate only after the producing engine's scientific preflight p
    on failure, consult `references/errors.md`, change one cause, and reconcile state
    before any rerun.
 
+## User-owned interactive allocations
+
+When the user has already acquired a long-lived scheduler allocation (for example with
+`salloc`) and the project says to run all work inside it, treat that allocation as a
+fixed resource supplied by the user.
+
+- Record the allocation job ID, total CPU/GPU resources, and expected end time in the
+  ledger.
+- Start only child processes or child `srun` steps inside it. Resource accounting must
+  prevent two child jobs from each assuming they own the full allocation.
+- Never `scancel` the allocation job, never terminate the shell/session that keeps it
+  alive, and never request a replacement allocation on the user's behalf.
+- A failed child calculation may be stopped or restarted without touching the parent
+  allocation.
+- If the allocation disappears or expires, stop new execution and report it. Do not
+  silently fall back to normal queue submission.
+
 ## Hard guardrails
 
 - Never guess a host, partition, account, module, launcher, resource request, or
@@ -54,7 +71,8 @@ Use this scheduler gate only after the producing engine's scientific preflight p
 - Run long work through the site scheduler when one exists. On a target without a
   scheduler, use managed tmux/nohup only with the PID, log, workdir, and stop/recovery
   procedure recorded; never leave an untracked long process on a login shell.
-- Never resubmit blindly. Reconcile leases/jobs/files after disconnects, diagnose the
-  exact failure, change one thing, and record it.
+- Never resubmit blindly. Reconcile the ledger, scheduler state, run directory, logs,
+  and parser result after disconnects; diagnose the exact failure, change one thing,
+  and record it.
 - Do not delete or overwrite outside the job workdir. Keep site facts in the private
   cluster guide, not the repository or report.
