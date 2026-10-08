@@ -5,8 +5,11 @@
 > ownership protocol. New calculation projects keep only
 > `00_project_overview.md` and `01_project_status.md` as root-level human reports.
 > Detailed execution, calculation, decision, and handoff records live under
-> `docs/`. Existing projects retain their original layout until deliberately
-> migrated with the user's approval.
+> `docs/`. Keep a project-root `archive/` for user-approved obsolete or rejected
+> results, while pending-review data stays in its working calculation directory.
+> New Work packages pause for user review before any next Work starts by default.
+> Existing projects retain their original layout until deliberately migrated with
+> the user's approval.
 >
 Agent skills for computational chemistry and materials science.
 
