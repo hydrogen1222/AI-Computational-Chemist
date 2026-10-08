@@ -8,6 +8,10 @@ the installed version before scripting them.
 
 ## What it can and cannot tell you
 
+`Conceptual DFT` means conceptual density-functional theory here; in other literature
+`CDFT` can also mean **constrained DFT**, which is a different method.
+Spell out which one you mean in every scientific plan and report.
+
 Conceptual DFT describes how the electron density and energy respond when one electron is added or
 removed, by finite differences between three calculations. It ranks sites within one molecule or
 cluster for attack by nucleophiles or electrophiles in frontier-controlled reactions. It gives no
@@ -101,10 +105,11 @@ numbers merely because they appeared in a previous installation.
 - **2**: global and condensed indices printed as text.
 - **3**: grid data (cube files) of f+, f-, f0 and the dual descriptor for plotting.
 
-Recommended practice in this fork: create/version-control the three **approved**
+Recommended practice in this fork: create and preserve the three **approved**
 ORCA inputs explicitly, rather than blindly accepting generated templates. If
 Multiwfn generates starter inputs, inspect and fix their electronic states,
-functional, basis, embedding field and filenames before using the normal route (`tools/orca/scripts/check_orca_input.py`, the machine's launcher,
+functional, basis, embedding field and filenames before using the normal route
+(`tools/orca/scripts/check_orca_input.py`, the machine's launcher,
 `tools/orca/scripts/parse_orca.py`) so every run is checked. Automatic calling from inside Multiwfn
 skips those checks. Then give Multiwfn the three wavefunction files under the names it expects
 (the guide uses `N.wfn`, `N+1.wfn`, `N-1.wfn`; follow the installed manual).
