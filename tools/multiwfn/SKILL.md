@@ -23,6 +23,7 @@ Inputs from ORCA: convert the validated `.gbw` with `orca_2mkl <job> -molden` (s
 | choosing and running common Multiwfn analyses | `references/running.md` |
 | orbital/NTO, charge, spin density, ESP/ELF/NCI/IRI, UV/ECD spectrum workflows | `references/orbital-charge-spectra.md` |
 | conceptual DFT: Fukui functions, dual descriptor, condensed indices, IP/EA/hardness/electrophilicity | `references/conceptual-dft.md` |
+| conceptual DFT for a periodic solid via an embedded cluster | `references/conceptual-dft.md` + `tools/orca/references/running.md` (embedded-crystal section), with periodic VASP cross-checks |
 | ORCA output as Multiwfn input (`.gbw` -> Molden) | `tools/orca/references/running.md` ("Wavefunction files for Multiwfn") |
 | checking whether a Multiwfn result is usable | `references/validation.md` |
 | bad input file, missing orbitals, cube/rendering problems, strange charges | `references/errors.md` |
@@ -46,4 +47,6 @@ Inputs from ORCA: convert the validated `.gbw` with `orca_2mkl <job> -molden` (s
 - NTOs are preferred over raw orbital-transition lists for mixed TD-DFT states.
 - Every figure must record file source, isovalue/cutoff, sign/color convention, and state/orbital index.
 - Do not use Multiwfn output to rescue an unconverged or wrong-state upstream calculation.
-- Conceptual DFT: N, N+1 and N-1 at one geometry and one level; condensed values from Hirshfeld; state the hardness convention and the sign of the vertical EA.
+- Conceptual DFT: N, N+1 and N-1 at one geometry and one level **and one fixed external potential**; record whether the source is an isolated molecule or a crystal-embedded cluster. Always state the hardness convention and sign of vertical EA.
+- Condensed Fukui requires one consistent population definition across all three electronic states. Conventional Hirshfeld is a reproducible baseline; Hirshfeld-I or other schemes are optional sensitivity checks, not interchangeable measurements. Do not assume the installed menu supports a scheme without checking its manual.
+- Menu numbers, input-conversion commands and their output interpretation must be checked against the user's installed Multiwfn version before unattended scripting. The Skill is a documented procedure and checklists, **not** a tested wrapper for every Multiwfn function.
