@@ -19,6 +19,8 @@ WARN (exit 3 if nothing failed):
   - NoAutoStart missing (an old .gbw with the same base name would be read)
   - no comment saying where charge and multiplicity come from
   - no %maxcore or no core count given
+  - PDB/QM-MM or Z-matrix coordinates: electron count and embedded QM region
+    cannot be verified by this checker; separate model validation required
 
 The script does not know every ORCA keyword. A misspelled method or basis is caught by
 ORCA itself within a second (INPUT ERROR); read the output right after starting a job.
@@ -185,7 +187,7 @@ def main():
         elif ctype == "xyzfile":
             fpath = os.path.join(os.path.dirname(os.path.abspath(path)), fname)
             if not os.path.isfile(fpath):
-                notes.append(f"{fname} not found next to the input; electron count not checked")
+                fails.append(f"coordinate file not found: {fname}; electron count cannot be checked")
             else:
                 xl = open(fpath, errors="replace").read().splitlines()
                 for row in xl[2:]:
@@ -197,7 +199,18 @@ def main():
                         else:
                             elements.append(el)
         else:
-            notes.append(f"'* {ctype}' coordinates: electron count not checked")
+            # PDB/QM-MM and Z-matrix inputs do not expose a trustworthy explicit
+            # QM atom/electron inventory to this simple-input checker.
+            if ctype in ("pdbfile", "gzmtfile"):
+                if not fname:
+                    fails.append(f"'* {ctype}' requires a coordinate filename")
+                elif not os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(path)), fname)):
+                    fails.append(f"coordinate file not found: {fname}")
+            warns.append(
+                f"'* {ctype}' coordinates: QM-region electron count, charge/multiplicity "
+                "consistency, and embedded-region assignment NOT checked; verify "
+                "against the actual QM/MM atom inventory and ORCA output"
+            )
         break
     if charge is None:
         fails.append("no coordinate line '* xyz <charge> <mult>' (or xyzfile) found")
