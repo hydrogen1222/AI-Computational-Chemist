@@ -27,6 +27,71 @@ should cite **at least two compatible observables**.
 | defect / magnetic polaron | spin density, local moments, PDOS, Bader/ELF | compare spin initializations; a collapsed moment can be a wrong minimum |
 | localized bonds / lone pairs | ELF + charge/PDOS context; COHP for pairwise strength | PAW/core treatment and pseudopotentials can hide core localization; ELF is qualitative |
 
+## HSAB, conceptual DFT and local reactivity in periodic electrolytes
+
+HSAB (hard-soft acid-base reasoning) is a useful **qualitative chemical
+hypothesis**, not a numerical bulk phase-stability criterion. In
+thiophosphates, P-S versus P-O preferences can motivate models for
+water-driven nucleophilic attack and S/H exchange, but the outcome
+also depends on reaction stoichiometry, competing phases, coordination,
+surface exposure, strain, electrochemical reservoirs and barriers.
+An inductive P-S bond-strengthening hypothesis needs independent
+structural/bonding and reaction-energy checks; partial atomic charges
+are **not** formal oxidation states or bond dissociation energies.
+
+Conceptual DFT defines response to electronic particle number at fixed
+external potential. For finite molecules the vertical finite differences
+`E(N-1)-E(N)` (IP) and `E(N)-E(N+1)` (EA), and
+`f+(r)=rho(N+1)-rho(N)` and
+`f-(r)=rho(N)-rho(N-1)`, can describe local electronic
+susceptibility. Here `f+` represents susceptibility to accepting
+electrons (potential nucleophilic attack at that site) and `f-`
+represents susceptibility to donating electrons (potential
+electrophilic attack at that site). These *responses* do not
+directly supply adsorption energies, reaction free energies or NEB
+barriers. Local softness obtained by combining `f` with global
+softness inherits the same reference and model limitations.
+
+There are major traps when transferring these definitions to solids:
+
+- An arbitrary vacuum-cut charged `PS4^3-` or analogous fragment
+  may bind an extra electron artificially in a finite basis. IP, EA,
+  hardness, Fukui and dual descriptor then depend on cluster
+  charge, boundary, basis and missing Madelung field.
+- For a crystal-embedded quantum cluster, N/N+1/N-1 comparisons
+  must share identical nuclei, QM boundary and **fixed external
+  embedding potential**. Self-consistent readjustment of the
+  external point charges for each electronic state computes a
+  different response.
+- Charged periodic supercells introduce compensating backgrounds,
+  finite-size electrostatics and band-edge/delocalization issues.
+  Local charge partitions and periodic eigenvalues cannot be silently
+  equated to finite-cluster IP/EA or molecular Fukui values.
+- Bader, Hirshfeld and Hirshfeld-I are alternative population
+  *definitions*, not uniquely correct atom-resolved observables.
+  Condensed Fukui indices depend on the population scheme and
+  electron-population versus net-charge sign convention.
+
+**A defensible validation ladder for a new solid-state descriptor:**
+first anchor reduction or hydration/hydrolysis with periodic
+reaction energetics and (where necessary) kinetic barriers;
+then check localized periodic density/bonding information;
+then introduce ORCA/Multiwfn charged-cluster descriptors with
+environment, spin, cluster-size and basis convergence;
+finally test whether descriptor trends correlate with independent
+periodic reference observables **without selecting test cases
+solely because the trend looks good**. For dopants, compare
+like-for-like concentrations and explicit charge-compensation
+models. An observed correlation is not proof of an HSAB mechanism.
+
+Primary methodological references: conceptual DFT definitions
+(Parr and Yang), `tools/multiwfn/references/conceptual-dft.md`
+for operational finite differences, and ORCA's official
+Ionic-Crystal-QM/MM tutorial for embedded-cluster caveats.
+In this fork the initially robust baseline remains periodic
+VASP; ORCA is an optional, independently validated advanced
+stage. No cross-code absolute-total-energy subtraction.
+
 ## DOS / PDOS interpretation
 
 - DOS at `E_F`, gap, and band crossings classify metal/semiconductor/insulator — always state the energy zero and smearing.
