@@ -84,10 +84,28 @@ solely because the trend looks good**. For dopants, compare
 like-for-like concentrations and explicit charge-compensation
 models. An observed correlation is not proof of an HSAB mechanism.
 
-Primary methodological references: conceptual DFT definitions
-(Parr and Yang), `tools/multiwfn/references/conceptual-dft.md`
-for operational finite differences, and ORCA's official
-Ionic-Crystal-QM/MM tutorial for embedded-cluster caveats.
+**Relevant literature before claiming novelty:**
+
+- Pucci and Angilella, *Foundations of Chemistry* **24**, 59–71
+  (2022), DOI: 10.1007/s10698-022-09416-z, connects HSAB,
+  electronegativity, hardness and the formal Fukui definitions.
+- Barrera et al., *J. Chem. Theory Comput.* **21**, 3187–...
+  (2025), DOI: 10.1021/acs.jctc.5c00086, \"Fukui Function and Fukui
+  Potential for Solid-State Chemistry: Application to Surface
+  Reactivity\". This **already addresses periodic solids**, including
+  artifacts from compensating charged backgrounds, finite differences
+  and corrected potentials. It even discusses sodium as a reducing
+  reagent on oxide surfaces. Any proposed VASP periodic Fukui branch
+  must examine this method before simply subtracting charged-cell
+  densities, and must not claim \"first conceptual DFT in solids\".
+- `tools/multiwfn/references/conceptual-dft.md` for finite-cluster
+  analysis and ORCA's official Ionic-Crystal-QM/MM tutorial for
+  embedded-cluster limitations.
+
+The novelty test for Na3PS4 is whether a **validated** local descriptor
+explains or predicts independent Na-contact and moisture-reaction
+energies/barriers across controlled dopants, not the existence of a
+Fukui function in a crystalline material.
 In this fork the initially robust baseline remains periodic
 VASP; ORCA is an optional, independently validated advanced
 stage. No cross-code absolute-total-energy subtraction.
