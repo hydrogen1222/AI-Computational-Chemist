@@ -57,6 +57,10 @@ fixed resource supplied by the user.
   allocation.
 - If the allocation disappears or expires, stop new execution and report it. Do not
   silently fall back to normal queue submission.
+- At the end of an approved Work package, cease dispatching any new Work until the
+  user explicitly releases it. Finish already approved running child jobs normally,
+  leave the user-owned allocation and parent shell untouched, and report that the
+  resource may idle while the user reviews the results.
 
 ## Hard guardrails
 

@@ -169,6 +169,38 @@ and pending execution steps; append the exact decision/reason/approval to
 New projects use the `docs/` paths. Existing projects keep their original layout
 until a user-approved migration, to avoid silently breaking running workflows.
 
+## Default stop at the end of each Work
+
+This fork defaults to **user-reviewed Work boundaries**, even when more work packages
+were approved at the roadmap-planning stage. The currently approved Work may run
+its own batch of cases to completion. Then vice records the results and stops
+dispatching any *new Work package*; it does not cancel running jobs or a user-owned
+interactive allocation. major rewrites the concise Work result in
+`01_project_status.md` and gives the user the immediate choice to continue with
+the named next Work, request further verification, or refer a scientific anomaly to
+SI. Give concrete directories, result paths, and allocation status. The next Work
+may be fully prepared but stays unsubmitted until the user explicitly releases it.
+
+Only an explicit, advance approval that names the Work packages to chain may waive
+an intervening pause; merely approving the scientific roadmap is not enough.
+If the user-owned allocation idles while waiting for review, report that fact and
+time remaining but never cancel or replace the allocation.
+
+## Root archive versus live data
+
+`archive/` at the project root collects old or unadopted whole result sets only
+after the user agrees to retire them. Keep active, approved and pending-review
+calculations in their normal `calculations/` paths. Pending review is not a
+rejection; a location outside `archive/` does not by itself prove scientific
+acceptance. Distinguish this project archive from each active calculation's
+`archive/` of failed restart attempts.
+
+Before a move, major checks running jobs, next-Work dependencies, and source-path
+references. On approval, preserve the retired inputs/outputs, record why the
+material was retired and old/new paths in `docs/change_log.md` and
+`docs/calculation_ledger.md`, update affected references, or postpone the move if
+it would break current work. No unattended archival or deletion by vice.
+
 ## Workflow handoff
 
 At a pause or handoff, keep two views separate.
