@@ -89,8 +89,7 @@ models. An observed correlation is not proof of an HSAB mechanism.
 - Pucci and Angilella, *Foundations of Chemistry* **24**, 59–71
   (2022), DOI: 10.1007/s10698-022-09416-z, connects HSAB,
   electronegativity, hardness and the formal Fukui definitions.
-- Barrera et al., *J. Chem. Theory Comput.* **21**, 3187–...
-  (2025), DOI: 10.1021/acs.jctc.5c00086, \"Fukui Function and Fukui
+- Barrera et al., *J. Chem. Theory Comput.* (2025), DOI: 10.1021/acs.jctc.5c00086, \"Fukui Function and Fukui
   Potential for Solid-State Chemistry: Application to Surface
   Reactivity\". This **already addresses periodic solids**, including
   artifacts from compensating charged backgrounds, finite differences
