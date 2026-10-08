@@ -59,6 +59,43 @@ plain scientific language:
 Do not expose command-by-command execution detail in this summary. Low-level detail
 belongs in the execution sheet and calculation directories.
 
+## User-appointed major/vice execution boundary
+
+The SI / major / vice terms are **roles**, not built-in agent primitives.
+The user chooses the runtime and session for each role. For instance,
+the user may run Codex as major and separately open dsh-tui as vice.
+The two do not have to be children of one process, share a chat history,
+or even use the same model.
+
+**Major may prepare, verify, and document execution; major does not
+self-authorize vice.** Do not call Codex's subagent/spawn tools,
+start another agent session or autonomous job, or appoint a helper as
+the vice executor without the user's explicit permission for this
+handoff and runtime. An internal helper doing bounded drafting or code
+review must not submit, monitor, cancel, or restart calculation jobs or
+be described as vice. Do not silently substitute a different execution
+platform if dsh-tui is the approved vice.
+
+Record the user's project-specific runtime mapping in
+`docs/reviewer_brief.md` (no tokens, API keys or secrets).
+Major prepares `docs/execution_sheet.md` as a **portable handoff**,
+naming the approved Work package, its complete self-contained
+calculation directories and exact command/preflight/expected-output
+paths, locked parameters, host/allocation constraints, permitted
+automatic recovery, and the explicit stop point. The independent vice
+reads the overview/status as context, the execution sheet as
+instructions, the ledger as actual historical evidence, then
+reconciles directories and scheduler state before running. It writes
+actual execution facts into `docs/calculation_ledger.md`; major
+synthesizes results for the human. Only the **user** starts the named
+vice runtime and authorizes release of the Work.
+
+If major and vice do not see an identical project path on the
+target machine, include an explicit file-transfer/synchronization
+plan. If the vice runtime, site configuration, or execution permission
+is unresolved, stop at handoff: do not work around it by spawning an
+unapproved agent or directly submitting jobs as major.
+
 ## Core decisions before input generation
 
 Record:
