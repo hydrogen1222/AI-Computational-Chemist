@@ -1,6 +1,6 @@
 # Locked parameters (fork)
 
-> Load this when: writing or changing a project's `locked_parameters.md`, choosing between a convergence test and a cited value, or reading a `check_locked_params.py` failure.
+> Load this when: writing or changing a project's `docs/locked_parameters.md`, choosing between a convergence test and a cited value, or reading a `check_locked_params.py` failure.
 
 The lock is the project's single list of settings that change the physics of every
 energy: plane-wave cutoff, functional, smearing, k-point density, and POTCARs. The
@@ -10,7 +10,7 @@ relying on an agent to notice.
 
 ## File format
 
-Plain markdown in the project root, readable in any markdown viewer:
+Plain markdown at `docs/locked_parameters.md` in new projects, readable in any markdown viewer (older projects may retain their original root-level path until deliberately migrated):
 
 - `## <profile>` starts a profile; the first profile is the default.
 - `- KEY = VALUE` inside a profile is a locked value. Every other line is free text for
