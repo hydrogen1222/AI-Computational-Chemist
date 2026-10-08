@@ -19,7 +19,7 @@ Multiwfn validates nothing about the upstream calculation. Start by checking the
 | spin density | open-shell or broken-symmetry state verified; sign convention and isovalue recorded |
 | MO/NTO figure | orbital/state index, occupation/transition, isovalue, and phase/color convention recorded |
 | TD spectrum | state list, oscillator/rotatory strengths, broadening, conformer weights recorded |
-| conceptual DFT (Fukui, dual descriptor, global indices) | three states at one geometry and level; each condensed Fukui sums to 1; EA sign and hardness convention stated (`references/conceptual-dft.md`) |
+| conceptual DFT (Fukui, dual descriptor, global indices) | N/N+1/N-1 use one QM geometry, level **and fixed external embedding**; selected charge/spin states checked; condensed population convention and sum tested; bound-state/basis sensitivity, EA sign, hardness convention and cluster/boundary limitations stated (`references/conceptual-dft.md`) |
 | ESP/ELF/LOL/NCI/IRI/AIM | scalar function, grid/cutoff/isovalue, and interpretation limit stated |
 | cube/VMD figure | cube type, isovalue, color sign, camera/render path, and source file recorded |
 
@@ -32,4 +32,12 @@ Multiwfn validates nothing about the upstream calculation. Start by checking the
 
 ## Report-ready threshold
 
-A Multiwfn result is report-ready only when the upstream calculation is valid, the analysis path is reproducible, and the claim states exactly what the analysis can and cannot prove.
+A Multiwfn result is report-ready only when the upstream calculation is valid,
+the analysis path is reproducible, and the claim states exactly what the analysis
+can and cannot prove. For an embedded-cluster solid-state Fukui calculation,
+passing normalization tests alone is insufficient: require convergence of
+QM size/embedding, no spurious edge electronic states, an unchanged external
+potential across N/N+1/N-1, and explicit comparison with the appropriate
+periodic VASP observables before interpreting trends in chemical stability.
+Record the exact installed Multiwfn version and interactive menu path; do
+not assume that an untested batch menu script matches the latest release.

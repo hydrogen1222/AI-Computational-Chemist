@@ -46,6 +46,28 @@ termination or incomplete. What it reads and what each check means:
   entropy for symmetry numbers 1 to 12 in the same section; correct G with the right value or rerun
   with the right symmetry number, and record which was done.
 
+## Embedded-crystal and conceptual-DFT special validation
+
+A parsed ORCA `* pdbfile`/IC-QM/MM job may terminate normally even though the
+chosen QM cluster, effective QM electron count, boundary cECP, or MM charges
+do not represent the intended solid. Before treating it as science:
+
+- Verify atom identities and selected QM region from actual ORCA input/output,
+  not merely the source PDB atom count or formal-charge bookkeeping.
+- Validate initial charges and the embedded charge distribution/neutrality,
+  point-charge-shell and QM-region convergence, and absence of electron leakage
+  toward the QM boundary.
+- For vertical CDFT: prove unchanged QM nuclei, point-charge field, ECP boundary
+  and electronic method for N/N+1/N-1; check each state converged to the
+  intended spin solution. A normal ORCA exit and the preflight script alone
+  do not establish this.
+- If added/removed electrons live on an artificial boundary, or the anion is
+  physically unbound/basis dependent, label `f+` and dual-descriptor
+  results unvalidated; report this before presenting any derived trend.
+- Any claim about bulk reduction/hydrolysis must still be anchored by periodic
+  VASP reaction energies, competing phases and/or appropriately selected
+  reaction barriers. Do not treat a Fukui isosurface as a kinetic mechanism.
+
 ## Energy discipline
 
 - Name the quantity: E, E+ZPE, H, or G, and the temperature for H and G.

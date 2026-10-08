@@ -31,6 +31,7 @@ section ORCA). Different users and machines differ; never assume one.
 | after the run: termination, SCF, optimization, imaginary modes, energies | `uv run scripts/parse_orca.py JOB.out`, then `references/validation.md` |
 | the job stopped with an error, or SCF / optimization will not converge | `references/errors.md` (match the exact output string first) |
 | wavefunction for Multiwfn (orbitals, charges, ESP, conceptual DFT) | `references/running.md` ("Wavefunction files for Multiwfn"), then `tools/multiwfn/SKILL.md` |
+| Na3PS4/solid-state local reactivity by embedded clusters | `references/running.md` ("Periodic-solid to embedded-cluster research boundary"), then `tools/multiwfn/references/conceptual-dft.md` |
 | conceptual DFT: Fukui functions, dual descriptor, global reactivity indices | `tools/multiwfn/references/conceptual-dft.md` |
 | manual pages and other sources | `references/resources.md` |
 | example rules | `examples/README.md` |
@@ -39,7 +40,7 @@ section ORCA). Different users and machines differ; never assume one.
 
 1. Decide the quantity first, then the level of theory (`knowledge/molecular-qc-practical-rules.md`).
 2. Write the input from `references/running.md`; record where charge and multiplicity come from.
-3. Run `uv run scripts/check_orca_input.py JOB.inp` (add `--mem-gb` with the machine's free memory). Fix every FAIL.
+3. Run `uv run scripts/check_orca_input.py JOB.inp` (add `--mem-gb` with the machine's free memory). Fix every FAIL. A WARN for `* pdbfile`/QM/MM means **the checker has NOT validated the QM electron count or embedded-region assignment**; resolve this with the structural/model checklist before submitting.
 4. Run through `hpc-submit` or the machine guide: ORCA called by its **full path**, never under `mpirun`, output redirected to `JOB.out`.
 5. Run `uv run scripts/parse_orca.py JOB.out`; apply `references/validation.md`. On failure go to `references/errors.md` and change one thing at a time.
 6. Hand validated `.gbw` / molden files to Multiwfn only after step 5 passes.
@@ -51,3 +52,5 @@ section ORCA). Different users and machines differ; never assume one.
 - Energies compared across species share functional, basis, dispersion, solvent, grid, and RI settings.
 - State the energy type (electronic E, E+ZPE, H, G) and unit on every number; ORCA prints Hartree (Eh).
 - Keep the `.inp`, `.out`, `.gbw`, and the final `.xyz`; record the ORCA version printed in the output header.
+- Use the **installed** ORCA/Multiwfn version and its matching manual; examples in this repository are guides, not a license to assume that menu numbers, conversion formats, or crystalprep flags still work. Do not download or redistribute proprietary manuals into this repository.
+- Embedded-crystal Fukui analysis is exploratory until cluster-size, embedding, electron binding, spin and periodic cross-checks pass. Do not call cluster IP/EA the bulk electrochemical stability window or use conceptual-DFT indices as substitutes for VASP reaction energies/barriers.

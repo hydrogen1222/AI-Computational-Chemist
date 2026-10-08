@@ -96,6 +96,70 @@ Raise the limit with `%geom MaxIter 300 end` (default is max(3 × atoms, 50)). R
 
 `.gbw` files are tied to the ORCA version that wrote them.
 
+## Periodic-solid to embedded-cluster research boundary
+
+**VASP (periodic structure and reaction energetics) stays the primary calculation
+for Na3PS4.** Molecular ORCA and Multiwfn are a later complementary probe of
+local electronic response. A vacuum-cut `PS4^3-` fragment is a useful
+toy model but not automatically representative of the Na3PS4 solid:
+its charge, missing Madelung field, edge dangling bonds and
+electron-binding behavior can dominate IP, EA and Fukui functions.
+
+The installed ORCA 6.1 manual has two relevant primary references:
+
+- [Ionic-Crystal-QM/MM tutorial](https://www.faccts.de/docs/orca/6.1/tutorials/multi/ionic_crystal.html)
+- [`orca_crystalprep` utility and QM/point-charge/boundary regions](https://www.faccts.de/docs/orca/6.1/manual/contents/utilitiesvisualization/utilities.html)
+
+These references illustrate QM cluster (QC), capping ECP boundary region (BR),
+and surrounding point-charge field (PC). They are **not** a verified turnkey
+recipe for thiophosphates. The polar/covalent P-S tetrahedra and mobile Na
+network require explicit model choices. Record the installed version before
+borrowing version-specific examples.
+
+Before preparing a Na3PS4 embedded cluster, major must record:
+
+1. The **periodic VASP parent** (exact POSCAR/CONTCAR, composition, charge,
+   defect/dopant site, orientation), and the scientific target (bulk PS4,
+   surface hydration site, Na-metal-contact model, etc.).
+2. Exact QM atom list and center, bonds cut at the boundary, edge termination
+   or capping ECP, MM/PC coordinate list, assigned initial point charges,
+   total QC charge, spin multiplicity and why these choices are physical.
+   Count charge/electrons using the actual QM inventory, not an entire PDB
+   supercell or unverified formal oxidation-state labels.
+3. Boundary-charge neutrality/electrostatic convergence checks, QM size and
+   shell convergence. Check that reactive density is not concentrated at the
+   artificial edge. Compare at least two sensible QM sizes/embedding choices
+   before any claimed solid-state trend.
+4. A consistent electronic level, basis, diffuse-function test for N+1,
+   spin solution, all-electron/ECP density handling, and compatible wavefunction
+   exports for Multiwfn; compare orbital/density localization with parent VASP
+   band-edge or local-charge information.
+
+For a vertical `N, N+1, N-1` finite-difference probe, use exactly the
+**same nuclear coordinates, QM boundary, MM charge locations *and numerical
+charge values*, capping potential, and method** for the three electronic
+states. A self-consistently relaxed/updated environment per charge state
+changes the external potential and yields a different observable. If a
+particular ORCA QM/MM route cannot keep these inputs fixed, stop and design
+a controlled alternative; do not present the resulting difference as a
+fixed-potential Fukui function. Use the charge-state wavefunction and
+spin-density checks in Multiwfn's `references/conceptual-dft.md`.
+
+The standard `check_orca_input.py` is intended for molecular input syntax and
+an explicit `xyz`/`xyzfile` electron inventory. For `* pdbfile` embedded
+models, its exit code is **not** an acceptance certificate: it cannot confirm
+QM region selection, actual QC electron count, point charges, cECP assignment,
+electrostatic convergence or the N +/- 1 fixed-potential requirement. These
+are mandatory manual/major preflight checks. No example `orca_crystalprep`
+output is safe to run unchanged without those checks.
+
+For any derived `f+`, `f-`, dual descriptor, global hardness, or IP/EA,
+state **embedded-cluster-local, exploratory** until this model-validation
+ladder is completed. Compare these descriptors against independently
+calculated VASP reaction energetics/NEB barriers when investigating
+reactivity. Do not merge ORCA absolute total energies with VASP energies
+into reaction enthalpies.
+
 ## Wavefunction files for Multiwfn
 
 1. Validate the run first (`references/validation.md`).
