@@ -15,6 +15,8 @@ description: Use when writing or revising the human-readable project overview (�
 | major（准备与编译工作流的 agent） | 把 SI 批准的科学路线图翻译成人能看懂的 work package，再准备完整计算目录、检查和交接。把 SI 回复替换进课题说明并记录变更，自己不改 SI 的科学内容 |
 | vice（执行和监控的 agent） | 执行 major 已经准备好的工作，监控任务、按允许范围恢复错误、记录原始运行事实；不自行改变科学路线 |
 
+角色由用户指定具体运行端，例如 SI=ChatGPT、major=Codex、vice=dsh-tui。major 不能凭内部 subagent 功能自行生成一个 vice；正式运行前必须把可供独立 Agent 阅读的执行说明和计算台账准备好，由用户启动批准的 vice。具体分工记在 `docs/reviewer_brief.md`，不新增根目录文档。
+
 用户用 `??` 标记读不懂的句子，处理办法见 `AGENTS.md` 里的 *Writing for the user*，这里不重复。
 
 ## 读者是谁

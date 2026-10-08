@@ -41,6 +41,17 @@ Use this scheduler gate only after the producing engine's scientific preflight p
    on failure, consult `references/errors.md`, change one cause, and reconcile state
    before any rerun.
 
+## Execution-agent authorization
+
+Read `AGENTS.md` and the project `docs/reviewer_brief.md` to identify the
+**user-designated** vice runtime and which approved Work it may execute.
+Being an internal subagent of the major harness does not confer job
+submission or monitoring authority. If the designated vice is a
+separately started dsh-tui session, major prepares portable inputs
+and documentation only; it must not launch a substitute Codex subagent
+or submit on behalf of vice. If the runtime or operator is undefined,
+stop and request user authorization rather than selecting one.
+
 ## User-owned interactive allocations
 
 When the user has already acquired a long-lived scheduler allocation (for example with
