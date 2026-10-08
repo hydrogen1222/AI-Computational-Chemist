@@ -49,7 +49,7 @@ and runnable without reading the helper's source code.
 When VASPKIT is installed and configured, prefer it for routine VASP input generation
 and routine VASP post-processing. Generate files inside the target run directory, then
 validate them here. VASPKIT's generated defaults are starting points, not method
-authority; the approved method fingerprint and `locked_parameters.md` still control.
+authority; the approved method fingerprint and the project's locked-parameter file (`docs/locked_parameters.md` in new projects) still control.
 
 A locally generated licensed `POTCAR` may remain in the user's private run directory.
 Never commit it, print its full contents, or include it in a public/shared handoff
