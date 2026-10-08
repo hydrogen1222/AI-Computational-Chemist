@@ -4,6 +4,46 @@
 
 Keep this operational. The science of what a charge/orbital/bonding claim means lives in `knowledge/electronic-structure.md`, `knowledge/bonding-analysis.md`, and `knowledge/molecular-qc-practical-rules.md`.
 
+## Verified current-version integration facts (narrow smoke test)
+
+An operator-supplied **ORCA 6.1.1 / Multiwfn 2026.10.1** p-benzoquinone
+three-charge-state example has been inspected using its real inputs, ORCA
+outputs, converted wavefunctions and Multiwfn commands/logs. It is a
+**tool-chain smoke test only** (the deliberately inexpensive B97-3c + def2-SVP
+setup lacks the diffuse-basis/electron-binding validation required for
+publication-quality f+). This is *not* a verified solid-state embedded-cluster
+or periodized crystal method. For a newer installed build, reconfirm these
+menu/format behaviors with a small test rather than assuming compatibility.
+
+| Multiwfn function in tested version | Acceptable demonstrated input | Do not blindly substitute |
+|---|---|---|
+| `22 -> 2` global quantities + condensed Hirshfeld Fukui | `.wfx` / `.wfn` (also lists `.fch`, `.mwfn`) from ORCA `orca_2aim` | `.molden.input` lacks the energies this option requires |
+| `22 -> 3` finite-difference Fukui and dual descriptor cube grids | `.wfx` observed (menu may accept Molden; do not assume this covers every property) | a filename prompt after missing `N.wfn` does **not** itself mean other formats are rejected |
+| `22 -> 6` orbital-weighted condensed Fukui/dual descriptor | `.molden.input` from `orca_2mkl` (menu lists `.mwfn`, `.fch`, `.gms`) | `.wfx` rejected for this option |
+| `18` excited-state hole/electron and NTO analysis | ORCA `.out` for excitations plus matching `.molden.input` orbitals | requires all prompts, not just the visible top-level menu |
+
+For ORCA conversion, use the **matching version's** `orca_2aim` to produce
+`.wfx`/`.wfn`, and `orca_2mkl <job> -molden` to produce
+`.molden.input`. A Molden conversion alone is not a universal replacement
+for an energy-containing wavefunction representation.
+
+**Batch-mode reliability:** `Multiwfnpath` points to the **directory
+containing `settings.ini`**, not the executable. Set the desired
+`OMP_NUM_THREADS`. Run with a separate analysis working directory because
+outputs are written to the process current working directory, and retain
+the input file, `commands.txt`, captured stdout/stderr and result files.
+First examine the installed version's prompts interactively; a batch
+command sequence is not guaranteed stable across versions. A hidden
+sub-question (e.g., whether a hole-density cube is total/local/cross)
+can shift every later answer and even create a zero-byte output while
+Multiwfn returns **exit code 0**. Therefore **exit code 0, an apparent
+“Done!”, and existence of a filename are not sufficient**: assert
+non-zero plausible size, readable complete cube header/grid/values or
+tabular row count, the exact requested output basename, expected
+scientific normalization, and absence of menu/runtime error messages.
+Do not turn a genuine error into an accepted result because the
+Fortran process exited successfully.
+
 ## Input preparation
 
 Gaussian checkpoint handoff:
