@@ -1,5 +1,13 @@
 # AI Computational Chemist (AICC)
 
+> **Fork-specific project layout:** `AGENTS.md` takes precedence over the upstream
+> orchestration descriptions below. This fork disables `.research/` and its task
+> ownership protocol. New calculation projects keep only
+> `00_project_overview.md` and `01_project_status.md` as root-level human reports.
+> Detailed execution, calculation, decision, and handoff records live under
+> `docs/`. Existing projects retain their original layout until deliberately
+> migrated with the user's approval.
+>
 Agent skills for computational chemistry and materials science.
 
 Building blocks for **semi-automatic computational research driven by peer review**. Given an original manuscript and the reviewers' comments asking for computational work, an AI agent uses this collection to triage which comments require calculations, run them consistently with the manuscript's own methods (or — for purely experimental manuscripts with no prior calculations — with a user-approved method designed around the experimental characterization), validate whether each result actually addresses the concern, and draft response-letter and SI material — with human approval at every scientific decision point.
@@ -18,7 +26,7 @@ manuscript + SI + reviews (+ original calculation archive)
 
 Two hard rules make it trustworthy: new calculations must match the manuscript's method fingerprint (or disclose the deviation), and results that *contradict* the manuscript are never buried or spun. Semi-automatic mode stops for author review; explicitly requested autonomous mode records the contradiction prominently and continues with a draft.
 
-## Research orchestration layer
+## Upstream research orchestration layer (disabled in this fork)
 
 For larger projects, `procedures/research-orchestrator/` adds a machine-readable control plane on top of the individual skills. A project becomes a task DAG under `.research/`, with explicit dependencies, claims, required checks, decisions, events, and artifact provenance. This is the layer used for multi-agent planning and critique, resumable handoffs, and final report assembly.
 
