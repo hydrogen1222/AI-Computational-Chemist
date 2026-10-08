@@ -30,6 +30,24 @@ Multiwfn validates nothing about the upstream calculation. Start by checking the
 - NCI/IRI/ELF pictures are qualitative unless the chosen metric and region integration are explicitly reported.
 - Spectra are sensitive to conformers, broadening, solvent model, functional, and state count.
 
+## Verification of batch execution
+
+A successful operating-system exit code from Multiwfn does **not** guarantee
+successful analysis. A supplied real ORCA 6.1.1 / Multiwfn 2026.10.1
+integration example exhibited a zero-byte cube after a hidden submenu question
+consumed the next scripted menu response, while the program returned 0.
+For unattended runs, validate:
+- exact expected output file names and plausible nonzero sizes;
+- numeric/text format completeness (cube grid header and count, atom count
+  and table rows, state/charge identity, computed units and signs);
+- known sum-rule checks for N/N+/-1 density differences, when applicable;
+- stdin-command transcript and program log for wrong menu branches,
+  Fortran input exceptions and unexpected prompts;
+- correct source of each energy/wavefunction and the version recorded at run time.
+
+Re-execute an incorrect menu sequence; do not accept the artifact because a
+message says `Done!` or a shell reports success.
+
 ## Report-ready threshold
 
 A Multiwfn result is report-ready only when the upstream calculation is valid,

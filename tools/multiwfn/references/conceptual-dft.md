@@ -91,9 +91,13 @@ independent periodic reaction/transition-state energies.
 ## Running it
 
 For the **version documented by Sobereva's older guide**, the conceptual-DFT
-main function is **22**. The current installed Multiwfn manual and its
-interactive prompts are the authority: confirm these choices on a validated
-small test before unattended/menu-script execution. Do not hard-code these
+main function is **22**. A provided smoke-test archive confirms menu 22 in Multiwfn 2026.10.1 for
+ORCA 6.1.1 p-benzoquinone N/N+1/N-1 outputs (22 -> 2 condensed Hirshfeld,
+22 -> 3 grid quantities, and 22 -> 6 orbital-weighted condensed indices).
+The exact installed build and its interactive prompts remain authoritative;
+reconfirm after a version upgrade. In this tested build, 22 -> 2 requires
+energy-containing .wfx/.wfn rather than .molden.input, whereas 22 -> 6
+accepts .molden.input but rejects .wfx. See `references/running.md`. Do not hard-code these
 numbers merely because they appeared in a previous installation.
 
 - **-2**: choose the quantum chemistry program used to generate the wavefunctions; select ORCA

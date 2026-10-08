@@ -2,6 +2,23 @@
 
 > Load this when: Multiwfn cannot read a file, outputs strange charges/orbitals, cube files look wrong, or spectra/plots do not match the intended state.
 
+## Silent-success and file-format traps verified with ORCA 6.1.1 / Multiwfn 2026.10.1
+
+- A Multiwfn batch analysis may return **exit code 0** after menu misalignment,
+  even if an exported cube is zero bytes or not generated. Check the exact file,
+  nonempty complete cube header, expected grid values and all menu/runtime messages;
+  never use exit code alone as a success criterion.
+- Option `22 -> 2` (global/condensed Fukui) needs a representation containing
+  energies (`.wfx` worked; `.molden.input` was rejected). Option `22 -> 6`
+  (orbital-weighted condensed Fukui) accepted Molden but rejected `.wfx`.
+  Do not assume one conversion format works for every submenu.
+- `Multiwfnpath` denotes the directory that contains `settings.ini`,
+  not the executable. Set working directory explicitly; generated files are
+  written to that directory.
+- Hidden submenu prompts can consume what a batch script intended as the
+  next menu number. Before automating a new version, capture a small manual
+  transcript and recheck output names/content with a known example.
+
 ## Common symptoms
 
 | Symptom | Likely cause | Fix |
