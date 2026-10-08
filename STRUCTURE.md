@@ -1,5 +1,13 @@
 # Repository Structure Convention
 
+> **Fork-specific project layout:** `AGENTS.md` takes precedence over the upstream
+> orchestration descriptions below. This fork disables `.research/` and its task
+> ownership protocol. New calculation projects keep only
+> `00_project_overview.md` and `01_project_status.md` as root-level human reports.
+> Detailed execution, calculation, decision, and handoff records live under
+> `docs/`. Existing projects retain their original layout until deliberately
+> migrated with the user's approval.
+>
 How this collection is organized and how to extend it.
 
 ## Top-level taxonomy
@@ -22,7 +30,7 @@ The test for tool-vs-knowledge: **"would this still be true if you switched code
 
 Procedure skills are a SKILL.md plus their own `references/` as needed. Every tool skill follows the canonical layout below.
 
-## Research-orchestrator protocol layout
+## Upstream research-orchestrator protocol layout (disabled in this fork)
 
 `procedures/research-orchestrator/` is a procedure skill with an additional responsibility: it defines shared project state. Keep this protocol separate from engine details. It coordinates tasks and records evidence; it does not decide that every calculation must use one code.
 

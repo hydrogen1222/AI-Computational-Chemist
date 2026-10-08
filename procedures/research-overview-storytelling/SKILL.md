@@ -5,7 +5,7 @@ description: Use when writing or revising the human-readable project overview (�
 
 # 课题说明的写法
 
-课题说明（文件 `00_project_overview.md`）是一个计算课题的**人类版正本**。执行用的参数和步骤另有一份执行说明（`01_execution_sheet.md`），不写在这里。项目根目录的全部固定文件见 `AGENTS.md` 里的 *Fixed project-root files*。课题说明要让课题的主人随时能回答三件事：这个课题想回答什么，每一步为什么这样算，结果出来以后该怎么读。
+课题说明（文件 `00_project_overview.md`）是一个计算课题的**人类版正本**。当前进度另写在根目录的 `01_project_status.md`；执行用的参数和步骤放在 `docs/execution_sheet.md`，详细台账放在 `docs/calculation_ledger.md`。完整文件位置见 `AGENTS.md` 的 *Project document layout*。课题说明要让课题的主人随时能回答三件事：这个课题想回答什么，每一步为什么这样算，结果出来以后该怎么读。
 
 ## 谁用这份 skill
 
@@ -49,6 +49,21 @@ AICC 的用户文档先服务于理解，再服务于展示。原始计算、阶
 - “做完以后我们会知道什么”必须写成直接的科学结论类型，例如“知道哪个 Na
   空位位置更稳定”，不要写成抽象的“为后续决策提供依据”。
 
+## 课题总览和当前进度分开写
+
+`00_project_overview.md` 专注科学问题、已有研究、当前批准的计算路线和
+SI 已确认的结果解释；不粘贴 Slurm 队列、每天的进度数字和失败重试细节。
+
+`01_project_status.md` 专注**现在**：当前研究阶段、每个 Work 已完成多少，
+得到哪些可以直接陈述的结果及其来源，哪些仍有疑问，当前机器在算什么，
+以及一条具体的「接下来」。正常情况下控制在一到两屏，不把旧版本依次追加。
+
+详细历史写进 `docs/calculation_ledger.md` 和 `docs/change_log.md`。当 SI
+修订路线并获得需要的用户批准后，major 替换总览的相应段落，刷新当前进度，
+保留旧计算和历史决定。已被新方案取代的有效计算应标记为「已被取代」，
+不应写成「失败」。一个项目只有一个总 Workflow，下面可以有多个 Stage、
+Work package 和 calculation。
+
 ## 写法规则
 
 1. **只回头引用，不提前剧透。** 每个概念第一次被用到之前，必须已经讲过。禁止"详见第 5 节""后面会讲到"这类往后指的说法。某个概念非得先用，就在用到它的地方当场讲清楚。
@@ -68,7 +83,7 @@ AICC 的用户文档先服务于理解，再服务于展示。原始计算、阶
 
 ## 术语表
 
-课题开头和课题说明一起建一份术语表，文件名固定为 `05_glossary.md`，markdown 表格，四列：
+课题开头和课题说明一起建一份术语表，文件名固定为 `docs/glossary.md`，markdown 表格，四列：
 
 | 词 | 一句话意思 | 第一次出现在课题说明哪一节 | 哪天加的 |
 |---|---|---|---|
@@ -110,7 +125,7 @@ SI、major 和 vice 给用户的每一轮回复都以一条很短的 `接下来�
 > package，暂时不要提交计算。
 
 > 接下来：把 `calculations/011_...` 到 `014_...` 和
-> `01_execution_sheet.md` 交给 vice；vice 只负责提交、监控和记录运行结果。
+> `docs/execution_sheet.md` 交给 vice；vice 只负责提交、监控和记录运行结果。
 
 不要用“如果你愿意我可以继续”“后续再看”这类没有动作的信息结束。
 

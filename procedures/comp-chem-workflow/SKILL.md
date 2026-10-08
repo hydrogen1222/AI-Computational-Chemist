@@ -7,8 +7,8 @@ description: Entry point and controller for computational chemistry and material
 
 Use this skill first for nontrivial computational work. It owns the **scientific
 lifecycle, workflow compilation, and cross-engine validation discipline**. Durable
-project state in this fork lives only in the fixed project-root files defined in
-`AGENTS.md`. Engine input/output details belong to the relevant tool skill and
+project state in this fork uses the two human-facing root documents and the detailed
+records under `docs/`, as defined in `AGENTS.md`. Engine input/output details belong to the relevant tool skill and
 scheduler operation to `hpc-submit`.
 
 ## Entry decision
@@ -140,18 +140,47 @@ scientific answer. SI interprets the evidence. If SI proposes a change to the ap
 scope, method, cost, or scientific roadmap, the user approves it before major rewrites
 the executable workflow.
 
+## Work results, SI stage handoff, and revisions
+
+The output of each Work package has two levels:
+
+- Human: major rewrites its compact result summary in `01_project_status.md`. Include
+  finished cases, key numbers with units and paths, the narrow result supported by
+  those facts, limitations, open SI decisions, and what happens next.
+- Detailed: vice/major retain per-calculation entries in `docs/calculation_ledger.md`,
+  including actual inputs/outputs, check verdicts, job IDs, and all recovery attempts.
+
+At a stage boundary, major writes one compact stage brief in
+`docs/instructions_and_reports/`. It summarizes work packages, key numerical evidence
+with source paths, anomalies, new decisions, and up to three independent scientific
+questions for SI. Before handing a new SI session a snapshot, prepare
+`docs/instructions_and_reports/SI_handoff_latest.zip` with the story, current human
+status, relevant recent change-log entries, locks/glossary/reviewer brief, latest
+stage brief, and only small key result tables/structures/figures. It is a reading set,
+not a raw calculation backup, and must not contain POTCAR or giant outputs.
+
+When SI changes the interpretation or proposes a new roadmap, major records which
+old result is superseded rather than failed, retains old directories and evidence,
+and waits for user approval before implementing changes to already approved scope,
+method, cost, or locked parameters. After approval, update current narrative/status
+and pending execution steps; append the exact decision/reason/approval to
+`docs/change_log.md`. Do not overwrite old science as if it never happened.
+
+New projects use the `docs/` paths. Existing projects keep their original layout
+until a user-approved migration, to avoid silently breaking running workflows.
+
 ## Workflow handoff
 
 At a pause or handoff, keep two views separate.
 
 The **user view** is short: current roadmap item, each work package as done/running/not
 started, the key result paths, any scientifically important anomaly, and the next user
-decision if one is needed. Runtime information such as job IDs or nodes may be shown
+decision if one is needed. This view belongs in `01_project_status.md`. Runtime information such as job IDs or nodes may be shown
 below this summary when useful, but it must not bury the scientific status.
 
 The **agent view** records the execution facts needed to resume safely: what was
 generated or run, file paths, job IDs, parser/checker verdicts, assumptions, fixes, and
-the next executable action.
+the next executable action. This belongs in `docs/calculation_ledger.md` and `docs/execution_sheet.md`.
 
 Every user-facing handoff ends with `接下来：` and a concrete action. State who acts
 next, what they receive or inspect, and what they should do. For example, major names
