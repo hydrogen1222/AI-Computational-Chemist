@@ -34,6 +34,7 @@ def chart(matplotlib, folder, case, data, charge):
     if not data:
         return
     import matplotlib.pyplot as plt
+    plt.rcParams['svg.fonttype'] = 'none'  # keep text editable in vector export
 
     if charge:
         title = "DDEC6 atomic net charge"
