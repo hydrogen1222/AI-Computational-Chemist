@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - "refactor/**"
+      - "cleanup/**"
 
 jobs:
   smoke:
