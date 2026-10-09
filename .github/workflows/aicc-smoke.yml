@@ -25,3 +25,16 @@ jobs:
           python aicc/tests/smoke_test.py
           python aicc/tests/batch_bader_test.py
           python aicc/tests/retired_components_test.py
+      - name: Verify clean install has no retired skills
+        run: |
+          tmp="$(mktemp -d)"
+          trap 'rm -rf "$tmp"' EXIT
+          mkdir -p "$tmp/home"
+          HOME="$tmp/home" XDG_STATE_HOME="$tmp/state" bash ./install.sh --target "$tmp/skills" --harness codex
+          test -f "$tmp/skills/scientific-modeling/SKILL.md"
+          test -f "$tmp/skills/batch-postprocessing/SKILL.md"
+          test -f "$tmp/skills/structure-prep/SKILL.md"
+          test ! -e "$tmp/skills/research-orchestrator"
+          test ! -e "$tmp/skills/hpc-submit"
+          test ! -e "$tmp/skills/rsess"
+          test ! -e "$tmp/skills/comp-chem-workflow"
