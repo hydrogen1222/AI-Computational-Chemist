@@ -111,7 +111,7 @@ class PeriodicCDFTTests(unittest.TestCase):
         d["states"][1]["delta_electrons"]=.1
         d["states"].pop()
         self.manifest.write_text(json.dumps(d))
-        self.assertIn("two-sided",self.pre().stderr)
+        self.assertIn("at least one state on each side",self.pre().stderr)
     def test_preflight_refuses_overwrite(self):
         self.make_preflight()
         self.assertEqual(self.pre("--write",self.preflight).returncode,1)
