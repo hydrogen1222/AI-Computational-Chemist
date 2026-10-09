@@ -352,11 +352,11 @@ def main(argv=None):
             "# DDEC6 analysis — slide-ready summary\n\n"
             f"Cases: {len(dirs)}; passed: {len(dirs)-errors}; failed: {errors}.\n\n"
             "Reported q is **DDEC6 net atomic charge (e)**, positive = electron-deficient.\n"
-            "SBO is the sum of bond orders per atom; pair BO is dimensionless.
-Each atom row also contains SBO reconstructed from the printed pairs
-and the residual (SBO minus printed contributions). A periodic self-image
-bond contributes twice to that atom's SBO but appears just once as an
-undirected pair in the bond table.\n"
+            "SBO is the sum of bond orders per atom; pair BO is dimensionless.\n"
+            "The atom CSV also reports SBO reconstructed from printed pairs,\n"
+            "and the residual (SBO minus printed-pair contributions).\n"
+            "A periodic self-image bond contributes twice to its atom's SBO\n"
+            "but appears once in the undirected bond table.\n"
             "The pair table retains periodic cell translations. A given pair is counted\n"
             "once even if both reciprocal listings are present. The SBO includes\n"
             "small bonds below Chargemol's bond-print cutoff and therefore need not\n"
