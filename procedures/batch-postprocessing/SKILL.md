@@ -47,6 +47,19 @@ commands. This is an **optional skill**, not a new agent or scheduler.
    existing CSVs without further DFT or population calculations. No
    project status database or extra management Markdown.
 
+### Periodic Fukui functions / conceptual DFT
+
+Route to `tools/periodic-cdft/SKILL.md` for independently
+installed Multiwfn/Critic2/FukuiGrid methods on fixed-geometry
+VASP `N±δN` electronic states. Separate 3D finite differences
+from FukuiGrid fractional-electron interpolation and conditional
+SCPC/electrode Fukui potentials. Agent validates atom mapping,
+valence-electron integration, FFT grid, spin/SCF, method-specific
+outputs, all charge sums and pointwise differences, and generates
+a readable Chinese analysis. Do not claim fractional charged PBC
+TOTEN automatically yields physical global electronegativity or
+hardness; do not install or copy external source into AICC.
+
 ### VASP Bader / AIM net charges
 
 Load `tools/vasp/references/electronic-analysis.md`. Required density

@@ -37,6 +37,12 @@ net-charge and method-specific quality checks, provenance, and limits on
 oxidation-state/mechanism claims. Use
 `tools/vasp/scripts/charge_report.py` for regeneration from existing CSVs.
 Never describe an unconverged Hirshfeld-I iteration as a calculated charge.
+For periodic VASP **conceptual DFT / Fukui** analyses, load
+`tools/periodic-cdft/SKILL.md` and follow its three independently
+installed Multiwfn/Critic2/FukuiGrid paths. Require electronic-state
+preflight, integral/normalization checks, controlled method comparisons
+and concise source-linked Chinese results; never treat charge backgrounds
+as automatically physical or missing external binaries as success.
 For **any figure or image intended as a finished deliverable**, load
 `tools/plotting/SKILL.md` first: the vendored Stormy-drawing plotting
 rules are authoritative over older `tools/report/` and
@@ -57,6 +63,7 @@ overwrite or relocate a researcher's existing plots.
 | Build and validate atoms, slabs, interfaces, defects, conformers | `tools/structure-prep/` |
 | Batch analysis of existing calculation results | `procedures/batch-postprocessing/` + the relevant tool skill |
 | Create, revise or redraw figures; structure illustrations; publishable plots | `tools/plotting/SKILL.md` (Stormy-drawing canonical standard) |
+| Periodic Fukui function f+/f-/f0, dual descriptor, condensed indices | `tools/periodic-cdft/SKILL.md` (local Multiwfn, Critic2, FukuiGrid only) |
 | DDEC6 atomic charges and periodic bond orders | `tools/chargemol/SKILL.md` |
 | Periodic Hirshfeld, CM5, Hirshfeld-I independent analysis | `tools/multiwfn/references/periodic-stockholder.md` |
 | Calculation inputs, parsers, methods, recovery | the relevant `tools/<engine>/` |

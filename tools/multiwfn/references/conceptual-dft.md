@@ -2,6 +2,13 @@
 
 > Load this when: computing Fukui functions, the dual descriptor, condensed (atomic) Fukui indices, or global reactivity indices (vertical IP and EA, electronegativity, hardness, electrophilicity, nucleophilicity) for a molecule or cluster.
 
+**For actual 3D periodic VASP charge densities**, use
+`tools/periodic-cdft/SKILL.md` and its 3-engine protocol instead:
+Multiwfn grid-data menu 13, not the molecule/cluster wavefunction-based
+menu 22. The periodic route explicitly distinguishes density finite
+differences from FukuiGrid fractional-interpolation and checks PBC
+charge artefacts.
+
 Sources: Multiwfn manual of the installed version (conceptual DFT section) and Sobereva's guide
 http://sobereva.com/484 (in Chinese). Menu numbers below are from that guide; check them against
 the installed version before scripting them.

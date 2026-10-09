@@ -24,6 +24,17 @@ It does not silently claim charge conservation if the expected
 cell net charge was not specified, and does not treat nonconverged
 Hirshfeld-I charges as valid.
 
+**Periodic conceptual DFT:** `tools/periodic-cdft/SKILL.md`
+covers f+, f-, f0, dual Fukui response and conditional condensed indices
+from the existing VASP/Bader/Chargemol/Multiwfn outputs. Three independently
+installed grid engines (Multiwfn, Critic2, FukuiGrid) can be compared on
+matching VASP states; FukuiGrid's fractional-electron interpolation is
+a separately labeled approximation. AICC provides read-only CHGCAR/
+NELECT/geometry preflight and condensed charge-table checks; actual
+third-party computation, output integrity checks and any charged-cell
+physical correction must be locally validated. No external binaries,
+licensed PAWs or third-party source are included.
+
 **Figures:** AICC includes the Stormy-drawing plotting Skill (source
 [Stormy-drawing](https://github.com/hydrogen1222/Stormy-drawing), snapshot
 `900add75a2978597640484d0b805a3d760a9da1b`). For publication figures,
@@ -67,6 +78,7 @@ limitations, then build and audit the candidate structures. Do not submit VASP."
 | `procedures/literature-to-calculation/` | Extract evidence and model choices from publications |
 | `procedures/batch-postprocessing/` | Batch analysis of existing calculations without manual scripts |
 | `tools/vasp/scripts/collect_hirshfeld.py` | Extract ordinary Hirshfeld/CM5 charges already computed by Chargemol; generate comparison CSV/PPT figures |
+| `tools/periodic-cdft/` | Periodic Fukui preflight, local Multiwfn/Critic2/FukuiGrid (finite-difference vs interpolation), condensed indices from charge CSVs, and scientific QC; no external binaries vendored |
 | `tools/chargemol/` | DDEC6 charges, SBO, all printed periodic bond types, and paginated PPT-ready plots |
 | `tools/vasp/scripts/charge_report.py` | Chinese presentation-ready, source-traceable reports for Bader, DDEC6, Chargemol Hirshfeld/CM5 and Multiwfn; no scientific recalculation |
 | `tools/plotting/` | Stormy-drawing publication figure Skill, reusable `pubstyle.py`, figure-folder builder, templates and QA |
