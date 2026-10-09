@@ -150,6 +150,38 @@ class DDEC6Tests(unittest.TestCase):
         self.assertEqual(r2.returncode, 0, r2.stdout + r2.stderr)
         self.assertIn("reused pre-existing outputs", r2.stdout)
 
+    def test_upstream_chargemol_format_with_periodic_self_bonds(self):
+        # Representative lines from pymatgen-core v2026.9.23's 2017 NaCl fixture.
+        d = self.root / 'upstream_fixture'
+        d.mkdir()
+        (d / 'CHGCAR').write_text('NaCl\n1\n0 2.829447 2.829447\n2.829447 0 2.829447\n2.829447 2.829447 0\nNa Cl\n1 1\nDirect\n0 0 0\n0.5 0.5 0.5\n')
+        out = d / 'postprocess/chargemol'
+        out.mkdir(parents=True)
+        (out / 'DDEC6_even_tempered_net_atomic_charges.xyz').write_text('2\ncell\nNa 0 0 0 0.843200\nCl 2.829447 2.829447 2.829447 -0.843200\n')
+        head = '2\ncell\nNa 0 0 0 0.539920\nCl 2.829447 2.829447 2.829447 0.901058\n\n'
+        def bond(shift, idx, elem, bo):
+            return f'Bonded to the ( {shift}) translated image of atom number {idx} ( {elem} ) with bond order = {bo} The average spin polarization of this bonding = 0.0000\n'
+        head += 'Printing BOs for ATOM # 1 ( Na ) in the reference unit cell.\n'
+        head += bond('-1, 0, 0', 2, 'Cl', '0.0882')
+        head += 'The sum of bond orders for this atom is SBO = 0.539920\n'
+        head += 'Printing BOs for ATOM # 2 ( Cl ) in the reference unit cell.\n'
+        head += bond('1, 0, 0', 1, 'Na', '0.0882')
+        head += bond('0, 0, 1', 2, 'Cl', '0.0306')
+        head += bond('0, 0, -1', 2, 'Cl', '0.0306')
+        head += 'The sum of bond orders for this atom is SBO = 0.901058\n'
+        (out / 'DDEC6_even_tempered_bond_orders.xyz').write_text(head)
+        r = self.run_batch('--collect-only', '--net-charge', '0',
+                           '--manifest', self.manifest('upstream_fixture'))
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        with (self.root / 'postprocess_summary/ddec6_bonds.csv').open() as fh:
+            bonds = list(csv.DictReader(fh))
+        self.assertEqual(len(bonds), 2)  # Na-Cl and periodic Cl-Cl, no mirrored duplicates
+        self.assertEqual({(b['element_i'], b['element_j']) for b in bonds},
+                         {('Na', 'Cl'), ('Cl', 'Cl')})
+        with (self.root / 'postprocess_summary/ddec6_atoms.csv').open() as fh:
+            atoms = list(csv.DictReader(fh))
+        self.assertAlmostEqual(float(atoms[0]['ddec6_net_charge_e']), 0.8432)
+        self.assertAlmostEqual(float(atoms[1]['sum_bond_orders']), 0.901058)
     def test_slide_figures_if_matplotlib_available(self):
         try:
             import matplotlib  # noqa: F401
