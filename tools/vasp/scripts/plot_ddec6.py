@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 from pathlib import Path
 import re
 
@@ -29,7 +30,11 @@ def read_rows(path):
 
 
 def safe_name(name):
-    return re.sub(r"[^a-zA-Z0-9_.-]", "_", name).strip("._")[:80] or "root"
+    clean = re.sub(r"[^a-zA-Z0-9_.-]", "_", name).strip("._")[:65] or "root"
+    # Distinguish a/b from a_b and avoid clobbering case-specific slide files.
+    if clean != name:
+        clean += "_" + hashlib.sha256(name.encode("utf-8")).hexdigest()[:8]
+    return clean
 
 
 def draw(folder, case, values, charge, page, pages):

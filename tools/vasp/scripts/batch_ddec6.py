@@ -353,34 +353,28 @@ def main(argv=None):
         # Add genuinely human-readable numbers to the overview without replacing
         # full precision atom/pair CSVs. This is for screening/slide drafting only.
         with (out / "ddec6_summary.md").open("a", encoding="utf-8") as md:
-            md.write("\n## Case QC (first 20)\n\n"
+            md.write("\n## Case QC (all cases)\n\n"
                      "| Case | Status | N atoms | Σq (e) | Charge-balance Δ (e) |\n"
                      "|---|---|---:|---:|---:|\n")
-            for row in status[:20]:
+            for row in status:
                 md.write(f"| {row['case']} | {row['status']} | {row['n_atoms']} | "
                          f"{row['sum_ddec6_q_e']} | {row['charge_balance_error_e']} |\n")
-            if len(status) > 20:
-                md.write(f"\nRemaining {len(status)-20} cases: consult ddec6_cases.csv.\n")
             md.write("\n## Element-resolved means / range\n\n"
                      "| Case | Element | N | Mean q (e) | q range (e) | Mean SBO | SBO range |\n"
                      "|---|---|---:|---:|---|---:|---|\n")
-            for e in els[:60]:
+            for e in els:
                 md.write(f"| {e['case']} | {e['element']} | {e['n_atoms']} | "
                          f"{e['mean_charge_e']:+.3f} | "
                          f"[{e['min_charge_e']:+.3f}, {e['max_charge_e']:+.3f}] | "
                          f"{e['mean_sbo']:.3f} | "
                          f"[{e['min_sbo']:.3f}, {e['max_sbo']:.3f}] |\n")
-            if len(els) > 60:
-                md.write(f"\nOther {len(els)-60} element rows: consult ddec6_elements.csv.\n")
             md.write("\n## Periodic bond-type means / range\n\n"
                      "| Case | Bond type | Printed pairs | Mean BO | BO range |\n"
                      "|---|---|---:|---:|---|\n")
-            for b in types[:60]:
+            for b in types:
                 md.write(f"| {b['case']} | {b['element_pair']} | "
                          f"{b['n_periodic_bonds']} | {b['mean_bond_order']:.3f} | "
                          f"[{b['min_bond_order']:.3f}, {b['max_bond_order']:.3f}] |\n")
-            if len(types) > 60:
-                md.write(f"\nOther {len(types)-60} bond-type rows: consult ddec6_bond_types.csv.\n")
             md.write("\n## Suggested figure caption template\n\n"
                      "DDEC6 net atomic charge q or pairwise bond order for [model] "
                      "from Chargemol analysis of a [DFT functional, potential and "

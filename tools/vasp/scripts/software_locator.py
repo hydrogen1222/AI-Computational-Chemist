@@ -145,10 +145,22 @@ def find_chargemol_densities(
         if os.getenv(env):
             return find_chargemol_densities(Path(os.environ[env]), executable)
 
-    candidate_roots = list(roots())
+    # Prefer a matching library beside the selected executable, not a
+    # different installation's density set found elsewhere under ~/apps.
     if executable is not None:
-        e = executable.resolve()
-        candidate_roots = [e.parent, e.parent.parent, *candidate_roots]
+        exe = executable.resolve()
+        nearby = [exe.parent / "atomic_densities",
+                  exe.parent.parent / "atomic_densities"]
+        direct = sorted(set(p.resolve() for p in nearby if valid_density_dir(p)))
+        if len(direct) == 1:
+            return direct[0]
+        if len(direct) > 1:
+            raise DiscoveryError(
+                "more than one reference library adjacent to this Chargemol executable; "
+                "specify DDEC6_ATOMIC_DENSITIES_DIR or --atomic-densities"
+            )
+
+    candidate_roots = list(roots())
     seen = set()
     hits = set()
     for base in candidate_roots:
