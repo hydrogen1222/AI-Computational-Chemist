@@ -29,6 +29,15 @@ Other skills and `knowledge/` are **on-demand references**, not mandatory stages
 For many completed calculations needing automated extraction, load
 `procedures/batch-postprocessing/SKILL.md`; the agent performs the batch,
 not the user. Parsing existing data is separate from running new simulations.
+For **any figure or image intended as a finished deliverable**, load
+`tools/plotting/SKILL.md` first: the vendored Stormy-drawing plotting
+rules are authoritative over older `tools/report/` and
+`knowledge/scientific-visualization.md` aesthetics when they conflict.
+Use one reproducible `figures/NNN_description/` folder with copied data,
+`plot.py`, README provenance, source files and QA outputs per finished figure.
+Legacy auto-generated quick-look charts remain usable as **previews**,
+not verified Stormy-style publication figures. Do not silently reformat,
+overwrite or relocate a researcher's existing plots.
 
 ## Skill routing
 
@@ -39,6 +48,7 @@ not the user. Parsing existing data is separate from running new simulations.
 | Respond to reviewer comments | `procedures/review-response/` |
 | Build and validate atoms, slabs, interfaces, defects, conformers | `tools/structure-prep/` |
 | Batch analysis of existing calculation results | `procedures/batch-postprocessing/` + the relevant tool skill |
+| Create, revise or redraw figures; structure illustrations; publishable plots | `tools/plotting/SKILL.md` (Stormy-drawing canonical standard) |
 | DDEC6 atomic charges and periodic bond orders | `tools/chargemol/SKILL.md` |
 | Periodic Hirshfeld, CM5, Hirshfeld-I independent analysis | `tools/multiwfn/references/periodic-stockholder.md` |
 | Calculation inputs, parsers, methods, recovery | the relevant `tools/<engine>/` |

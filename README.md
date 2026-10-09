@@ -15,6 +15,19 @@ down installed Chargemol/Bader executables by hand. AICC searches the
 current PATH and common user/application directories first and asks
 for a path only if discovery is impossible or ambiguous.
 
+**Figures:** AICC includes the Stormy-drawing plotting Skill (source
+[Stormy-drawing](https://github.com/hydrogen1222/Stormy-drawing), snapshot
+`900add75a2978597640484d0b805a3d760a9da1b`). For publication figures,
+`tools/plotting/SKILL.md` supersedes the older report-oriented style.
+Use `tools/plotting/scripts/init_figure.py` to create a self-contained
+`figures/001_.../` with its own copied data, plot.py, source recipe, stable
+color registry and style QA. Temporary/PPT-ready charts produced by analysis
+scripts are exploratory previews until regenerated and reviewed under the
+plotting Skill. Arial is required for final output; the upstream Skill
+documents setup and a stand-in font strictly for drafts and tests. The
+standard requires local matplotlib/numpy/Pillow dependencies, not a
+bundled licensed font.
+
 The researcher decides what to calculate and manually submits, monitors and
 restarts production jobs. AICC prepares inspectable inputs and optional manual
 job scripts but does not operate schedulers or remote job sessions.
@@ -46,6 +59,7 @@ limitations, then build and audit the candidate structures. Do not submit VASP."
 | `procedures/batch-postprocessing/` | Batch analysis of existing calculations without manual scripts |
 | `tools/vasp/scripts/collect_hirshfeld.py` | Extract ordinary Hirshfeld/CM5 charges already computed by Chargemol; generate comparison CSV/PPT figures |
 | `tools/chargemol/` | DDEC6 charges, SBO, all printed periodic bond types, and paginated PPT-ready plots |
+| `tools/plotting/` | Stormy-drawing publication figure Skill, reusable `pubstyle.py`, figure-folder builder, templates and QA |
 | `tools/vasp/scripts/batch_bader.py` | Batch VASP Bader/AIM charges, per-atom and per-element CSV |
 | `procedures/review-response/` | Optional manuscript reviewer-response workflow |
 | `tools/structure-prep/` | ASE/pymatgen/RDKit structure building, enumeration, audits |

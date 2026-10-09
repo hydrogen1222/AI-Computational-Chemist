@@ -1,5 +1,14 @@
 # Figure Contract
 
+**Historical report-layout reference:** The upstream Stormy-drawing
+`tools/plotting/SKILL.md` is now AICC's default for newly generated and
+redrawn figures. If older guidance below conflicts (font choice, grid,
+open/closed axes, multi-panel assembly, panel labels, 16:9 canvas,
+palette or QA), **use the plotting Skill**. This reference remains only
+to interpret/reproduce older report packages; it does not authorize
+a second competing style.
+
+
 > Load this before designing, plotting, rendering, or assembling a report-ready figure.
 > A figure contract turns a figure from a result collage into a traceable visual
 > argument. It is useful for reviewer responses, manuscript support, exploratory

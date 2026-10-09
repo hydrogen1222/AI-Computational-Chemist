@@ -27,6 +27,7 @@ jobs:
       - name: Test one-agent routing and CLI
         run: |
           python aicc/tests/smoke_test.py
+          python aicc/tests/plotting_skill_test.py
           python aicc/tests/batch_bader_test.py
           python aicc/tests/ddec6_test.py
           python aicc/tests/hirshfeld_test.py
@@ -43,6 +44,9 @@ jobs:
           test -f "$tmp/skills/batch-postprocessing/SKILL.md"
           test -f "$tmp/skills/structure-prep/SKILL.md"
           test -f "$tmp/skills/chargemol/SKILL.md"
+          test -f "$tmp/skills/plotting/SKILL.md"
+          test -f "$tmp/skills/plotting/scripts/pubstyle.py"
+          test -f "$tmp/skills/plotting/scripts/init_figure.py"
           test ! -e "$tmp/skills/research-orchestrator"
           test ! -e "$tmp/skills/hpc-submit"
           test ! -e "$tmp/skills/rsess"
