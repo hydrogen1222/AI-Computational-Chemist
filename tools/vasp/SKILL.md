@@ -23,6 +23,7 @@ description: Prepare, validate, run, and troubleshoot VASP DFT calculations for 
 | fork checks: locked settings before submission, too-close atoms before and after relaxation, same settings before combining energies | `scripts/check_locked_params.py`; `scripts/check_distances.py`; `scripts/compare_settings.py`; `references/locked-parameters.md` |
 | match crashes, warnings, or convergence failures | `references/errors.md` |
 | DOS, bands, PDOS, and d-band analysis | `references/dos-band.md`; `tools/vaspkit/references/dos-band.md`; `knowledge/electronic-structure.md` |
+| Ordinary Hirshfeld and CM5 from completed Chargemol DDEC6 logs | `tools/chargemol/SKILL.md`; `scripts/collect_hirshfeld.py` |
 | DDEC6 charges/SBO/pair BO with Chargemol and PPT figures | `tools/chargemol/SKILL.md`; `scripts/batch_ddec6.py`; `scripts/software_locator.py` |
 | batch Bader/AIM charges from many existing runs | `scripts/batch_bader.py`; `scripts/software_locator.py`; `procedures/batch-postprocessing/SKILL.md` |
 | charge, Bader, spin, partial charge, work function, ELF, or fields | `references/electronic-analysis.md`; `references/volumetric-visualization.md`; `scripts/bader_summary.py`; `tools/vaspkit/references/electronic-analysis.md` |

@@ -88,6 +88,18 @@ fallbacks. For DDEC6 show **every printed bond type by default**,
 paginate dense slides instead of picking scientifically arbitrary bonds,
 and never impute unprinted bond orders as zero.
 
+### Ordinary Hirshfeld / CM5 population analysis
+
+If the user has already run Chargemol DDEC6, first check its
+`VASP_DDEC_analysis.output`: the initial *noniterative Hirshfeld*
+partition and CM5 values may already be present. Use
+`tools/vasp/scripts/collect_hirshfeld.py` to batch-extract results
+without starting any electronic-structure or Chargemol program.
+Export full atom/site/element tables, keep source provenance, and
+optionally plot Hirshfeld vs CM5 vs DDEC6 for the same density.
+Do not confuse this with **Hirshfeld-I**, which requires a separate
+iterative charged-reference algorithm.
+
 ### Other tools
 
 - VASPKIT: `tools/vaspkit/`; determine the installed version and exact

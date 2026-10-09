@@ -5,6 +5,22 @@
 Each task below is a post-processing run from a converged static. Keep settings consistent across
 the runs you compare. The *meaning* of every output lives in the knowledge doc above.
 
+## Hirshfeld and CM5 from a previous Chargemol run
+
+Chargemol DDEC6 first computes an ordinary, **noniterative Hirshfeld**
+charge partition and usually writes CM5 to its
+`VASP_DDEC_analysis.output`. The script
+`scripts/collect_hirshfeld.py` extracts these logged values, aligns
+them to CHGCAR atom order, checks charge closure where the total charge
+is specified, and writes comparative tables and PPT charts. It does not
+recompute density and it is **not Hirshfeld-I**.
+
+VASP can print Hirshfeld/Hirshfeld-I charges with TS/TS-HI
+`IVDW=2/20` or `IVDW=21`, but those tags also change dispersion
+energies/forces and may change self-consistent density or relaxed
+geometry. Do not introduce them as a silent post-processing switch
+to an otherwise plain-PBE calculation.
+
 ## DDEC6 charge and bond order (Chargemol)
 
 For DDEC6 atomic net charges and bond orders, use
