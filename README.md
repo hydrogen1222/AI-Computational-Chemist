@@ -12,9 +12,9 @@ identify the requested observable, invoke the relevant program/skill on many run
 folders, check missing or invalid cases, and produce comparable tabular results.
 The user should not need to write shell loops or Python scripts.
 
-The user owns scientific approval and decides whether or when to run expensive
-calculations. This collection **does not** launch a built-in SI/Major/Vice team,
-operate a task DAG, or run HPC jobs by default.
+The researcher decides what to calculate and manually submits, monitors and
+restarts production jobs. AICC prepares inspectable inputs and optional manual
+job scripts but does not operate schedulers or remote job sessions.
 
 ## Typical use
 
@@ -45,7 +45,7 @@ limitations, then build and audit the candidate structures. Do not submit VASP."
 | `procedures/review-response/` | Optional manuscript reviewer-response workflow |
 | `tools/structure-prep/` | ASE/pymatgen/RDKit structure building, enumeration, audits |
 | `tools/vasp/`, `tools/cp2k/`, `tools/orca/`, etc. | Per-code methods, preflight, parsers, troubleshooting |
-| `tools/hpc-submit/`, `tools/rsess/` | Optional, explicitly authorized execution support |
+| Code-specific running guides | Manual submission templates and environment notes for the researcher |
 | `knowledge/` | Tool-agnostic science and methods; loaded selectively |
 | `benchmark/` | Separate historical benchmark/evaluation materials |
 | `aicc/` | Optional installation/skill-discovery CLI; no task or job manager |
@@ -77,16 +77,15 @@ aicc skill --help
 aicc doctor
 ```
 
-The obsolete `aicc status/task/job` and `.research/` orchestration features
-were removed. If updating an existing installation, old skill links may
-remain; inspect and remove retired AICC-owned links or use the CLI's explicit
-stale-link cleanup option, without touching foreign skills. **Existing projects
-are not automatically migrated or deleted.**
+The CLI provides only `aicc skill` and `aicc doctor`. Old remote-session and
+scheduler-control skills were removed. When updating an installed copy,
+inspect and explicitly remove stale AICC-owned links, preserving foreign
+skills. **Existing project calculations are never automatically migrated.**
 
 ## Design principles
 
-- **One agent, multiple on-demand skills.** Use a capable interactive or coding
-  model; no mandatory subagents, leases, approval gates or role-specific sessions.
+- **One agent, multiple on-demand skills.** The researcher owns all production
+  simulation execution.
 - **Physical model before input syntax.** Different scientific questions require
   different representations; one good POSCAR cannot prove the chosen physics.
 - **Actual model files, not only advice.** Keep sources and transformations so
@@ -95,9 +94,8 @@ are not automatically migrated or deleted.**
   can test the stated mechanism; describe competing models and confounders.
 - **Automated post-processing.** The agent runs existing software tools on many
   cases, isolates failures and generates source-traceable summary tables.
-- **User-controlled execution.** Running simulations or changing approved
-  methods/resources requires authorization; creating and auditing structures
-  does not imply approval to submit.
+- **Manual job execution.** The agent prepares inputs and analyzes outputs; it
+  never submits, monitors, cancels or restarts production jobs.
 
 For directory and reference conventions see [STRUCTURE.md](STRUCTURE.md).
 For license and citation see [LICENSE](LICENSE) and [CITATION.cff](CITATION.cff).

@@ -1,6 +1,10 @@
 # Peer-review-replication benchmark
 
-This folder contains the complete materials for the benchmark reported in the
+This is a **historical, read-only evaluation archive**, not an active agent
+workflow. Original fixtures, scoring records and published study data are
+preserved; the obsolete subagent evaluation launcher has been removed.
+
+This folder contains the data for the benchmark reported in the
 AICC paper: real referees' computational requests on published Nature
 Communications papers, with the original authors' computational answers
 removed, posed to autonomous agents — and the full evaluation records that

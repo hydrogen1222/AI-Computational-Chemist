@@ -1,7 +1,8 @@
 # AICC Repository Structure
 
-This repository provides **one agent with modular, on-demand skills**. There is no
-central scheduler, task state machine or mandatory project document protocol.
+This repository provides **one agent with modular, on-demand skills**. The
+researcher runs and monitors production calculations. There is no scheduler
+service or mandatory project document protocol.
 
 - `procedures/`: scientific tasks that combine reasoning and tools. The default
   entry is `scientific-modeling`; literature extraction and reviewer response
@@ -26,11 +27,12 @@ individual tool skills (running/validation/errors/resources) still apply.
 question -> physical model options -> user decision on material choices
          -> atomistic generation -> deterministic geometry audit
          -> scientific model criticism -> deliver structure + build script
-                                      -> optional calculation (only if authorized)
+                                      -> user submits simulations manually
+                                      -> agent analyzes existing outputs
 ```
 
-A critique is a **reasoning pass**, not a new role, service or mandatory extra
-agent. Use a separate reviewer only when requested or useful for independence.
+Model criticism is a reasoning pass performed by the working agent.
+The researcher can seek independent scientific review outside AICC.
 
 ## Files for a new standalone modeling task
 

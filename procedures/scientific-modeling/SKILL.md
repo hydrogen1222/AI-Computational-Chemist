@@ -94,7 +94,7 @@ worth building if assumptions and limitations are honest.
 
 Revise the model when checks fail; otherwise record unresolved warnings and
 what comparisons could resolve them. No machine-readable approval gate,
-lease or second agent is required.
+approval state machine is required.
 
 ## 5. Deliver a compact, reproducible model package
 
@@ -111,9 +111,9 @@ The human-facing report should give:
 
 An actual structure/model package is the default deliverable. On explicit
 request, also prepare engine input files using the corresponding tool skill.
-**Do not submit, monitor, restart or cancel production simulations without
-a separate user authorization** for those operations. Standalone analysis
-of already available outputs may use engine parsers on request.
+**The researcher submits, monitors, restarts and cancels simulations.** The
+agent never operates the scheduler or remote execution sessions. It may run
+read-only parsers and requested bounded post-processing on completed data.
 
 ## Routing
 
@@ -125,4 +125,4 @@ of already available outputs may use engine parsers on request.
 | Published paper to model requirements | `procedures/literature-to-calculation/SKILL.md` |
 | Electron structure, surfaces, MD, thermodynamics | relevant `knowledge/` entry |
 | Batch post-processing of many completed simulations | `procedures/batch-postprocessing/SKILL.md` |
-| Optional authorized cluster execution | `tools/hpc-submit/SKILL.md` |
+| Preparing inputs for manual submission | Corresponding engine skill; no automatic launch |

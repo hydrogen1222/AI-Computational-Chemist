@@ -143,7 +143,7 @@ Before TS submission:
 - confirm IS and FS use the same slab cell, atom ordering, constraints, charge/spin policy, and method fingerprint;
 - align adsorbates so the reaction coordinate is local and chemically sensible;
 - avoid atom index mismatches when adding/removing species by defining the elementary step consistently;
-- gate the IS/FS pair or NEB image set when the project uses `.research/`.
+- scientifically review the IS/FS pair or NEB image set before preparation.
 
 After TS optimization:
 
@@ -187,7 +187,7 @@ T_B_relax -> relaxed B* candidates
 T_TS_AB -> TS/NEB between accepted A* and B* when needed
 ```
 
-Use `structure-prep` for candidate construction, `research-orchestrator` gates for model review, engine skills for relaxation/static/frequency/TS jobs, `hpc-submit` for scheduler ownership, and `tools/report` or plotting scripts for the final path diagram.
+Use `scientific-modeling` for candidate relevance, `structure-prep` for construction and model checks, relevant engine skills for input generation and output parsing, and plotting tools for diagrams. The researcher submits and monitors jobs.
 
 Hard rule for execution: a candidate structure set should be reviewed before expensive submission. The first reactant adsorption and any co-adsorption branch may include multiple candidates, but downstream intermediates should be generated from accepted relaxed predecessors unless the pathway explicitly branches.
 

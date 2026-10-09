@@ -3,8 +3,8 @@
 AICC is a **single-agent, modeling-first** skill collection. One agent can investigate
 a scientific question, propose competing physical models, construct atomistic structures
 with code, critique them, and explain what their observables could establish.
-A web-chat consultation may help with difficult scientific choices; it is **not**
-a mandatory SI/Major/Vice role or a second execution authority.
+An external web-chat consultation can inform difficult scientific choices,
+but AICC works as one agent under the researcher's direction.
 
 ## Start with the scientific model
 
@@ -40,11 +40,11 @@ not the user. Parsing existing data is separate from running new simulations.
 | Build and validate atoms, slabs, interfaces, defects, conformers | `tools/structure-prep/` |
 | Batch analysis of existing calculation results | `procedures/batch-postprocessing/` + the relevant tool skill |
 | Calculation inputs, parsers, methods, recovery | the relevant `tools/<engine>/` |
-| Optional SSH, Slurm/PBS submission and monitoring | `tools/hpc-submit/` or `tools/rsess/` |
+| Preparing an inspectable manual run script | The chosen engine skill; the researcher executes it |
 | Theoretical foundations and interpretation | relevant `knowledge/*.md` |
 
-Never require a multi-agent hierarchy, project DAG, leases, artificial gate files,
-or a prescribed set of project Markdown documents. Do not create `.research/`.
+Do not create scheduler-control services, task-state databases, artificial review
+gates or prescribed sets of project reports. Do not create `.research/`.
 Existing project layouts remain valid; **do not migrate or rename existing work
 without permission**. For a fresh standalone modeling task, a compact
 `models/model.md`, source structures, candidate files, and a reproducible build
@@ -68,11 +68,13 @@ than making duplicate overview/status files.
 - **Reproducibility:** generated structures must be reproducible from recorded
   inputs and scripts. Inspect outputs after running builders; do not report a model
   as created when no actual files were generated.
-- **Permissions:** structure generation, read-only analysis and local preflight are
-  ordinary modeling work. **Do not submit, cancel, restart, or monitor production
-  calculations, spend significant HPC/GPU resources, or overwrite/delete existing
-  data without user authorization for that operation or batch.** Preparing optional
-  engine inputs does not authorize their execution.
+- **Researcher-run calculations:** the agent may build models, prepare self-contained
+  inputs and inspectable manual job scripts, check inputs, and perform bounded
+  post-processing of existing data. **The researcher submits, monitors, cancels and
+  restarts all production jobs.** The agent must never invoke Slurm/PBS scheduler
+  submission or monitoring commands, SSH execution sessions, background recovery
+  loops or model-training launches. Never delete/overwrite scientific data without
+  approval or silently consume significant HPC/GPU resources.
 - **Safety and licensing:** no passwords/API tokens in outputs, files, scripts or
   commits. Never print, bundle or commit licensed POTCAR/potential/force-field data.
   Confirm target machines and site conventions rather than inventing them.

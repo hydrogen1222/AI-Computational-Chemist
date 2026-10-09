@@ -39,5 +39,5 @@ alternative physical models, `tools/structure-prep/SKILL.md` for actual
 structure construction, and the relevant engine skills for method syntax.
 
 Reuse a pre-existing project file, or place the evidence directly in
-`models/model.md`; do not create `.research/`, artifact registries,
-mandatory YAML state, duplicate root reports, or role handoff packages.
+`models/model.md`; do not create task-state directories, duplicate root reports,
+mandatory YAML state or role handoff packages.

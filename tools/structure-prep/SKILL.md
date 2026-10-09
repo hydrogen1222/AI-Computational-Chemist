@@ -47,7 +47,7 @@ model genuinely tests the target mechanism. Passing one does not imply
 passing the other.
 
 A reviewer can be the same agent performing an explicit second reasoning
-pass; a subagent, YAML approval gate and `.research/` state are not required.
+pass; no separate approval service or task state files are required.
 
 ## Output and permissions
 

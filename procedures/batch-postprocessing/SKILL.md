@@ -38,7 +38,7 @@ commands. This is an **optional skill**, not a new agent or scheduler.
    distribution/outliers and scientific limitations without overclaiming.
 6. **Deliver:** concise overall results with exact paths to per-case outputs
    and aggregate tables, plus the reusable script and how to rerun it. No
-   project DAG, leases, gates or extra management Markdown.
+   project status database or extra management Markdown.
 
 ### VASP Bader / AIM net charges
 
