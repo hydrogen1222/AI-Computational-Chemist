@@ -5,6 +5,18 @@ description: "Assemble stage-synthesis or final .docx reports from computed resu
 
 # Report Builder
 
+**Legacy compatibility only (this fork also disables installation of the
+`report` Skill in `FORK_DISABLED_SKILLS.txt`).** Existing report assembly,
+multi-panel scripts and the `aicc_figure_style.py` helper are preserved to
+avoid breaking historical artifacts. For **new or redrawn finished
+figures**, first use `tools/plotting/SKILL.md` from Stormy-drawing.
+Its publication-figure style, one-figure-folder provenance and QA take
+precedence over contradictory aesthetics and layout prescriptions in this
+legacy report module. An existing finished report may assemble separately
+approved single figures; report assembly is not permission to silently
+recolor, relabel, crop, composite or overwrite them.
+
+
 Build one of two post-result deliverables: a **stage synthesis** from validated but
 unaccepted evidence, or a **final `.docx`** from accepted claims and explicit waivers.
 Do not require report drafting as a prerequisite to input construction.
@@ -25,7 +37,7 @@ Do not require report drafting as a prerequisite to input construction.
 | choose mode, write the manifest, and assemble the document | `references/running.md`; `scripts/build_report.py`; `examples/manifest.json` |
 | check scientific and human-readability readiness | `references/validation.md` |
 | contract a figure and choose its panel responsibilities | `references/figure-contract.md`; `references/figure-archetype-atlas.md` |
-| compose, size, and QA publication figures | `references/computational-chemistry-figure-style.md`; `references/figure-layout-qa.md`; `scripts/aicc_figure_style.py`; `scripts/check_figure_images.py` |
+| compose new publication figures | `tools/plotting/SKILL.md` (authoritative); legacy layout checks below are optional report-only compatibility |
 | run final `.docx` package QA | `references/final-package-checklist.md` |
 | render atomistic models and choose scientifically appropriate evidence | `tools/ovito/references/structure-rendering.md`; `knowledge/scientific-visualization.md` |
 

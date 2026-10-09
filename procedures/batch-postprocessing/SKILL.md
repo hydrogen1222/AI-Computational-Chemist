@@ -111,6 +111,17 @@ Do **not** label Chargemol's initial Hirshfeld iteration as H-I, nor
 substitute an unrelated Multiwfn bond-index method for DDEC6 BO.
 MBIS is out of scope.
 
+### Finished plots and exploratory previews
+
+Analysis utilities may write fast 16:9 PNG/SVG previews or diagnostic
+figures. For figures intended as finished research/PPT/manuscript
+deliverables, load **`tools/plotting/SKILL.md`**: copy the relevant
+data into a reproducible `figures/NNN_description/` folder, generate
+using the versioned Stormy style and complete its visual/automated QA.
+Do not merely relabel an existing generic analysis image as a
+Stormy-style publication figure. Do not overwrite the original
+post-processing charts or mutate calculation data.
+
 ### Other tools
 
 - VASPKIT: `tools/vaspkit/`; determine the installed version and exact

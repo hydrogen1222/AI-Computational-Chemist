@@ -1,5 +1,17 @@
 # Scientific Visualization and Figure Choice
 
+**Current drawing authority:** For creation, revision or submission of a
+figure, load `tools/plotting/SKILL.md` (vendored from Stormy-drawing,
+style version 0.5.0). Its font, canvas, axes, legend, palette, one-figure-per-
+directory reproducibility and QA rules supersede conflicting older AICC
+instructions below. The guidance below remains useful for selecting *which
+scientific object/observable* to visualize and for evidence provenance;
+it does **not** override Stormy-drawing aesthetic rules. Automated
+multi-panel assemblies in older report workflows are legacy/optional,
+not the default finished-figure workflow. Domain-specific axis/normalization
+requirements remain scientific checks even if the plot style changes.
+
+
 > Covers: choosing appropriate tools and minimum quality standards for computational-chemistry figures, including atomistic structure renders, volumetric charge-density figures, molecular wavefunction-style plots, and numerical plots.
 
 Tool-agnostic figure strategy. Use this before making a figure for a report, SI, response letter, or manuscript-style comparison. The goal is not to make a quick screenshot; it is to choose a rendering path that preserves the scientific object, makes the visual claim auditable, and records enough parameters to reproduce the figure.
