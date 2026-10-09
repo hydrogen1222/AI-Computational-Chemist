@@ -28,7 +28,7 @@ LWAVE   = .FALSE. ; LCHARG = .FALSE.
 ISMEAR/SIGMA/ENCUT/k-mesh: same as the relaxation
 ```
 
-Submit as a job array (`hpc-submit`); before writing the array script, read the
+Prepare an optional job-array script for the researcher to submit; use the
 target `~/.cluster-agents.md`. The displacement-directory → force-file mapping is
 provenance — never reorder by hand. A validated MLP backend (via ASE calculators)
 can replace DFT here (`mlp` skill).

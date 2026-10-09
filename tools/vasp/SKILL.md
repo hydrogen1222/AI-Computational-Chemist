@@ -31,7 +31,7 @@ description: Prepare, validate, run, and troubleshoot VASP DFT calculations for 
 | surface Pourbaix diagrams, dissolution, and phase-boundary audits | `knowledge/surface-pourbaix.md`; `references/electrochemistry.md`; `scripts/surface_pourbaix.py`; `examples/surface-pourbaix-audit/` |
 | AIMD, enhanced sampling, and trajectory analysis | `references/aimd.md`; `knowledge/molecular-dynamics.md`; `tools/vaspkit/references/aimd-postprocessing.md` |
 | surface thermodynamics, kinetics, and microkinetics | `knowledge/surface-thermodynamics.md`; `knowledge/reaction-kinetics.md`; `tools/vaspkit/references/thermochemistry.md`; `tools/catmap/SKILL.md` |
-| GPU/OpenACC execution | `references/gpu-openacc.md`; `tools/hpc-submit/references/running.md` |
+| GPU/OpenACC settings and manual scheduler template | `references/gpu-openacc.md` |
 | COHP/COOP bonding | `tools/lobster/SKILL.md`; `knowledge/bonding-analysis.md` |
 | scientific visualization or upstream documentation | `knowledge/scientific-visualization.md`; `references/resources.md` |
 
@@ -63,9 +63,11 @@ and hashes where appropriate.
    reference before generating inputs. Record the full method fingerprint and source.
 2. Run `uv run scripts/check_inputs.py` with the production policy in
    `references/validation.md`; resolve or explicitly waive every warning.
-3. Execute through `hpc-submit`, preserving the exact inputs and runtime provenance.
-4. Run `scripts/parse_vasp.py` and apply task-specific validation. On failure, match
-   `references/errors.md`, change one cause, and rerun only with approval/ownership.
+3. Hand the self-contained inputs (and optional inspected batch script) to the
+   researcher for manual submission; the agent never launches or monitors the job.
+4. Run `scripts/parse_vasp.py` and apply task-specific validation. On failure, diagnose using
+   `references/errors.md`, propose one defensible change, and let the researcher
+   decide whether to restart.
 
 ## Hard guardrails
 

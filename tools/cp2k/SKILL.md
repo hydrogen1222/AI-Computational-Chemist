@@ -50,8 +50,8 @@ Task types: **single-point** (`RUN_TYPE ENERGY`), **optimization** (`GEO_OPT`, `
 1. Decide the scientific question first; if it is code-agnostic, read the matching `knowledge/` doc before choosing CP2K settings.
 2. Build the input from `running.md` or a verified example; keep all compared energies on the same functional, basis/potential, grid, k-policy, SCF, smearing, electrostatics, and correction settings.
 3. Preflight: `uv run scripts/check_inputs.py input.inp`; for novel setups, run `cp2k -c input.inp` and a short smoke test.
-4. Execute through `hpc-submit` for durable local/Slurm/PBS runs; before writing
-   the job script, read the target `~/.cluster-agents.md`.
+4. Prepare a manual launcher or batch script only with verified site settings.
+   The researcher submits and monitors jobs; the agent only checks the inputs.
 5. Validate: `uv run scripts/parse_cp2k.py output.out`; apply `validation.md`. On failure, use `errors.md`, change one thing, and rerun.
 
 ## Hard guardrails

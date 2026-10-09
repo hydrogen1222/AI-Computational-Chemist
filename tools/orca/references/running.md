@@ -116,7 +116,7 @@ recipe for thiophosphates. The polar/covalent P-S tetrahedra and mobile Na
 network require explicit model choices. Record the installed version before
 borrowing version-specific examples.
 
-Before preparing a Na3PS4 embedded cluster, major must record:
+Before preparing a Na3PS4 embedded cluster, the modeling agent records:
 
 1. The **periodic VASP parent** (exact POSCAR/CONTCAR, composition, charge,
    defect/dopant site, orientation), and the scientific target (bulk PS4,
@@ -150,7 +150,7 @@ an explicit `xyz`/`xyzfile` electron inventory. For `* pdbfile` embedded
 models, its exit code is **not** an acceptance certificate: it cannot confirm
 QM region selection, actual QC electron count, point charges, cECP assignment,
 electrostatic convergence or the N +/- 1 fixed-potential requirement. These
-are mandatory manual/major preflight checks. No example `orca_crystalprep`
+are required scientific and geometric preflight checks. No example `orca_crystalprep`
 output is safe to run unchanged without those checks.
 
 For any derived `f+`, `f-`, dual descriptor, global hardness, or IP/EA,
