@@ -1,6 +1,6 @@
 # VASP on GPUs (OpenACC builds)
 
-> Load this when: running VASP on GPU nodes — choosing between CPU and GPU builds, writing the launch script, setting ranks/threads per GPU, or adapting INCAR parallelization for OpenACC VASP. For generic Slurm GPU discovery and request syntax, also load `tools/hpc-submit/references/running.md`.
+> Load this when: running VASP on GPU nodes — choosing between CPU and GPU builds, writing the launch script, setting ranks/threads per GPU, or adapting INCAR parallelization for OpenACC VASP. The agent may prepare a manual Slurm GPU script using verified site-specific options; the researcher submits and monitors it.
 
 ## Build choice is a method decision
 

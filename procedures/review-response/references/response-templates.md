@@ -4,7 +4,7 @@
 > fingerprint or compact reviewer-comment status table. Do not create these
 > files for unrelated scientific modeling.
 
-There is no mandatory `.research/` state or project DAG. Reuse an existing
+Reuse an existing
 manuscript/project record when possible. If author coordination benefits from
 a separate table, the following formats are examples, **not schemas**.
 

@@ -76,13 +76,8 @@ the DeepMD chain, not an interactive stop after every figure:
   model path, dataset paths, frame counts, type_map, plotted files, exclusions, and
   interpretation limits.
 
-Run the default chain after the DFT labels are converted/split:
-
-```bash
-python tools/deepmd/scripts/run_deepmd_chain.py --run-dir <run> --data-root data
-```
-
-Use the individual helpers only to rerun or debug one part of the chain:
+After the researcher has trained and frozen the model, use the individual
+helpers for bounded post-processing and quality checks:
 
 ```bash
 uv run tools/deepmd/scripts/plot_deepmd_postprocess.py --work-dir <run> --detail-prefix detail_file
