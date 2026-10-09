@@ -49,6 +49,14 @@ when the original system is confirmed neutral, to verify charge closure.
 
 ## Inputs
 
+POTCAR compatibility: an observed Chargemol 3.5/VASP 6 failure arose
+from extra `SHA256 =` and `COPYR =` metadata headers. A local agent
+may create an **isolated compatible POTCAR copy** in the Chargemol
+work folder, remove only those proven-incompatible metadata lines,
+verify preserved element order, TITEL, ZVAL and actual PAW data, and
+record original/adapted SHA-256. Never modify or redistribute the
+original source POTCAR, and do not strip unrelated header content.
+
 For VASP, require a compatible single completed electron-density calculation
 with CHGCAR, AECCAR0, AECCAR2, POTCAR. Generate with LCHARG=.TRUE. and
 LAECHG=.TRUE. in the VASP input. Density files cannot be recreated by a
@@ -70,11 +78,23 @@ original pseudopotentials without understanding the implications.
 2. Default batch action is read-only and does not start Chargemol.
 3. With explicit approval for this bounded post-processing operation, run
    Chargemol with DDEC6 and compute BOs enabled, one case at a time.
+   **Force OMP_NUM_THREADS=1 in the child environment**, independent of
+   the user's inherited shell settings: one local gfortran/OpenMP Chargemol
+   3.5 build produced severely corrupted SBO with 12/32 threads yet
+   reproduced reliably with one thread. Chargemol's published design is
+   OpenMP parallel, so this is a *local build/runtime issue*, not proof
+   that all builds are unsafe. Re-enable parallelism only after proving
+   invariant contact-exchange, SBO, bond pairs and charges for that build.
    The user alone submits and monitors **DFT/HPC production calculations**.
 4. Collect existing output without an installed binary using collect-only.
 5. Check atom counts and element mapping against the original CHGCAR;
-   reject invalid numeric data and mismatch in charge balance (if expected
-   charge is provided). Preserve periodic image translations and avoid
+   reject invalid numeric data, negative SBO, and mismatch in charge
+   balance (if expected charge is provided). Also inspect the
+   `The maximum error in the summed contact exchange is ...` diagnostic.
+   `--contact-exchange-tol` defaults to a *conservative empirical* 0.005 e,
+   based on this Li2S experiment (0.016 e bad, 0.00023 e good); this is
+   not a published universal limit. Missing logs/diagnostics are
+   `LOG_MISSING`/`METRIC_NOT_REPORTED`, **not a QC PASS**. Preserve periodic image translations and avoid
    double counting reversed pair listings.
 6. Provide actual CSVs and an immediately readable Markdown summary.
    When Matplotlib is present, automatically make 16:9 PNG (300 dpi)
@@ -113,7 +133,8 @@ bond classes appear. Use the full raw BO table for detailed analysis.
 
 - Original density and POTCAR files are never modified. Chargemol work goes
   under each run's postprocess/chargemol/ and is never silently overwritten.
-- Under CALC_ROOT/postprocess_summary/: ddec6_cases.csv (case QC),
+- Under CALC_ROOT/postprocess_summary/: ddec6_cases.csv (case QC,
+  including `contact_exchange_error_e` and `bond_qc_status`),
   ddec6_atoms.csv (q and SBO per atom), ddec6_bonds.csv (pairs with image
   vectors), ddec6_elements.csv (element means and min-max),
   ddec6_bond_types.csv (bond type means and min-max), ddec6_summary.md,
