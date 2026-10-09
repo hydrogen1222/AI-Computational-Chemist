@@ -23,7 +23,8 @@ BONDS_FILE = "DDEC6_even_tempered_bond_orders.xyz"
 HEADER = ["case", "status", "detail", "n_atoms", "net_charge_e",
           "sum_ddec6_q_e", "charge_balance_error_e", "source", "chargemol_dir"]
 ATOMS = ["case", "atom_index_1based", "element", "ddec6_net_charge_e",
-         "sum_bond_orders", "source_xyz"]
+         "sum_bond_orders", "sbo_from_printed_pairs", "sbo_unprinted_remainder",
+         "source_xyz"]
 BONDS = ["case", "atom_i_1based", "element_i", "atom_j_1based", "element_j",
          "translation_a", "translation_b", "translation_c", "ddec6_bond_order",
          "source_xyz"]
@@ -192,8 +193,29 @@ def read_analysis(case: str, run: Path, expected_charge: float | None, tol: floa
     total = sum(q)
     if expected_charge is not None and abs(total - expected_charge) > tol:
         raise ValueError(f"charge sum {total:.6f} e differs from expected {expected_charge:.6f} e")
+    # Each undirected periodic bond contributes to *both* endpoint SBOs.
+    # For an atom bonded to one of its own periodic images, that means two
+    # contributions to that atom, even though the bond itself is only
+    # reported once in ddec6_bonds.csv.
+    printed = [0.0] * len(symbols)
+    for bond in pair:
+        left = bond["atom_i_1based"] - 1
+        right = bond["atom_j_1based"] - 1
+        printed[left] += bond["ddec6_bond_order"]
+        printed[right] += bond["ddec6_bond_order"]
+    for i, value in enumerate(printed):
+        # Allow normal printed-value rounding and unprinted weak bonds, but
+        # reject a sum larger than the authoritative Chargemol SBO.
+        if value - sbo[i] > max(0.02, 0.01 * abs(sbo[i])):
+            raise ValueError(
+                f"printed pair BOs exceed SBO for atom {i+1}: "
+                f"{value:.6f} > {sbo[i]:.6f}; check periodic duplication"
+            )
     atoms = [{"case": case, "atom_index_1based": i+1, "element": el,
-              "ddec6_net_charge_e": round(q[i], 8), "sum_bond_orders": round(sbo[i], 8),
+              "ddec6_net_charge_e": round(q[i], 8),
+              "sum_bond_orders": round(sbo[i], 8),
+              "sbo_from_printed_pairs": round(printed[i], 8),
+              "sbo_unprinted_remainder": round(sbo[i] - printed[i], 8),
               "source_xyz": str(charge_path)}
              for i, el in enumerate(symbols)]
     bonds = [{"case": case, **b, "source_xyz": str(bo_path)} for b in pair]
@@ -330,7 +352,11 @@ def main(argv=None):
             "# DDEC6 analysis — slide-ready summary\n\n"
             f"Cases: {len(dirs)}; passed: {len(dirs)-errors}; failed: {errors}.\n\n"
             "Reported q is **DDEC6 net atomic charge (e)**, positive = electron-deficient.\n"
-            "SBO is the sum of bond orders per atom; pair BO is dimensionless.\n"
+            "SBO is the sum of bond orders per atom; pair BO is dimensionless.
+Each atom row also contains SBO reconstructed from the printed pairs
+and the residual (SBO minus printed contributions). A periodic self-image
+bond contributes twice to that atom's SBO but appears just once as an
+undirected pair in the bond table.\n"
             "The pair table retains periodic cell translations. A given pair is counted\n"
             "once even if both reciprocal listings are present. The SBO includes\n"
             "small bonds below Chargemol's bond-print cutoff and therefore need not\n"
@@ -338,7 +364,7 @@ def main(argv=None):
             f"Charge sum check: {'enabled against '+str(opt.net_charge)+' e' if opt.net_charge is not None else 'NOT CHECKED: --net-charge unspecified'}.\n\n"
             "## Files\n\n"
             "- ddec6_cases.csv — case status/errors and charge-sum check\n"
-            "- ddec6_atoms.csv — full per-atom q and SBO\n"
+            "- ddec6_atoms.csv — full per-atom q, SBO, printed-pair SBO and residual\n"
             "- ddec6_bonds.csv — pairwise BO including periodic translations\n"
             "- ddec6_elements.csv — element-resolved means and ranges\n"
             "- ddec6_bond_types.csv — bond-type means and ranges\n\n"
