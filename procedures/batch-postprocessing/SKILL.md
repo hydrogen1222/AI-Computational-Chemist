@@ -75,6 +75,14 @@ and report `q = ZVAL - N_Bader` (e), not formal oxidation states. Keep
 element/atom mapping intact and compare like-with-like. The original
 `scripts/bader_summary.py` remains useful for one run.
 
+### DDEC6 net atomic charge and bond orders
+
+Load tools/chargemol/SKILL.md and use tools/vasp/scripts/batch_ddec6.py.
+Chargemol, not pymatgen, performs the DDEC6 computation. Keep each atom's
+net charge, SBO and the pairwise periodic BO information separate. The
+batch reports source-traceable CSVs, readable Markdown and optional PPT-ready
+SVG/PNG. Preserve density input provenance and charge-balance checks.
+
 ### Other tools
 
 - VASPKIT: `tools/vaspkit/`; determine the installed version and exact
