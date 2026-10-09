@@ -14,6 +14,7 @@ import argparse
 import csv
 import re
 import shutil
+from software_locator import find_executable
 import subprocess
 import sys
 from pathlib import Path
@@ -31,8 +32,8 @@ def arguments(argv=None):
     mode.add_argument("--collect-only", action="store_true", help="Parse existing ACF.dat; no external binaries")
     parser.add_argument("--manifest", type=Path, help="Optional newline-separated run directories, relative to root")
     parser.add_argument("--zval", default="", help="Explicit valence electrons, e.g. Na:9,P:5,S:6; no guessed defaults")
-    parser.add_argument("--bader-bin", default="bader")
-    parser.add_argument("--chgsum-bin", default="chgsum.pl")
+    parser.add_argument("--bader-bin", help="Bader executable; auto-discover when omitted")
+    parser.add_argument("--chgsum-bin", help="chgsum.pl path; auto-discover when omitted")
     parser.add_argument("--force", action="store_true", help="Explicitly replace generated Bader outputs only")
     parser.add_argument("--timeout", type=int, default=0, help="Seconds per external tool (0 = no timeout)")
     return parser.parse_args(argv)
@@ -169,15 +170,19 @@ def prepare_and_run(folder: Path, opts):
             raise ValueError("existing ACF.dat is older than density files; use --force after review")
         return acf, "reused"
 
-    if not shutil.which(opts.chgsum_bin) or not shutil.which(opts.bader_bin):
-        raise ValueError("missing chgsum.pl or bader executable on PATH; no VASP files changed")
+    if not hasattr(opts, "_resolved_bader"):
+        chgsum = find_executable("chgsum", opts.chgsum_bin)
+        bader = find_executable("bader", opts.bader_bin)
+        opts._resolved_bader = (str(chgsum), str(bader))
+        print(f"Bader tools discovered: chgsum={chgsum}; bader={bader}")
+    chgsum_bin, bader_bin = opts._resolved_bader
     if not opts.force and any((output / n).exists() for n in BADER_FILES):
         raise ValueError("incomplete existing Bader output; inspect it or use --force")
-    run_tool([opts.chgsum_bin, "AECCAR0", "AECCAR2"],
+    run_tool([chgsum_bin, "AECCAR0", "AECCAR2"],
              output, output / "chgsum.log", opts.timeout)
     if not (output / "CHGCAR_sum").is_file():
         raise RuntimeError("chgsum.pl did not produce CHGCAR_sum")
-    run_tool([opts.bader_bin, "CHGCAR", "-ref", "CHGCAR_sum"],
+    run_tool([bader_bin, "CHGCAR", "-ref", "CHGCAR_sum"],
              output, output / "bader.log", opts.timeout)
     if not acf.is_file():
         raise RuntimeError("bader did not produce ACF.dat")

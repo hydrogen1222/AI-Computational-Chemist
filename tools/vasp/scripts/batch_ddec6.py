@@ -13,7 +13,7 @@ import os
 import importlib.util
 from pathlib import Path
 import re
-import shutil
+from software_locator import DiscoveryError, find_executable, find_chargemol_densities
 import subprocess
 import sys
 
@@ -40,7 +40,7 @@ def cli(argv=None):
     mode.add_argument("--execute", action="store_true", help="Run installed Chargemol; request user approval first")
     mode.add_argument("--collect-only", action="store_true", help="Read existing Chargemol output files")
     p.add_argument("--manifest", type=Path, help="Optional case directories (newline-separated)")
-    p.add_argument("--binary", default="chargemol", help="Chargemol executable; or absolute path")
+    p.add_argument("--binary", help="Optional executable path/name; auto-discover if omitted")
     p.add_argument("--atomic-densities", type=Path, help="Installed Chargemol atomic_densities directory")
     p.add_argument("--net-charge", type=float, help="Expected cell net charge in e, required with --execute")
     p.add_argument("--charge-tol", type=float, default=0.05, help="Maximum abs(sum q - expected q), in e")
@@ -223,14 +223,12 @@ def exec_chargemol(run: Path, opts):
         if (work / CHARGE_FILE).is_file() and (work / BONDS_FILE).is_file():
             return "reused pre-existing outputs"
         raise ValueError(f"nonempty or partial Chargemol workdir: {work}; inspect manually")
-    if not opts.atomic_densities:
-        raise ValueError("--atomic-densities is required with --execute")
-    densities = opts.atomic_densities.expanduser().resolve()
-    if not densities.is_dir() or not any(densities.iterdir()):
-        raise ValueError(f"missing/empty Chargemol atomic reference density directory: {densities}")
-    binary = shutil.which(opts.binary) if not Path(opts.binary).is_file() else str(Path(opts.binary).resolve())
-    if not binary:
-        raise ValueError(f"Chargemol executable not found: {opts.binary}")
+    if not hasattr(opts, "_resolved_chargemol"):
+        exe = find_executable("chargemol", opts.binary)
+        density = find_chargemol_densities(opts.atomic_densities, exe)
+        opts._resolved_chargemol = (exe, density)
+        print(f"Chargemol discovered: {exe}; atomic densities: {density}")
+    binary, densities = opts._resolved_chargemol
     missing = [n for n in INPUTS if not (run/n).is_file()]
     if missing:
         raise ValueError("missing " + ", ".join(missing))
