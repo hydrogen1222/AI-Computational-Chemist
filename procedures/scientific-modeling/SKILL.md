@@ -124,4 +124,5 @@ of already available outputs may use engine parsers on request.
 | VASP/CP2K/ORCA/Gaussian/etc. input methods | respective `tools/<engine>/SKILL.md` |
 | Published paper to model requirements | `procedures/literature-to-calculation/SKILL.md` |
 | Electron structure, surfaces, MD, thermodynamics | relevant `knowledge/` entry |
+| Batch post-processing of many completed simulations | `procedures/batch-postprocessing/SKILL.md` |
 | Optional authorized cluster execution | `tools/hpc-submit/SKILL.md` |

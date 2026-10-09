@@ -20,4 +20,6 @@ jobs:
           bash -n install.sh
           python -m compileall -q aicc
       - name: Test one-agent routing and CLI
-        run: python aicc/tests/smoke_test.py
+        run: |
+          python aicc/tests/smoke_test.py
+          python aicc/tests/batch_bader_test.py

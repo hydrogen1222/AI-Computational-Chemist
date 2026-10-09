@@ -29,6 +29,15 @@ counts, and the static structure. Reported ionic charge ≈ `ZVAL − Bader_elec
 model-dependent number — see the knowledge doc; it is not a formal oxidation state). For magnetic
 runs, `chgsplit.pl CHGCAR` separates total and magnetization components for a spin-density plot.
 
+For many existing VASP directories, use
+`tools/vasp/scripts/batch_bader.py ROOT` for a read-only audit,
+`--execute` after permission to run `chgsum.pl` and `bader`, or
+`--collect-only` to aggregate existing `ACF.dat` files.
+It writes per-case statuses and per-atom/per-element CSV under
+`ROOT/postprocess_summary/`, while new Bader working files remain in
+`<run>/postprocess/bader/`. Original density files are never overwritten.
+This is the preferred route when the user does not want manual analysis.
+
 ## Charge-density difference
 
 ```text

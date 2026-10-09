@@ -10,6 +10,8 @@ central scheduler, task state machine or mandatory project document protocol.
   CP2K, ORCA, analysis, visualization, optional HPC submission).
 - `knowledge/`: scientific background that survives switching codes; references,
   **not** separate agents or executable skills.
+- `procedures/batch-postprocessing/`: an optional one-agent workflow for
+  analyzing many finished calculations with existing tool skills.
 - `benchmark/`: standalone evaluation archive, not default agent context.
 - `aicc/`: optional local skill discovery/install diagnostics CLI.
 
