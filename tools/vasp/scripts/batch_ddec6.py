@@ -21,7 +21,8 @@ INPUTS = ("CHGCAR", "AECCAR0", "AECCAR2", "POTCAR")
 CHARGE_FILE = "DDEC6_even_tempered_net_atomic_charges.xyz"
 BONDS_FILE = "DDEC6_even_tempered_bond_orders.xyz"
 HEADER = ["case", "status", "detail", "n_atoms", "net_charge_e",
-          "sum_ddec6_q_e", "charge_balance_error_e", "source", "chargemol_dir"]
+          "sum_ddec6_q_e", "charge_balance_error_e", "contact_exchange_error_e",
+          "bond_qc_status", "source", "chargemol_dir"]
 ATOMS = ["case", "atom_index_1based", "element", "ddec6_net_charge_e",
          "sum_bond_orders", "sbo_from_printed_pairs", "sbo_unprinted_remainder",
          "source_xyz"]
@@ -46,6 +47,8 @@ def cli(argv=None):
     p.add_argument("--net-charge", type=float, help="Expected cell net charge in e, required with --execute")
     p.add_argument("--charge-tol", type=float, default=0.05, help="Maximum abs(sum q - expected q), in e")
     p.add_argument("--timeout", type=int, default=0, help="Chargemol seconds per case; 0 = unlimited")
+    p.add_argument("--contact-exchange-tol", type=float, default=0.005,
+                   help="Empirical maximum summed-contact-exchange error in e; default 0.005")
     return p.parse_args(argv)
 
 
@@ -181,7 +184,33 @@ def read_bonds(path: Path, symbols: list[str], sums: list[float]):
             for (a,b,dx,dy,dz), bo in sorted(result.items())]
 
 
-def read_analysis(case: str, run: Path, expected_charge: float | None, tol: float):
+CONTACT_EXCHANGE_RE = re.compile(
+    r"The maximum error in the summed contact exchange is\\s*"
+    r"([+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eEdD][+-]?\\d+)?)",
+    flags=re.IGNORECASE,
+)
+
+
+def contact_exchange_qc(folder: Path, tolerance: float):
+    """Screen Chargemol internal BO consistency (empirical, not a universal limit)."""
+    for logfile in (folder / "VASP_DDEC_analysis.output", folder / "output.txt"):
+        if logfile.is_file():
+            matches = CONTACT_EXCHANGE_RE.findall(logfile.read_text(errors="replace"))
+            if not matches:
+                return None, "METRIC_NOT_REPORTED"
+            value = float(matches[-1].replace("D", "E").replace("d", "e"))
+            if not math.isfinite(value) or value < 0:
+                raise ValueError("invalid maximum summed contact exchange error")
+            if value > tolerance:
+                raise ValueError(
+                    f"contact-exchange error {value:.6g} e exceeds "
+                    f"{tolerance:.6g} e screening tolerance; reject BO result"
+                )
+            return value, "PASS"
+    return None, "LOG_MISSING"
+
+
+def read_analysis(case: str, run: Path, expected_charge: float | None, tol: float, contact_tol: float):
     symbols = source_structure(run)
     output = run / "postprocess" / "chargemol"
     if not (output / CHARGE_FILE).is_file() and (run / CHARGE_FILE).is_file():
@@ -189,6 +218,9 @@ def read_analysis(case: str, run: Path, expected_charge: float | None, tol: floa
     charge_path, bo_path = output / CHARGE_FILE, output / BONDS_FILE
     q = xyz_properties(charge_path, symbols)
     sbo = xyz_properties(bo_path, symbols)
+    ce_error, bo_qc_status = contact_exchange_qc(output, contact_tol)
+    if any(v < -1e-6 for v in sbo):
+        raise ValueError("negative Chargemol SBO: corrupted bond-order data")
     pair = read_bonds(bo_path, symbols, sbo)
     total = sum(q)
     if expected_charge is not None and abs(total - expected_charge) > tol:
@@ -236,7 +268,7 @@ def read_analysis(case: str, run: Path, expected_charge: float | None, tol: floa
         types.append({"case": case, "element_pair": label, "n_periodic_bonds": len(vals),
                       "mean_bond_order": round(sum(vals)/len(vals), 8),
                       "min_bond_order": round(min(vals), 8), "max_bond_order": round(max(vals), 8)})
-    return atoms, bonds, els, types, total, str(output)
+    return atoms, bonds, els, types, total, str(output), ce_error, bo_qc_status
 
 
 def exec_chargemol(run: Path, opts):
@@ -268,11 +300,16 @@ def exec_chargemol(run: Path, opts):
         "<charge type>\nDDEC6\n</charge type>\n"
         "<compute BOs>\n.true.\n</compute BOs>\n",
         encoding="utf-8")
+    # This local Chargemol 3.5 build produced corrupt bond orders with OpenMP>1.
+    child_env = os.environ.copy()
+    child_env["OMP_NUM_THREADS"] = "1"
     with (work/"chargemol_stdout.log").open("w") as log:
+        log.write("AICC safety setting: OMP_NUM_THREADS=1\\n")
+        log.flush()
         try:
             proc = subprocess.run([binary], cwd=work, stdout=log,
                                   stderr=subprocess.STDOUT, check=False,
-                                  timeout=opts.timeout if opts.timeout>0 else None)
+                                  timeout=opts.timeout if opts.timeout>0 else None, env=child_env)
         except subprocess.TimeoutExpired as e:
             raise ValueError("Chargemol timeout; inspect workdir and log") from e
     if proc.returncode:
@@ -292,7 +329,7 @@ def write_csv(path: Path, keys, records):
 def main(argv=None):
     opt = cli(argv)
     root = opt.root.expanduser().resolve()
-    if not root.is_dir() or opt.charge_tol <= 0 or opt.timeout < 0:
+    if not root.is_dir() or opt.charge_tol <= 0 or opt.contact_exchange_tol <= 0 or opt.timeout < 0:
         print("invalid root, tolerance, or timeout", file=sys.stderr)
         return 2
     if opt.execute and opt.net_charge is None:
@@ -313,13 +350,15 @@ def main(argv=None):
     for run in dirs:
         case = "." if run == root else run.relative_to(root).as_posix()
         msg, state, total, outdir, n = "", "READY", None, "", 0
+        ce_error, bo_qc_status = None, "NOT_CHECKED"
         try:
             symbols = source_structure(run)
             n = len(symbols)
             if opt.execute:
                 msg = exec_chargemol(run, opt)
             if opt.execute or opt.collect_only:
-                aa, bb, ee, tt, total, outdir = read_analysis(case, run, opt.net_charge, opt.charge_tol)
+                aa, bb, ee, tt, total, outdir, ce_error, bo_qc_status = read_analysis(
+                    case, run, opt.net_charge, opt.charge_tol, opt.contact_exchange_tol)
                 atoms.extend(aa); bonds.extend(bb); els.extend(ee); types.extend(tt)
                 state, msg = "OK", msg or "collected"
             else:
@@ -336,7 +375,9 @@ def main(argv=None):
                        "sum_ddec6_q_e": round(total, 8) if total is not None else "",
                        "charge_balance_error_e": round(total-opt.net_charge,8)
                        if total is not None and opt.net_charge is not None else "NOT_CHECKED",
-                       "source": str(run), "chargemol_dir": outdir})
+                       "contact_exchange_error_e": round(ce_error, 8) if ce_error is not None else "",
+                        "bond_qc_status": bo_qc_status,
+                        "source": str(run), "chargemol_dir": outdir})
     if opt.execute or opt.collect_only:
         out = root / "postprocess_summary"
         out.mkdir(exist_ok=True)
