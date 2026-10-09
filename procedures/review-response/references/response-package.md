@@ -12,10 +12,10 @@ Produce these files when the requested deliverable is a reviewer response:
 response-letter.md or response-letter.docx
 cover-letter.md or cover-letter.docx
 revision-changelog.md
-report.docx or SI-ready calculation report from tools/report
+optional manuscript/SI report (only if requested and report tooling is installed)
 ```
 
-The calculation report remains governed by `tools/report`. This file governs the
+The requested report format follows the author's requirements. This file governs
 letter structure and author-facing decisions.
 
 ## Comment identity
@@ -29,9 +29,7 @@ R1.C1, R1.C2, R2.C1, ...
 Keep the same ID in:
 
 - triage entries;
-- `.research/tasks/*.yaml`;
-- scientific-claim artifacts;
-- figure contracts (`scientific_drivers.driver_type: reviewer_comment`);
+- the relevant scientific evidence paths and figures;
 - response-letter sections;
 - revision changelog entries.
 
