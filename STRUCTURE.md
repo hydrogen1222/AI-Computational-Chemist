@@ -49,7 +49,7 @@ models/
 
 Add files only when they hold real scientific information or reproducibility
 evidence. Do not auto-create `00_project_overview.md`, `01_project_status.md`,
-multiple work ledgers, review briefs, glossary files or `.research/`.
+multiple work ledgers, review briefs, glossary files or task state directories.
 
 ## Contributions
 

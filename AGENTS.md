@@ -44,7 +44,7 @@ not the user. Parsing existing data is separate from running new simulations.
 | Theoretical foundations and interpretation | relevant `knowledge/*.md` |
 
 Do not create scheduler-control services, task-state databases, artificial review
-gates or prescribed sets of project reports. Do not create `.research/`.
+gates or prescribed sets of project reports.
 Existing project layouts remain valid; **do not migrate or rename existing work
 without permission**. For a fresh standalone modeling task, a compact
 `models/model.md`, source structures, candidate files, and a reproducible build

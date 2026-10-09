@@ -1,13 +1,13 @@
 ---
 name: report
-description: "Assemble stage-synthesis or final .docx reports from computed results. Use for interim review packets after a calculation wave, or as the final deliverable of peer-review responses, calculation reports, and reproductions when accepted claims must be handed to humans with figures, captioned relative-energy tables, and structure figures paired with their data. Encodes report maturity gates: stage reports disclose pending follow-up; final reports consume accepted claims by default."
+description: "Assemble stage-synthesis or final .docx reports from computed results. Use for interim review packets after a calculation wave, or as the final deliverable of peer-review responses, calculation reports, and reproductions when accepted claims must be handed to humans with figures, captioned relative-energy tables, and structure figures paired with their data. Requires scientifically traceable evidence and human review before final publication."
 ---
 
 # Report Builder
 
 Build one of two post-result deliverables: a **stage synthesis** from validated but
 unaccepted evidence, or a **final `.docx`** from accepted claims and explicit waivers.
-Do not put report tasks on the first engine/HPC submission critical path.
+Do not require report drafting as a prerequisite to input construction.
 
 ## Required inputs
 
@@ -15,7 +15,7 @@ Do not put report tasks on the first engine/HPC submission critical path.
   limitations, waivers, and open follow-up items.
 - Source tables and figures; for new or revised figures, their source data and
   scientific driver.
-- The accepted report gate for final mode.
+- Human-reviewed evidence and explicit open limitations for any final draft.
 
 ## Route map
 
@@ -31,8 +31,8 @@ Do not put report tasks on the first engine/HPC submission critical path.
 
 ## Workflow
 
-1. Choose stage synthesis unless claims are accepted, waivers and limitations are
-   explicit, follow-up state is resolved, and the report gate permits final mode.
+1. Prepare an interim synthesis when evidence remains inconclusive; prepare a
+   final **draft** only when findings and limitations can be honestly reported.
 2. Load `manifest.yaml` routes, run the pre-report checks in `references/validation.md`,
    and resolve or visibly waive missing low-cost analyses.
 3. Contract any new figures before plotting, build the report manifest, and run

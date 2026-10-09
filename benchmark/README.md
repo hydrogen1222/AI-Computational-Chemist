@@ -16,7 +16,6 @@ score the agents' reports head-to-head against the authors' own calculations.
 prompt.md                 the fixed task prompt given to the benchmarked agents
 EVAL_PROMPT.md            the grading rubric (six dimensions, seven red flags,
                           zero-prior protocol, ±5-point tie band)
-RUN_ALL.md                the batch-orchestration protocol for evaluator runs
 EVAL_DESIGN_RATIONALE.md  the rubric's design rationale (withheld from graders
                           during evaluation; published here for transparency)
 cases/                    the five evaluated cases (fixtures + agent reports)
@@ -49,7 +48,7 @@ Agents received `01`–`03` only; `04` is the grading reference.
 ## The evaluations
 
 The full five-case evaluation was executed twice end-to-end under the identical
-rubric and orchestration protocol, once per evaluator model. Run folders are
+original grading rubric, once per evaluator model. Run folders are
 labelled by the git commit of the case data they scored:
 
 | Run folder | Evaluator | Mean weighted totals (HUMAN / AI-GPT5.5 / AI-GPT5.5-FU) |

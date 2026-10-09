@@ -14,7 +14,7 @@ axes:
     detect: |
       Use stage-synthesis when calculations are validated but claims are not yet
       accepted or follow-up proposals remain open. Use final only when accepted
-      claims, explicit waivers, and report gates are available.
+      claims, explicit limitations, and source traceability are available.
     values:
       stage-synthesis: []
       final:

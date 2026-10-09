@@ -11,14 +11,13 @@
   list the follow-up task or decision needed. It is not a final deliverable and not a
   prerequisite for first engine input generation or HPC submission.
 - **Final report**: use only after relevant claims are accepted or explicitly waived as
-  limitations, no open `needs-follow-up` blocks final conclusions, and the report gate
-  passes. It consumes accepted claims by default.
+  limitations, no open `needs-follow-up` blocks final conclusions, and the sources and limitations are clear. It remains an editable draft.
 
 ## Flow
 
 1. Choose the report mode. If any critic outcome is `needs-follow-up` and no human
    waiver exists, write a stage synthesis and create/point to the follow-up tasks.
-2. Run the pre-report soft gate in `validation.md`: decide whether free-energy corrections, DOS/PDOS, charge/work-function, or another low-cost analysis is needed before claims are drafted. Do the analysis when it is needed, or record a visible waiver/limitation.
+2. Run the pre-report checks in `validation.md`: decide whether free-energy corrections, DOS/PDOS, charge/work-function, or another low-cost analysis is needed before claims are drafted. Do the analysis when it is needed, or record a visible waiver/limitation.
 3. Create a short figure contract for each report-ready figure using
    `figure-contract.md`. The contract names the scientific driver (reviewer comment,
    research question, manuscript claim, benchmark case, method-validation task, or

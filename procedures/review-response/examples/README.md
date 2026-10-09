@@ -8,7 +8,7 @@ assessment and honest reporting without project state machines.
 place a real manuscript, real reviewer text, or real engagement details here.
 
 **Each example contains:** the fake `inputs/` (manuscript + reviews), the artifacts
-of each phase (`method-fingerprint.md`, `triage.md`),
+of the analysis steps (`method-fingerprint.md`, `triage.md`),
 the verified calculation `scripts/`, and an `expected-output.md` (trimmed numbers +
 pass criteria, never bulky raw output). A run that validates ends in a drafted
 `response-package.md`; a run whose result *contradicts* a manuscript claim halts at
