@@ -25,7 +25,7 @@ RETIRED_FILES = [
     "procedures/review-response/examples/toy-contradicts-au-vs-cu/response-workflow.md",
 ]
 ROLE_PATTERNS = [
-    re.compile(r"\\bvice\\b|\\bsubagents?\\b|\\bSI\\s*/\\s*major\\b|\\bmajor\\s*/\\s*SI\\b", re.I),
+    re.compile(r"\bvice\b|\bsubagents?\b|\bSI\s*/\s*major\b|\bmajor\s*/\s*SI\b", re.I),
 ]
 RETIRED_STRINGS = [
     "research-orchestrator",
