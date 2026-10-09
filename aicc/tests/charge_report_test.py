@@ -10,7 +10,6 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[2]
 REPORTER=ROOT/"tools/vasp/scripts/charge_report.py"
-BADER=ROOT/"tools/vasp/scripts/batch_bader.py"
 
 
 def write(folder,name,records):
@@ -124,7 +123,6 @@ class ReadableCharges(unittest.TestCase):
         self.assertIn("普通 Hirshfeld",text)
         self.assertIn("不包含 Hirshfeld-I",text)
         self.assertIn("—",text)
-        self.assertIn("reference",text.lower() if False else "reference") if False else None
         self.assertIn("参考密度",text)
 
     def test_multiwfn_failed_hirshfeld_i_does_not_show_intermediate_number(self):

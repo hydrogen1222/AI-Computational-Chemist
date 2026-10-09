@@ -29,6 +29,7 @@ jobs:
           python aicc/tests/smoke_test.py
           python aicc/tests/plotting_skill_test.py
           python aicc/tests/batch_bader_test.py
+          python aicc/tests/charge_report_test.py
           python aicc/tests/ddec6_test.py
           python aicc/tests/hirshfeld_test.py
           python aicc/tests/multiwfn_periodic_test.py

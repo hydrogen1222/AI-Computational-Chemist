@@ -25,7 +25,8 @@ for read-only discovery and adds `--collect-only` to write full per-atom,
 per-element, and charge-method-comparison tables. Add `--net-charge 0`
 when the original system is confirmed neutral, to verify charge closure.
 
-- Output: `hirshfeld_atoms.csv`, `hirshfeld_elements.csv`,
+- Output: `hirshfeld_report_cn.md` (presentation-ready Chinese explanations),
+  `hirshfeld_atoms.csv`, `hirshfeld_elements.csv`,
   `hirshfeld_cases.csv`, `hirshfeld_summary.md`, and 16:9
   `ppt_figures/*_charge_methods.{svg,png}` if Matplotlib is available.
 - Compare **ordinary Hirshfeld**, CM5 and DDEC6 calculated from the
@@ -34,6 +35,17 @@ when the original system is confirmed neutral, to verify charge closure.
   first DDEC6 partition, DDEC6 itself or CM5 as Hirshfeld-I.
 - If the Chargemol log lacks a uniquely labeled first-iteration block,
   report missing evidence; never guess charges from the final DDEC6 XYZ.
+
+## Human-readable deliverables are mandatory
+
+After a successful DDEC6 batch, provide `ddec6_report_cn.md` alongside
+the existing `ddec6_summary.md` and CSV files. Include all atom/site
+charges, every printed bond type (without arbitrary top-N truncation),
+SBO/BO source and QC, a quantitative but cautious Chinese summary that
+can be pasted into a group-meeting PPT, and explanation of what the
+numbers **cannot** prove. The report is assembled from checked CSVs with
+`tools/vasp/scripts/charge_report.py`; do not hand users CSV and expect
+them to interpret raw software output unaided.
 
 ## Cross-validation with Multiwfn
 

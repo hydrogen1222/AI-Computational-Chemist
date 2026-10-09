@@ -115,6 +115,13 @@ It also reads existing Chargemol first-step Hirshfeld/CM5 from
 without rerunning Chargemol.
 
 **Output:** under `CALC_ROOT/postprocess_summary`:
+The human-facing Chinese report is required even when the user only
+requests numerical results. Do not hand off CSVs alone. Any failed
+H-I iteration is invalid as a reported charge and must remain
+an explicit method failure rather than a speculative numerical result.
+- `multiwfn_report_cn.md` — actual Chinese, presentation-ready
+  case descriptions, full element/atom comparisons, QC and status
+  interpretation; never quote a nonconverged H-I number.
 - `multiwfn_atoms.csv` — every atom with H, CM5, H-I from
   Multiwfn beside existing Chargemol H, CM5 and DDEC6 values;
 - `multiwfn_elements.csv` — per-element means/min/max;

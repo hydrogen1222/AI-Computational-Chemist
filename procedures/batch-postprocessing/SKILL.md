@@ -37,7 +37,14 @@ commands. This is an **optional skill**, not a new agent or scheduler.
    source path, per-case errors, units and result convention. Summarize
    distribution/outliers and scientific limitations without overclaiming.
 6. **Deliver:** concise overall results with exact paths to per-case outputs
-   and aggregate tables, plus the reusable script and how to rerun it. No
+   and aggregate tables, plus the reusable script and how to rerun it.
+   For **atomic charges**, CSV alone is not an acceptable handoff: always
+   generate an actual Chinese human-readable Markdown report with
+   case QC, per-element and site-resolved values and a careful, quantitative
+   explanation suitable for a group meeting or PPT. The agent, not the user,
+   writes and verifies the report; never dump raw numbers without interpretation.
+   Use `tools/vasp/scripts/charge_report.py` to regenerate these reports from
+   existing CSVs without further DFT or population calculations. No
    project status database or extra management Markdown.
 
 ### VASP Bader / AIM net charges
@@ -67,7 +74,11 @@ via `--zval "Na:...,P:...,S:..."`; never guess them. Original VASP
 files are not overwritten. Execution writes under each run's
 `postprocess/bader/`; aggregate tables are under the selected root's
 `postprocess_summary/`. Cases, atom charges and per-element
-mean/min/max/spread become three CSV files. `--force` deliberately
+mean/min/max/spread become three CSV files, plus a Chinese
+`bader_summary.md` containing full data, signed charge interpretation,
+case-specific errors, and QC. Set `--net-charge` only when the cell's
+net charge is verified; without it the report explicitly states that
+charge conservation is not checked. `--force` deliberately
 overwrites **generated Bader outputs only**; inspect them first.
 
 Use the PAW all-electron reference `AECCAR0+AECCAR2` for Bader partitioning,
@@ -80,7 +91,8 @@ element/atom mapping intact and compare like-with-like. The original
 `tools/chargemol/SKILL.md` and `tools/vasp/scripts/batch_ddec6.py`.
 Chargemol, not pymatgen, performs the DDEC6 computation. Keep each atom's
 net charge, SBO and the pairwise periodic BO information separate. The
-batch reports source-traceable CSVs, readable Markdown and optional PPT-ready
+batch reports source-traceable CSVs, the existing technical Markdown,
+an explicit Chinese `ddec6_report_cn.md`, and optional PPT-ready
 SVG/PNG. Preserve density input provenance and charge-balance checks.
 Chargemol and Bader executables are auto-discovered in PATH or typical
 installation roots; `--binary` flags and environment overrides are
@@ -95,6 +107,9 @@ If the user has already run Chargemol DDEC6, first check its
 partition and CM5 values may already be present. Use
 `tools/vasp/scripts/collect_hirshfeld.py` to batch-extract results
 without starting any electronic-structure or Chargemol program.
+Also produce `hirshfeld_report_cn.md`; distinguish Chargemol's
+ordinary Hirshfeld and CM5 from Multiwfn, and do not assert that
+differences are wholly attributable to any one density convention.
 Export full atom/site/element tables, keep source provenance, and
 optionally plot Hirshfeld vs CM5 vs DDEC6 for the same density.
 Do not confuse this with **Hirshfeld-I**, which requires a separate
@@ -107,6 +122,9 @@ Use `tools/multiwfn/references/periodic-stockholder.md` and its
 The agent prepares Nval using the matching POTCAR, independently
 runs each validated Multiwfn menu, then exports all atom/element
 charges and compares against the existing Chargemol outputs.
+Also generate `multiwfn_report_cn.md`: a failed/unconverged method's
+values are not usable even if a last-iteration charge was printed.
+Report convergence *separately* from basic file/charge parsing success.
 Do **not** label Chargemol's initial Hirshfeld iteration as H-I, nor
 substitute an unrelated Multiwfn bond-index method for DDEC6 BO.
 MBIS is out of scope.

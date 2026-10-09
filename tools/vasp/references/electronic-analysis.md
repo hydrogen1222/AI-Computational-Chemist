@@ -28,7 +28,9 @@ For DDEC6 atomic net charges and bond orders, use
 Require CHGCAR, AECCAR0, AECCAR2 and POTCAR from the same converged
 VASP density, plus a separately installed Chargemol binary and reference
 densities. The agent should first auto-detect both (PATH, ~/apps, /opt/apps,
-etc.); only request paths if detection fails or is ambiguous. Pymatgen provides a parser/wrapper, **not** an independent
+etc.); only request paths if detection fails or is ambiguous. The batch creates a Chinese `ddec6_report_cn.md` with actual charges,
+all printed bond categories, SBO, check states and conservative PPT
+interpretation text. Pymatgen provides a parser/wrapper, **not** an independent
 DDEC6 engine. Preserve periodic translation vectors in pair BOs.
 
 ## Bader charge
@@ -59,6 +61,11 @@ For many existing VASP directories, use
 `tools/vasp/scripts/batch_bader.py ROOT` for a read-only audit,
 `--execute` after permission to run `chgsum.pl` and `bader`, or
 `--collect-only` to aggregate existing `ACF.dat` files.
+It additionally creates `bader_summary.md` with Chinese, quantitative,
+PPT-quotable conclusions, all element/atom rows, paths, sign convention
+and quality checks. If a reliable cell charge is known, pass optional
+`--net-charge 0` (replace 0 with the *actual* charge); otherwise
+charge conservation is NOT_CHECKED, never automatically marked PASS.
 It writes per-case statuses and per-atom/per-element CSV under
 `ROOT/postprocess_summary/`, while new Bader working files remain in
 `<run>/postprocess/bader/`. Original density files are never overwritten.
