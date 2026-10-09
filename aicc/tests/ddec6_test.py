@@ -134,6 +134,7 @@ class DDEC6Tests(unittest.TestCase):
         binary.write_text("#!/bin/sh\n"
                           "test -L CHGCAR && test -L POTCAR || exit 5\n"
                           "grep -q '<compute BOs>' job_control.txt || exit 6\n"
+                          "test \"$OMP_NUM_THREADS\" = 1 || exit 7\n"
                           f"cp '{expected / 'DDEC6_even_tempered_net_atomic_charges.xyz'}' .\n"
                           f"cp '{expected / 'DDEC6_even_tempered_bond_orders.xyz'}' .\n")
         binary.chmod(0o755)
@@ -186,6 +187,37 @@ class DDEC6Tests(unittest.TestCase):
         # One Cl self-image +/- pair appears once in the bond CSV but twice in SBO.
         self.assertAlmostEqual(float(atoms[1]['sbo_from_printed_pairs']), 0.0882 + 2*0.0306)
         self.assertAlmostEqual(float(atoms[1]['sbo_unprinted_remainder']), 0.901058 - 0.1494)
+    def test_negative_sbo_rejected(self):
+        file = self.one / "postprocess/chargemol/DDEC6_even_tempered_bond_orders.xyz"
+        file.write_text(file.read_text().replace("Na 0 0 0 0.3", "Na 0 0 0 -20.0", 1))
+        result = self.run_batch("--collect-only", "--manifest", self.manifest("a"))
+        self.assertEqual(result.returncode, 1, result.stderr + result.stdout)
+        self.assertIn("negative Chargemol SBO", result.stdout)
+
+    def test_contact_exchange_error_is_rejected(self):
+        file = self.one / "postprocess/chargemol/VASP_DDEC_analysis.output"
+        file.write_text("The maximum error in the summed contact exchange is   0.016000\n")
+        result = self.run_batch("--collect-only", "--manifest", self.manifest("a"))
+        self.assertEqual(result.returncode, 1, result.stderr + result.stdout)
+        self.assertIn("contact-exchange error", result.stdout)
+
+    def test_contact_exchange_healthy_and_reported(self):
+        file = self.one / "postprocess/chargemol/VASP_DDEC_analysis.output"
+        file.write_text("The maximum error in the summed contact exchange is   0.000230\n")
+        result = self.run_batch("--collect-only", "--manifest", self.manifest("a"))
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        with (self.root / "postprocess_summary/ddec6_cases.csv").open() as fh:
+            row = next(csv.DictReader(fh))
+        self.assertEqual(row["bond_qc_status"], "PASS")
+        self.assertAlmostEqual(float(row["contact_exchange_error_e"]), 0.000230)
+
+    def test_missing_chargemol_log_is_not_reported_as_qc_pass(self):
+        result = self.run_batch("--collect-only", "--manifest", self.manifest("a"))
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        with (self.root / "postprocess_summary/ddec6_cases.csv").open() as fh:
+            row = next(csv.DictReader(fh))
+        self.assertEqual(row["bond_qc_status"], "LOG_MISSING")
+
     def test_slide_figures_if_matplotlib_available(self):
         try:
             import matplotlib  # noqa: F401

@@ -185,8 +185,8 @@ def read_bonds(path: Path, symbols: list[str], sums: list[float]):
 
 
 CONTACT_EXCHANGE_RE = re.compile(
-    r"The maximum error in the summed contact exchange is\\s*"
-    r"([+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eEdD][+-]?\\d+)?)",
+    r"The maximum error in the summed contact exchange is\s*"
+    r"([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eEdD][+-]?\d+)?)",
     flags=re.IGNORECASE,
 )
 
