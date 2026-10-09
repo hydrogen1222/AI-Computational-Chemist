@@ -128,7 +128,7 @@ class DDEC6Tests(unittest.TestCase):
             (fresh / f).write_text((self.one / f).read_text())
         density = self.root / "atomic_densities"
         density.mkdir()
-        (density / "test_density").write_text("mock\n")
+        (density / "c2_mock.txt").write_text("mock\n")
         binary = self.root / "chargemol_stub.sh"
         expected = self.one / "postprocess/chargemol"
         binary.write_text("#!/bin/sh\n"

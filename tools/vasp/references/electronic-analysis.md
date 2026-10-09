@@ -10,8 +10,9 @@ the runs you compare. The *meaning* of every output lives in the knowledge doc a
 For DDEC6 atomic net charges and bond orders, use
 `tools/chargemol/SKILL.md` and `scripts/batch_ddec6.py`.
 Require CHGCAR, AECCAR0, AECCAR2 and POTCAR from the same converged
-VASP density, plus separately installed Chargemol binary and reference
-densities. Pymatgen provides a parser/wrapper, **not** an independent
+VASP density, plus a separately installed Chargemol binary and reference
+densities. The agent should first auto-detect both (PATH, ~/apps, /opt/apps,
+etc.); only request paths if detection fails or is ambiguous. Pymatgen provides a parser/wrapper, **not** an independent
 DDEC6 engine. Preserve periodic translation vectors in pair BOs.
 
 ## Bader charge
@@ -46,6 +47,9 @@ It writes per-case statuses and per-atom/per-element CSV under
 `ROOT/postprocess_summary/`, while new Bader working files remain in
 `<run>/postprocess/bader/`. Original density files are never overwritten.
 This is the preferred route when the user does not want manual analysis.
+The Bader/chgsum binary paths are resolved automatically through
+`scripts/software_locator.py`; explicit `--bader-bin` and `--chgsum-bin`
+are optional fallbacks, not normally required.
 
 ## Charge-density difference
 

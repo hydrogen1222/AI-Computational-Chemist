@@ -13,7 +13,7 @@ import os
 import importlib.util
 from pathlib import Path
 import re
-import shutil
+from software_locator import DiscoveryError, find_executable, find_chargemol_densities
 import subprocess
 import sys
 
@@ -40,7 +40,7 @@ def cli(argv=None):
     mode.add_argument("--execute", action="store_true", help="Run installed Chargemol; request user approval first")
     mode.add_argument("--collect-only", action="store_true", help="Read existing Chargemol output files")
     p.add_argument("--manifest", type=Path, help="Optional case directories (newline-separated)")
-    p.add_argument("--binary", default="chargemol", help="Chargemol executable; or absolute path")
+    p.add_argument("--binary", help="Optional executable path/name; auto-discover if omitted")
     p.add_argument("--atomic-densities", type=Path, help="Installed Chargemol atomic_densities directory")
     p.add_argument("--net-charge", type=float, help="Expected cell net charge in e, required with --execute")
     p.add_argument("--charge-tol", type=float, default=0.05, help="Maximum abs(sum q - expected q), in e")
@@ -223,14 +223,12 @@ def exec_chargemol(run: Path, opts):
         if (work / CHARGE_FILE).is_file() and (work / BONDS_FILE).is_file():
             return "reused pre-existing outputs"
         raise ValueError(f"nonempty or partial Chargemol workdir: {work}; inspect manually")
-    if not opts.atomic_densities:
-        raise ValueError("--atomic-densities is required with --execute")
-    densities = opts.atomic_densities.expanduser().resolve()
-    if not densities.is_dir() or not any(densities.iterdir()):
-        raise ValueError(f"missing/empty Chargemol atomic reference density directory: {densities}")
-    binary = shutil.which(opts.binary) if not Path(opts.binary).is_file() else str(Path(opts.binary).resolve())
-    if not binary:
-        raise ValueError(f"Chargemol executable not found: {opts.binary}")
+    if not hasattr(opts, "_resolved_chargemol"):
+        exe = find_executable("chargemol", opts.binary)
+        density = find_chargemol_densities(opts.atomic_densities, exe)
+        opts._resolved_chargemol = (exe, density)
+        print(f"Chargemol discovered: {exe}; atomic densities: {density}")
+    binary, densities = opts._resolved_chargemol
     missing = [n for n in INPUTS if not (run/n).is_file()]
     if missing:
         raise ValueError("missing " + ", ".join(missing))
@@ -355,34 +353,28 @@ def main(argv=None):
         # Add genuinely human-readable numbers to the overview without replacing
         # full precision atom/pair CSVs. This is for screening/slide drafting only.
         with (out / "ddec6_summary.md").open("a", encoding="utf-8") as md:
-            md.write("\n## Case QC (first 20)\n\n"
+            md.write("\n## Case QC (all cases)\n\n"
                      "| Case | Status | N atoms | Σq (e) | Charge-balance Δ (e) |\n"
                      "|---|---|---:|---:|---:|\n")
-            for row in status[:20]:
+            for row in status:
                 md.write(f"| {row['case']} | {row['status']} | {row['n_atoms']} | "
                          f"{row['sum_ddec6_q_e']} | {row['charge_balance_error_e']} |\n")
-            if len(status) > 20:
-                md.write(f"\nRemaining {len(status)-20} cases: consult ddec6_cases.csv.\n")
             md.write("\n## Element-resolved means / range\n\n"
                      "| Case | Element | N | Mean q (e) | q range (e) | Mean SBO | SBO range |\n"
                      "|---|---|---:|---:|---|---:|---|\n")
-            for e in els[:60]:
+            for e in els:
                 md.write(f"| {e['case']} | {e['element']} | {e['n_atoms']} | "
                          f"{e['mean_charge_e']:+.3f} | "
                          f"[{e['min_charge_e']:+.3f}, {e['max_charge_e']:+.3f}] | "
                          f"{e['mean_sbo']:.3f} | "
                          f"[{e['min_sbo']:.3f}, {e['max_sbo']:.3f}] |\n")
-            if len(els) > 60:
-                md.write(f"\nOther {len(els)-60} element rows: consult ddec6_elements.csv.\n")
             md.write("\n## Periodic bond-type means / range\n\n"
                      "| Case | Bond type | Printed pairs | Mean BO | BO range |\n"
                      "|---|---|---:|---:|---|\n")
-            for b in types[:60]:
+            for b in types:
                 md.write(f"| {b['case']} | {b['element_pair']} | "
                          f"{b['n_periodic_bonds']} | {b['mean_bond_order']:.3f} | "
                          f"[{b['min_bond_order']:.3f}, {b['max_bond_order']:.3f}] |\n")
-            if len(types) > 60:
-                md.write(f"\nOther {len(types)-60} bond-type rows: consult ddec6_bond_types.csv.\n")
             md.write("\n## Suggested figure caption template\n\n"
                      "DDEC6 net atomic charge q or pairwise bond order for [model] "
                      "from Chargemol analysis of a [DFT functional, potential and "
