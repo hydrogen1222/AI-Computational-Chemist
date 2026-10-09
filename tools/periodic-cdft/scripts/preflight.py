@@ -17,7 +17,7 @@ import sys
 NELECT_RE=re.compile(r"\bNELECT\s*=\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[EeDd][+-]?\d+)?)")
 PARAMS=("ENCUT","PREC","ISPIN","ISMEAR","SIGMA","GGA","METAGGA","LHFCALC",
         "LASPH","LDAU","LDAUTYPE","LDAUL","LDAUU","LDAUJ","KSPACING",
-        "NGXF","NGYF","NGZF","SYMPREC","ISYM")
+        "NGXF","NGYF","NGZF","SYMPREC","ISYM","KGAMMA")
 
 
 def parse_incar(path):
@@ -155,14 +155,19 @@ def inspect(root,manifest,epsilon=0.03,geotol=1e-5,deltatol=1e-4):
         chg=read_chgcar(folder/"CHGCAR")
         nelect,scf=charge_outcar(folder/"OUTCAR")
         inc=parse_incar(folder/"INCAR")
-        if not (folder/"POTCAR").is_file() or not (folder/"KPOINTS").is_file():
-            raise ValueError("POTCAR/KPOINTS missing: cannot confirm comparable VASP settings")
+        if not (folder/"POTCAR").is_file():
+            raise ValueError("POTCAR missing: cannot confirm comparable VASP settings")
+        has_kpoints=(folder/"KPOINTS").is_file()
+        if not has_kpoints and "KSPACING" not in inc:
+            raise ValueError("KPOINTS missing and INCAR KSPACING unspecified")
+        kpt_fp=(sha256(folder/"KPOINTS") if has_kpoints else
+                "KSPACING:"+inc["KSPACING"]+":KGAMMA:"+inc.get("KGAMMA","DEFAULT"))
         if abs(chg["density_sum_e"]-nelect)>epsilon:
             raise ValueError(f"{label}: first CHGCAR block integrates to {chg['density_sum_e']:.7f} e, OUTCAR NELECT {nelect:.7f} e")
         results.append(dict(label=label,directory=str(rel),delta_electrons=claimed,
                             NELECT=nelect,integrated_electrons=chg["density_sum_e"],
                             SCF_EDIFF_marker=scf,potcar_sha256=sha256(folder/"POTCAR"),
-                            kpoints_sha256=sha256(folder/"KPOINTS"),incar=inc,geometry=chg))
+                            kpoints_sha256=kpt_fp,incar=inc,geometry=chg))
     neutral=[x for x in results if abs(x["delta_electrons"])<1e-9]
     if len(neutral)!=1:raise ValueError("need exactly one delta_electrons=0 neutral/reference state")
     ref=neutral[0]; plus=minus=0

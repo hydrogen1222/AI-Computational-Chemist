@@ -12,6 +12,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[2]
 PRE=ROOT/"tools/periodic-cdft/scripts/preflight.py"
 COND=ROOT/"tools/periodic-cdft/scripts/condensed.py"
+CRIT=ROOT/"tools/periodic-cdft/scripts/make_critic2.py"
 
 def make_vasp(path,nelect,*,grid=(2,2,2),scale=1,shift=0,
               potcar="POTCAR mock",positions=("0 0 0","0.5 0.5 0.5","0.25 0.25 0.25")):
@@ -80,6 +81,36 @@ class PeriodicCDFTTests(unittest.TestCase):
         self.assertEqual(data["plus_states"],1)
         self.assertEqual(data["minus_states"],1)
         self.assertEqual([round(x["integrated_electrons"],3) for x in data["states"]],[6,6.1,5.9])
+    def test_critic2_input_generated_only_and_non_destructive(self):
+        self.make_preflight()
+        work=self.root/"postprocess"/"periodic_cdft"/"critic2"
+        work.mkdir(parents=True)
+        inputs={state:(self.root/state/"CHGCAR").read_bytes() for state in ("N","plus","minus")}
+        cmd=("--root",self.root,"--preflight",self.preflight,
+             "--plus-label","p","--minus-label","m","--workdir",work)
+        r=self.call(CRIT,*cmd)
+        self.assertEqual(r.returncode,0,r.stdout+r.stderr)
+        inputfile=work/"critic2.in"
+        self.assertTrue(inputfile.is_file())
+        content=inputfile.read_text()
+        for marker in ("LOAD VASP", "SIZEOF neutral", "ID fplus",
+                       "ID fminus", "ID fzero", "ID dual",
+                       "SUM fplus", "CUBE GRID FILE fzero.cube"):
+            self.assertIn(marker,content)
+        self.assertFalse((work/"critic2.log").exists())
+        self.assertEqual(self.call(CRIT,*cmd).returncode,1)
+        self.assertEqual(inputs,{state:(self.root/state/"CHGCAR").read_bytes()
+                                 for state in inputs})
+
+    def test_critic2_rejects_invalid_state_label(self):
+        self.make_preflight()
+        work=self.root/"postprocess"/"periodic_cdft"/"critic2"
+        work.mkdir(parents=True)
+        r=self.call(CRIT,"--root",self.root,"--preflight",self.preflight,
+             "--plus-label","wrong","--minus-label","m","--workdir",work)
+        self.assertEqual(r.returncode,1)
+        self.assertIn("unknown",r.stderr)
+
     def test_density_integral_inconsistent_fail(self):
         p=self.root/"plus/CHGCAR"
         p.write_text(p.read_text().replace("6.1 6.1 6.1","6.0 6.0 6.0"))
