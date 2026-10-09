@@ -12,7 +12,7 @@ VASP POTCAR/CHGCAR, Multiwfn, Critic2 or FukuiGrid code.** No VASP jobs,
 scheduler jobs or expensive analyses without permission. Do not invent
 output values, convergence or software-supported menu numbers.
 
-Start with \`references/three-engine-protocol.md\`. The agent should drive the
+Start with `references/three-engine-protocol.md`. The agent should drive the
 local programs on the user's behalf, not ask the user to program an algorithm.
 If an installed version has not been smoke-tested, mark the particular branch
 **UNVERIFIED**, not "success." The protocol is reproducible even if a binary
@@ -31,17 +31,17 @@ finite-size/PBC effects); **do not call their discrepancy a code bug**.
 
 Definitions, always with **positive electronic density** and fixed external
 potential:
-- \`f+ = [rho(N+δ+) - rho(N)]/δ+\` (δ+ > 0; electron **addition**);
-- \`f- = [rho(N) - rho(N−δ-)]/δ-\` (δ- > 0; electron **removal**);
-- \`f0 = (f+ + f-)/2\` (declared averaged-response convention);
-- \`dual = f+ − f-\` (sign convention mandatory);
-- \`f_A+ = [q_A(N)−q_A(N+δ+)]/δ+\`,
-  \`f_A- = [q_A(N−δ-)−q_A(N)]/δ-\`, q = ZVAL − population,
+- `f+ = [rho(N+δ+) - rho(N)]/δ+` (δ+ > 0; electron **addition**);
+- `f- = [rho(N) - rho(N−δ-)]/δ-` (δ- > 0; electron **removal**);
+- `f0 = (f+ + f-)/2` (declared averaged-response convention);
+- `dual = f+ − f-` (sign convention mandatory);
+- `f_A+ = [q_A(N)−q_A(N+δ+)]/δ+`,
+  `f_A- = [q_A(N−δ-)−q_A(N)]/δ-`, q = ZVAL − population,
   and condensed f_A0 / dual analogous.
 
-Each \`f\` is in inverse volume (e.g. Å^-3 per added electron).
+Each `f` is in inverse volume (e.g. Å^-3 per added electron).
 For electron-conserving neutral-to-charged comparisons, integrals:
-\`∫f+≈1, ∫f-≈1, ∫f0≈1, ∫dual≈0\`.
+`∫f+≈1, ∫f-≈1, ∫f0≈1, ∫dual≈0`.
 Local Fukui can contain *negative lobes* due to density relaxation:
 never clip negatives or reinterpret any local lobe as a strictly positive
 electron probability. A condensed f_A is **method-dependent**, not an
@@ -50,7 +50,7 @@ Fukui over a fixed Bader basin (basins shift with density).
 
 ## Operational sequence
 
-1. Use \`scripts/preflight.py --root ... --manifest ...\` (read-only by
+1. Use `scripts/preflight.py --root ... --manifest ...` (read-only by
    default): validate VASP5 species/site positions, lattice, first scalar
    FFT grids, electron sums, NELECT metadata, all δN, and required
    two-sided sampling. Fail closed on incompatible geometry, atom order,
@@ -58,7 +58,7 @@ Fukui over a fixed Bader basin (basins shift with density).
    wavefunction/occupation and spin manually as well; parser-only checks
    cannot establish physical validity.
 2. Create isolated result directories **under the research project**:
-   \`postprocess/periodic_cdft/{multiwfn,critic2,fukuigrid,comparison}/\`.
+   `postprocess/periodic_cdft/{multiwfn,critic2,fukuigrid,comparison}/`.
    Keep originals read-only, stage symlinks or copies only after conflict
    checks, record executable paths, versions, local command/script and logs.
 3. Using the SAME validated N±δ VASP densities, run:
@@ -77,16 +77,16 @@ Fukui over a fixed Bader basin (basins shift with density).
    no additional VASP run. Never substitute f0 for a spin-specific
    radical-attack barrier. For each exported grid verify cell integral,
    origin/axes/shape, units, atom alignment, and f0/dual identities.
-   \`∫dual≈0\` alone is NOT proof of spatial correctness.
+   `∫dual≈0` alone is NOT proof of spatial correctness.
 5. Optional condensed indices from the existing **three-state charge
-   tables**: use \`scripts/condensed.py\`. Supported matched population
+   tables**: use `scripts/condensed.py`. Supported matched population
    methods include Bader, Chargemol DDEC6, Chargemol ordinary H/CM5 and
    Multiwfn ordinary H/CM5, provided each is available and valid in
    **all three** electronic states. Keep methods separate. Multiwfn
    Hirshfeld-I only with independently verified iterative convergence,
    not merely a parsed terminal number. If the input lacks three
    independently valid charge tables, mark condensed indices
-   \`NOT_AVAILABLE\`, never infer them from the one neutral state.
+   `NOT_AVAILABLE`, never infer them from the one neutral state.
 6. Compare as a **controlled two-axis matrix**: at one δN,
    Multiwfn vs Critic2 vs (validated) FukuiGrid finite differences
    isolates implementation; within FukuiGrid, finite difference vs
@@ -96,14 +96,18 @@ Fukui over a fixed Bader basin (basins shift with density).
    Compare condensed indices **within the same population model across
    three states**, not across arbitrary charge conventions. Include
    volume/unit normalization and grid conservation in the Chinese report.
-7. Deliver concise Chinese \`periodic_cdft_report.md\` under the project's
-   single \`postprocess/periodic_cdft/comparison/\` folder: purpose, exact
+7. Deliver concise Chinese `periodic_cdft_report.md` under the project's
+   single `postprocess/periodic_cdft/comparison/` folder: purpose, exact
    case and filenames, method names/δN, all requested available results,
    QC/integrals/side-by-side figures, scientifically qualified findings,
-   \`NOT_AVAILABLE\`/failed statuses, and reproducible commands.
+   `NOT_AVAILABLE`/failed statuses, and reproducible commands.
+   Use `scripts/report.py` with validated preflight/grid-audit JSON and
+   checked condensed CSVs to generate one evidence-grounded Chinese
+   summary. Agent then adds physical interpretation and installed-version
+   information; never claim missing methods ran.
    Quantitative statements must be generated from actual measured files;
    do **not** publish placeholder output as a result. Plotting final
-   figures follows \`tools/plotting/SKILL.md\`.
+   figures follows `tools/plotting/SKILL.md`.
 
 ## Things deliberately out of scope for a first cross-check
 
@@ -113,9 +117,9 @@ Fukui over a fixed Bader basin (basins shift with density).
   electrode alignment or a defensible solid-state thermodynamic model.
 - Fukui potentials when no legitimate electrode geometry or SCPC
   correction exists; point-charge perturbation energies when no physically
-  defined external probe exists. \`NOT_APPLICABLE\` is an acceptable outcome.
+  defined external probe exists. `NOT_APPLICABLE` is an acceptable outcome.
 - Equating f+ to a reduction reaction pathway or f- to an oxidation
   barrier. It probes density response, not kinetics or actual metal insertion.
 
 Read scientific implementation caveats in
-\`references/three-engine-protocol.md\` **before running anything**.
+`references/three-engine-protocol.md` **before running anything**.

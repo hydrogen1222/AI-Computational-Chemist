@@ -13,16 +13,16 @@ Authoritative upstream references:
   https://doi.org/10.1016/j.cpc.2025.109957
 - Multiwfn installed manual, GUI/noGUI grid-data menu 13; version-dependent.
 - AICC molecular/cluster CDFT (NOT VASP reciprocal-space calculation):
-  \`tools/multiwfn/references/conceptual-dft.md\`.
+  `tools/multiwfn/references/conceptual-dft.md`.
 Do not interchange molecule-only main-menu 22 wavefunction features with
 VASP CHGCAR grids. Never claim VASP WAVECAR is a Multiwfn molecular
 wavefunction file.
 
 ## 0. Input contract: a single VASP *family*
 
-Given root \`/project/fukui_vasp\`, organize verified source calculations as:
+Given root `/project/fukui_vasp`, organize verified source calculations as:
 
-\`\`\`text
+```text
 /project/fukui_vasp/
   00_N/          INCAR KPOINTS POSCAR POTCAR CHGCAR OUTCAR
   plus_005/      INCAR KPOINTS POSCAR POTCAR CHGCAR OUTCAR
@@ -32,12 +32,12 @@ Given root \`/project/fukui_vasp\`, organize verified source calculations as:
   minus_010/     ...
   minus_015/     ...
   cdft_states.json
-\`\`\`
+```
 
 The **manifest is the only new input file**, not an additional project-root
 README. Electron counts in OUTCAR must differ by the *declared* delta:
 
-\`\`\`json
+```json
 {
   "states": [
     {"label": "N", "directory": "00_N", "delta_electrons": 0},
@@ -49,7 +49,7 @@ README. Electron counts in OUTCAR must differ by the *declared* delta:
     {"label": "m015", "directory": "minus_015", "delta_electrons": -0.15}
   ]
 }
-\`\`\`
+```
 
 The agent, NOT the user, inventories existing calculations and writes this
 manifest with **actual** counts. The quantities 0.05/0.10/0.15 are
@@ -61,28 +61,28 @@ fixed-external-potential Fukui. Reference charge need not be zero.
 
 Preflight, non-destructive (prefer user-approved root):
 
-\`\`\`bash
+```bash
 python tools/periodic-cdft/scripts/preflight.py \
   --root /project/fukui_vasp \
   --manifest /project/fukui_vasp/cdft_states.json
-\`\`\`
+```
 
 After the output has passed operator review, the agent may record a
 machine-readable manifest fingerprint in an already-prepared output dir:
-\`--write /project/fukui_vasp/postprocess/periodic_cdft/comparison/preflight.json\`.
-No overwrites. \`SCF_EDIFF_marker=false\` is a warning that requires manual
+`--write /project/fukui_vasp/postprocess/periodic_cdft/comparison/preflight.json`.
+No overwrites. `SCF_EDIFF_marker=false` is a warning that requires manual
 review, NOT permission to proceed. Source CHGCAR/POTCAR never leave machine.
 
-VASP stores its first scalar CHGCAR grid as \`rho(r)*Vcell\` with
-\`sum(raw)/Ngrid = valence NELECT\`. It is **not** a density in e/Å³ until
+VASP stores its first scalar CHGCAR grid as `rho(r)*Vcell` with
+`sum(raw)/Ngrid = valence NELECT`. It is **not** a density in e/Å³ until
 divided by real cell volume. Multiwfn/Critic2/FukuiGrid may choose different
 output units. Verify exported grid integrals **after conversion**.
 
 ## 1. Three engines, same finite differences
 
-Compare at the same **nonzero** \`δ>0\` available on *both* sides, e.g.
+Compare at the same **nonzero** `δ>0` available on *both* sides, e.g.
 0.10 e. If electron counts are not symmetric, use separate positive
-and negative actual δ values. Prepare \`f+\` and \`f-\` in each engine.
+and negative actual δ values. Prepare `f+` and `f-` in each engine.
 
 **Common field-output QA after each engine:** collect fplus, fminus,
 fzero and dual in individual Gaussian `.cube` files, with **positive
@@ -119,7 +119,7 @@ replace source NELECT preflight or validate PBC electrostatics.
   submenu 11, operation 4 (subtract a second grid); verify **operand order**
   with a deliberately simple positive/negative test. Export to cube
   without interpolation/normalization changes; record menu transcript.
-- \`f+ = (rho_p−rho_N)/δ+\`; \`f- = (rho_N−rho_m)/δ-\`. If menu paths,
+- `f+ = (rho_p−rho_N)/δ+`; `f- = (rho_N−rho_m)/δ-`. If menu paths,
   CHGCAR conversion or cube export differ in the installed build, STOP
   and label **UNVERIFIED**, do not try main function 22 on a VASP grid.
 
@@ -139,72 +139,72 @@ Reference protocol is **not evidence of having locally run Critic2**.
 
 **Critic2** syntax template (external executable), from
 upstream LOAD and CUBE GRID docs; example for two INPUT CHGCAR paths
-with \`δ+ = 0.10\`:
+with `δ+ = 0.10`:
 
-\`\`\`text
+```text
 CRYSTAL 00_N/POSCAR
 LOAD VASP 00_N/CHGCAR ID neutral
 LOAD VASP plus_010/CHGCAR ID plus
 LOAD AS "($plus-$neutral)/0.10" SIZEOF neutral ID fplus
 SUM fplus
 CUBE GRID FILE fplus.cube FIELD fplus
-\`\`\`
+```
 
 For the other direction:
-\`\`\`text
+```text
 CRYSTAL 00_N/POSCAR
 LOAD VASP 00_N/CHGCAR ID neutral
 LOAD VASP minus_010/CHGCAR ID minus
 LOAD AS "($neutral-$minus)/0.10" SIZEOF neutral ID fminus
 SUM fminus
 CUBE GRID FILE fminus.cube FIELD fminus
-\`\`\`
+```
 
 Place input and generated output in the proper local isolated workdir;
 adjust RELATIVE PATHS to the actual working directory, and check the
-installed binary accepts expression names. Generate \`f0\`, \`dual\`
-via additional \`LOAD AS "($fplus+$fminus)/2"\` and
-\`LOAD AS "$fplus-$fminus"\` on fields from the same two-sided set, or
+installed binary accepts expression names. Generate `f0`, `dual`
+via additional `LOAD AS "($fplus+$fminus)/2"` and
+`LOAD AS "$fplus-$fminus"` on fields from the same two-sided set, or
 by similarly documented FIELD expressions; preserve all input metadata.
 Upstream docs:
 https://aoterodelaroza.github.io/critic2/manual/fields/ ,
 https://aoterodelaroza.github.io/critic2/manual/graphics/ .
-Use \`SUM\` on each field to verify expected normalized cell integrals.
+Use `SUM` on each field to verify expected normalized cell integrals.
 Do **not** treat Critic2's built-in AIM basin electron populations as
 identical to user-selected Bader/Chargemol atomic charge models.
 
 **FukuiGrid** (user's external git clone, GPL-3.0, NOT copied into AICC):
-- Source at \`cacarden/FukuiGrid\`, read commit SHA, version, local
+- Source at `cacarden/FukuiGrid`, read commit SHA, version, local
   dependencies, user-visible license; run in a dedicated work folder.
 - **Finite differences:** FukuiGrid's grid addition/subtraction/scaling
-  can implement exactly the same \`f+\`/\`f-\` as the other two codes.
+  can implement exactly the same `f+`/`f-` as the other two codes.
   The published CPC article describes both finite difference and
   interpolation. For a raw density check, compute normalized differences
   directly; validate the writer's output *including true interior ZERO*
-  samples and \`Ngrid\` values before claiming any valid output. The
-  upstream \`write_fukui_file\` in the 2025-12-17 SHA
-  \`a9d349044ea52bbae22028b219e13b5bc94a10de\` contains
-  \`for value in row if value != 0\`, which can silently drop valid
+  samples and `Ngrid` values before claiming any valid output. The
+  upstream `write_fukui_file` in the 2025-12-17 SHA
+  `a9d349044ea52bbae22028b219e13b5bc94a10de` contains
+  `for value in row if value != 0`, which can silently drop valid
   zero-valued data. **Treat it as a BLOCKER until a local fixed upstream
   release or an independently verified noncorrupt writing path is used.**
   Do not make changes to the researcher's clone silently.
 - **Interpolation:** Use separate 4-point sets on EACH side if
-  available; menu \`1 -> 11\` for f- with default δN
-  \`[-0.15,-0.10,-0.05,0]\`, \`1 -> 12\` for f+ with
-  \`[0,+0.05,+0.10,+0.15]\` in the cited version; exact input order
+  available; menu `1 -> 11` for f- with default δN
+  `[-0.15,-0.10,-0.05,0]`, `1 -> 12` for f+ with
+  `[0,+0.05,+0.10,+0.15]` in the cited version; exact input order
   and δ values are critical. The source routine
-  \`Fukui_interpolation(CHGCAR1,CHGCAR2,CHGCAR3,CHGCAR4,dn=...)\`
+  `Fukui_interpolation(CHGCAR1,CHGCAR2,CHGCAR3,CHGCAR4,dn=...)`
   fits a linear slope at each point; this is NOT the same estimator as
   δ=1 or δ=.1 finite differences. Check there are enough distinct points,
   record fit residuals (the upstream's single correlation diagnostic is
   not per-grid-point R²).
 - **Fukui potential (optional)** has two *correction approaches*:
-  \`electrodes\` and \`SCPC\`. The former requires an appropriate
+  `electrodes` and `SCPC`. The former requires an appropriate
   slab/electrode geometry and dielectric/surface assumptions;
-  SCPC requires genuine external \`z-vcor.dat\` correction. Neither
-  is a generic bulk periodic \`f+\`/\`f-\` alternative, and neither
+  SCPC requires genuine external `z-vcor.dat` correction. Neither
+  is a generic bulk periodic `f+`/`f-` alternative, and neither
   is automatically applicable to Na3PS4 bulk. If files or physical
-  boundary conditions absent: \`NOT_APPLICABLE\` — **no fabricated data**.
+  boundary conditions absent: `NOT_APPLICABLE` — **no fabricated data**.
 - Point-charge interaction estimates via the paper's perturbative
   expansion additionally require a well-defined external probe/charge
   and reference. They are not required just to compare Fukui densities.
@@ -212,11 +212,11 @@ identical to user-selected Bader/Chargemol atomic charge models.
 ## 2. Derived observables and conditional opportunities
 
 Once *valid* f+ and f- from an individual method exist:
-\`\`\`text
+```text
 f0(r)      = [f+(r) + f-(r)] / 2
 dual(r)    = f+(r) - f-(r)
 ∫f+ ≃ 1,  ∫f- ≃ 1,  ∫f0 ≃ 1,  ∫dual ≃ 0
-\`\`\`
+```
 
 Additionally useful: signed min/max, integral of negative/positive lobes,
 planar mean along a **declared physical** crystallographic/surface axis,
@@ -227,7 +227,7 @@ rather than additional electronic SCF runs.
 
 **Condensed atomic Fukui**, from **validated per-state atomic charges**
 for the SAME population model:
-\`\`\`bash
+```bash
 python tools/periodic-cdft/scripts/condensed.py \
   --preflight postprocess/periodic_cdft/comparison/preflight.json \
   --method bader \
@@ -236,10 +236,10 @@ python tools/periodic-cdft/scripts/condensed.py \
   --minus minus_010/postprocess_summary/bader_atoms.csv \
   --delta-plus 0.1 --delta-minus 0.1 \
   --output postprocess/periodic_cdft/comparison/condensed_bader.csv
-\`\`\`
+```
 Other methods:
-\`ddec6\`, \`chargemol-h\`, \`chargemol-cm5\`,
-\`multiwfn-h\`, \`multiwfn-cm5\`. Each requires every state, same
+`ddec6`, `chargemol-h`, `chargemol-cm5`,
+`multiwfn-h`, `multiwfn-cm5`. Each requires every state, same
 atom indexing and complete output; report unavailable methods, do
 not fill missing values by guessing. The script refuses absent or
 nonconserved atomic responses and writes an actual Chinese scientific
@@ -251,25 +251,25 @@ been independently validated — Li2S case was not converged.
 electron affinity, electronegativity, hardness, softness and Parr
 electrophilicity can be derived only from **justifiable total
 energy differences with a physical vacuum/reference and PBC charged
-cell correction**. Report \`NOT_VALIDATED_FOR_CHARGED_PBC\` by default;
-do NOT compute a table of spurious \`I\`, \`A\` and \`η\` from arbitrary
+cell correction**. Report `NOT_VALIDATED_FOR_CHARGED_PBC` by default;
+do NOT compute a table of spurious `I`, `A` and `η` from arbitrary
 background-charged VASP TOTEN. Same for physical reaction rates or
 barriers; a Fukui map alone cannot predict them.
 
 ## 3. What the comparison report must include
 
 AICC's agent is responsible for publishing a **plain Chinese,
-source-traceable** \`postprocess/periodic_cdft/comparison/periodic_cdft_report.md\`,
+source-traceable** `postprocess/periodic_cdft/comparison/periodic_cdft_report.md`,
 with these report-level components in this one file (no extra Markdown
 sprayed into the repository root):
 
 - A simple, explicit title, system, all electronic states and δ values;
   functional, PAWs, geometry freeze, spin, grid, versions + executable
   paths. Original files' SHA-256 or immutable paths.
-- Matrix of \`f+\`, \`f-\`, \`f0\`, \`dual\` by Multiwfn/ Critic2/
+- Matrix of `f+`, `f-`, `f0`, `dual` by Multiwfn/ Critic2/
   FukuiGrid finite differences; FukuiGrid interpolation separately.
   For each, actual output path, format, units, charge integral and
-  status \`PASS\`, \`FAIL\`, \`UNVERIFIED\` or \`NOT_APPLICABLE\`.
+  status `PASS`, `FAIL`, `UNVERIFIED` or `NOT_APPLICABLE`.
 - Numeric consistency checks and explanations in normal language;
   *not* invented results, generic "more reactive" labels or a claim
   that the software agrees unless grid-point overlap is checked.
@@ -280,14 +280,35 @@ sprayed into the repository root):
 - At least one peer-to-peer signed field difference or correlation
   metric after matching cube origin, axes, units and shapes; variation
   from code must be separated from variation in electronic perturbation.
-  \`N±1\` vs \`N±0.1\` not a direct code-only agreement benchmark.
+  `N±1` vs `N±0.1` not a direct code-only agreement benchmark.
 - A short PPT-quotable conclusion **only if** data passed tests; say
   "未通过数值验收，暂不用于反应位点判定" where appropriate.
   Figures for publication go through Stormy-drawing Skill.
 
+## 3a. One human-readable Chinese summary
+
+After real analyses have passed, collect the preflight and grid-audit JSON
+plus checked condensed f_A CSVs. Example:
+
+```bash
+python tools/periodic-cdft/scripts/report.py \
+  --preflight /project/fukui_vasp/postprocess/periodic_cdft/comparison/preflight.json \
+  --grid-audit /project/fukui_vasp/postprocess/periodic_cdft/comparison/grid_audit.json \
+  --condensed /project/fukui_vasp/postprocess/periodic_cdft/comparison/condensed_bader.csv \
+  --out /project/fukui_vasp/postprocess/periodic_cdft/comparison/periodic_cdft_report.md
+```
+
+Omit `--grid-audit` or `--condensed` if unavailable. The generated
+report will explicitly say **no verified comparison** and never guess.
+Condensed CSVs must have the paired PASS QC Markdown output created by
+`condensed.py`. The agent then adds actual software versions,
+SCF/localization/PBC evidence, reproducible commands and scientifically
+qualified interpretation to that **single** report, not extra Markdown
+files in the research root.
+
 ## 4. Failure-mode checklist and ownership
 
-\`CHGCAR\` vs \`CHG\` vs all-electron densities are not interchangeable.
+`CHGCAR` vs `CHG` vs all-electron densities are not interchangeable.
 Do not silently normalize each field to an integral of 1: such
 renormalization can hide a wrong NELECT or wrong cell. Never clip
 negative Fukui lobes. Be careful with spin magnetization grids,
