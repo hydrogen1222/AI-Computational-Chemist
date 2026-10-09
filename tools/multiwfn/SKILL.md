@@ -24,6 +24,7 @@ Inputs from ORCA: convert the validated `.gbw` with `orca_2mkl <job> -molden` (s
 | orbital/NTO, charge, spin density, ESP/ELF/NCI/IRI, UV/ECD spectrum workflows | `references/orbital-charge-spectra.md` |
 | conceptual DFT: Fukui functions, dual descriptor, condensed indices, IP/EA/hardness/electrophilicity | `references/conceptual-dft.md` |
 | periodic VASP CHGCAR: Hirshfeld, CM5, Hirshfeld-I and Chargemol comparisons | `references/periodic-stockholder.md`; `scripts/prepare_periodic_chgcar.py`; `scripts/collect_periodic_charges.py` |
+| periodic VASP CHGCAR Fukui via grid operations + two other engines | `tools/periodic-cdft/SKILL.md` (different from orbital CDFT main menu 22) |
 | conceptual DFT for a periodic solid via an embedded cluster | `references/conceptual-dft.md` + `tools/orca/references/running.md` (embedded-crystal section), with periodic VASP cross-checks |
 | ORCA output as Multiwfn input (`.gbw` -> Molden) | `tools/orca/references/running.md` ("Wavefunction files for Multiwfn") |
 | checking whether a Multiwfn result is usable | `references/validation.md` |
