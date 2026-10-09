@@ -6,7 +6,7 @@
 
 - Initial-structure provenance uses bounded project-local discovery only. Accepted
   sources are files in the current project root/current working directory, user-explicit
-  paths, registered `.research` artifacts, database entries, literature/manuscript
+  paths, previously recorded project source paths, database entries, literature/manuscript
   evidence, or documented builder assumptions. Absence of files after this bounded
   check is recorded as `not_supplied`; it is not a reason to run broad searches over
   `$HOME`, `/home`, `/opt`, `/`, shared software trees, or unrelated archives.
@@ -41,7 +41,7 @@
   source precedent is recorded. Redox-active/variable-valence components may use
   non-stoichiometric terminations, vacancies, hydroxylation, or reservoir-dependent
   compositions when the chemical environment and oxidation-state rationale are stated.
-- Model economy: atom count, lattice lengths, and vacuum are reviewed together. Models above roughly 200 atoms, above roughly 300 atoms, or with any lattice length above roughly 30 Å need a recorded finite-size/accuracy/cost justification rather than automatic approval. For systems with large lateral dimensions, or with vacuum in two or three directions, oversized vacuum is a cost problem: if the nonperiodic images are already separated and the target property is not vacuum-sensitive, reduce the relevant vacuum spacing to about 10 Å instead of carrying 15-25 Å by default. Keep larger vacuum only for recorded reasons such as work functions/vacuum-level alignment, strong dipoles, charged cells, diffuse states, convergence tests, or explicit literature/source settings. If `audit_structure.py` would otherwise fail the default lower-bound check, rerun it with an explicit economy threshold such as `--min-vacuum 10` and, only when justified for the adsorbate case, `--min-vacuum-adsorbate 10`; record that command and rationale in the structure gate.
+- Model economy: atom count, lattice lengths, and vacuum are reviewed together. Models above roughly 200 atoms, above roughly 300 atoms, or with any lattice length above roughly 30 Å need a recorded finite-size/accuracy/cost justification rather than automatic approval. For systems with large lateral dimensions, or with vacuum in two or three directions, oversized vacuum is a cost problem: if the nonperiodic images are already separated and the target property is not vacuum-sensitive, reduce the relevant vacuum spacing to about 10 Å instead of carrying 15-25 Å by default. Keep larger vacuum only for recorded reasons such as work functions/vacuum-level alignment, strong dipoles, charged cells, diffuse states, convergence tests, or explicit literature/source settings. If `audit_structure.py` would otherwise fail the default lower-bound check, rerun it with an explicit economy threshold such as `--min-vacuum 10` and, only when justified for the adsorbate case, `--min-vacuum-adsorbate 10`; record that command and rationale in the model report.
 - Symmetry statements always carry their symprec.
 
 ## After every structure operation
@@ -64,7 +64,7 @@ uv run tools/structure-prep/scripts/audit_structure.py work/models/ads00/POSCAR 
 
 Use `--adsorbate-count N` when the adsorbate/cluster is the last N atoms, or
 `--adsorbate-indices 73-84` when atom indices are known. The script reports facts; the
-structure critic decides whether those facts are acceptable for the registered model.
+agent's scientific review decides whether those facts are acceptable for the registered model.
 
 Hard checks:
 
@@ -84,34 +84,27 @@ Hard checks:
 
 For adsorbate placement, report at least the adsorbate-anchor distance, the nearest adsorbate-surface distance, and the closest unintended atom pair. If those distances are uncertain, make a quick structure render or neighbor table before proceeding. A visually plausible figure is not enough; it must agree with the numerical neighbor check.
 
-## Model-structure review release gate
+## Scientific model review (no workflow gate)
 
-Before a generated slab/adsorbate/cluster structure enters VASP, CP2K, Gaussian, LAMMPS,
-or HPC submission, require two evidence artifacts when the modeling choice matters:
+Geometry checks and scientific justification are distinct. Before treating an
+atomistic candidate as suitable for the intended calculations, review:
+- the hypothesis/observable the structure represents, with alternatives;
+- structure provenance, facet and termination justification (if relevant);
+- model-specific charge/spin, stoichiometry, constraints and environment;
+- cell/strain/coverage, finite-size effects, polarity, dipoles, surface/vacuum
+  adequacy, and key contacts across periodic images;
+- constraints on interpretation and any required control models.
 
-1. `surface-literature-review`: Miller index, exposed facet, termination, slab thickness,
-   lateral cell, coverage, and adsorption motif checked against source literature or
-   explicitly labeled exploratory. If the chosen Miller index differs from the facet
-   commonly used, synthesized, or modeled for the material, record why the current facet
-   is still relevant to the scientific question. For very niche materials or unusual
-   modifications, a documented `exploratory/no-precedent-found` label is acceptable; do
-   not force a weak comparison to unrelated literature or block solely because no direct
-   precedent exists.
-2. `structure-audit-report`: numerical geometry audit, including a/b/c, alpha/beta/gamma,
-   `c`-axis orthogonality to `a`/`b`, vacuum estimate, slab thickness, atom
-   count/cell-size economy flags, selective dynamics, closest PBC pairs with
-   covalent-radius thresholds/margins, adsorbate-surface distance, and adsorbate-image
-   separation. Register the complete JSON/details as an artifact, but keep the
-   reviewer-facing report compact: a summary table, top FAIL/WARN checks, decisive
-   pair/image rows, and a path to the full audit file. Do not paste full closest-pair
-   dumps into gate evidence, chat, or stage synthesis.
+Use `references/model-review.md` for the scientific checklist. Keep deterministic
+audit JSON/details as files if generated, but give the user only a concise
+decision and warning summary. The same agent can perform the independent
+reasoning pass: no separate structure-critic role, YAML approval gate,
+`.research/` artifact registry or execution lease is required.
 
-The recommended outcomes are `approve`, `request_revision`, or `block`. A
-`request_revision` outcome returns to structure-prep; do not patch the engine input by
-hand downstream. A `block` outcome prevents expensive engine/HPC work until the model
-choice is changed or explicitly approved as exploratory. Use `block` for invalid or
-unapproved models, not for a well-labeled niche exploratory model that simply lacks a
-direct literature analogue.
+Mark models **usable**, **revise**, **exploratory/limited**, or **invalid**,
+with reasons rather than declaring every numerically passing structure fit
+for production. A model with no direct precedent is not automatically
+invalid; label it exploratory and investigate its physical plausibility.
 
 ## Molecular
 

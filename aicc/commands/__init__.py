@@ -1,6 +1,6 @@
-"""Built-in AICC command registry."""
+"""Built-in AICC commands: installed-skill management and diagnostics only."""
 
-from . import doctor, job, skill, status, task
+from . import doctor, skill
 
 
-COMMAND_MODULES = (status, task, job, skill, doctor)
+COMMAND_MODULES = (skill, doctor)
