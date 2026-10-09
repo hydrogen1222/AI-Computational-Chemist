@@ -15,6 +15,13 @@ service or mandatory project document protocol.
   analyzing many finished calculations with existing tool skills.
 - `benchmark/`: standalone evaluation archive, not default agent context.
 - `aicc/`: optional local skill discovery/install diagnostics CLI.
+- `tools/plotting/`: the vendored Stormy-drawing **authoritative** figure
+  Skill (publication and presentation figures, style 0.5.0), its plotting
+  code/templates, original MIT license and pinned-upstream provenance.
+  Finished plots use reproducible `figures/NNN_description/` directories;
+  temporary analysis previews need not be silently migrated or rewritten.
+  `tools/report/` retains historical multi-panel report code for compatibility
+  but is disabled in this fork and no longer sets the default aesthetic rules.
 
 Each installed skill has `SKILL.md` with a short trigger and routing map. Load
 only relevant `references/` for the current task; call `scripts/` when a
