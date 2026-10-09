@@ -252,14 +252,16 @@ def render_multiwfn(items):
             return fmt(r.get(key),6,True) if method in passed else "不可引用"
         text+="**全部逐原子对照：**\n\n"+table(
             ["编号","元素","Multiwfn H","Multiwfn CM5","Multiwfn H-I（待验收）",
-             "Chargemol H","Chargemol CM5","DDEC6"],
+             "Chargemol H","Chargemol CM5","DDEC6","ΔH：Multiwfn−Chargemol","ΔCM5：Multiwfn−Chargemol"],
             [[r["atom_1based"],r["element"],
               cell(r,"hirshfeld","multiwfn_hirshfeld_e"),
               cell(r,"cm5","multiwfn_cm5_e"),
               cell(r,"hirshfeld_i","multiwfn_hirshfeld_i_e"),
               fmt(r.get("chargemol_hirshfeld_e"),6,True),
               fmt(r.get("chargemol_cm5_e"),6,True),
-              fmt(r.get("chargemol_ddec6_e"),6,True)] for r in ar])+"\n"
+              fmt(r.get("chargemol_ddec6_e"),6,True),
+              cell(r,"hirshfeld","delta_hirshfeld_e") if r.get("chargemol_hirshfeld_e") else "—",
+              cell(r,"cm5","delta_cm5_e") if r.get("chargemol_cm5_e") else "—"] for r in ar])+"\n"
         text+=("**交叉比较解释：** 仅将同名的 H–H、CM5–CM5 作为有符号差值诊断；"
                "不同参考密度与芯价电子约定可造成数值/符号差异，不意味着其中一方一定错误。\n\n")
     text+=("## 验收边界\n\n"

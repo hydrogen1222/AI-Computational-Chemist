@@ -13,7 +13,7 @@ of a separate work copy* to identify true PAW valence nuclear charges.
 | Observable | Engine |
 |---|---|
 | Standard Hirshfeld / CM5 | Multiwfn; also in Chargemol's first noniterative DDEC6 log |
-| True iterative Hirshfeld-I | **Multiwfn** with the installed `atomrad/` ionic reference database |
+| True iterative Hirshfeld-I | **Multiwfn** with the installed `atmrad/` ionic reference database |
 | DDEC6 q, DDEC6 SBO and periodic DDEC6 pair BO | **Chargemol** only |
 | Other bond indices in Multiwfn | Different definitions — do not relabel them DDEC6 BO |
 
@@ -60,7 +60,7 @@ not necessarily to the executable. Work in the per-case isolated folder.
 The reference tutorial's main function 7 ("Population analysis")
 uses **1** = ordinary Hirshfeld, **16** = CM5, and **15 → 1** =
 Hirshfeld-I with default settings; run H-I only after locating the
-installed Multiwfn `examples/atomrad/` charge-state radial-density
+installed Multiwfn `examples/atmrad/` charge-state radial-density
 reference folder in the current analysis working directory (may
 symlink the unmodified installed folder). Treat these menu numbers as
 **documented reference values**, not a guarantee across installations.
