@@ -12,6 +12,29 @@ or its atomic reference-density library**. Never distribute a Chargemol binary,
 atomic reference densities, licensed POTCAR, or secret machine configurations
 in this repository.
 
+## Ordinary Hirshfeld charges and CM5 — included in DDEC6 logs
+
+Chargemol v3.5 performs **noniterative neutral-reference Hirshfeld**
+partitioning in the first iteration of a DDEC6 analysis. The labeled block
+in `VASP_DDEC_analysis.output` contains atomic charges; the same log
+normally prints CM5 charges, too. **No repeat DFT or Chargemol execution**
+is needed if the source log is retained.
+
+The agent uses `python tools/vasp/scripts/collect_hirshfeld.py CALC_ROOT`
+for read-only discovery and adds `--collect-only` to write full per-atom,
+per-element, and charge-method-comparison tables. Add `--net-charge 0`
+when the original system is confirmed neutral, to verify charge closure.
+
+- Output: `hirshfeld_atoms.csv`, `hirshfeld_elements.csv`,
+  `hirshfeld_cases.csv`, `hirshfeld_summary.md`, and 16:9
+  `ppt_figures/*_charge_methods.{svg,png}` if Matplotlib is available.
+- Compare **ordinary Hirshfeld**, CM5 and DDEC6 calculated from the
+  same density, with distinct column labels and no inferred oxidation states.
+- This does **not** produce iterative Hirshfeld-I. Do not relabel the
+  first DDEC6 partition, DDEC6 itself or CM5 as Hirshfeld-I.
+- If the Chargemol log lacks a uniquely labeled first-iteration block,
+  report missing evidence; never guess charges from the final DDEC6 XYZ.
+
 ## Scientific meaning
 
 - **DDEC6 net atomic charge q (e):** positive means electron-deficient,
@@ -102,6 +125,26 @@ bond classes appear. Use the full raw BO table for detailed analysis.
   pymatgen 2026.9.23. Mock-binary integration tests are NOT sufficient
   for publication use: at least one genuine Chargemol + pymatgen
   numerical cross-check remains required.
+
+## Chemical validity flags learned from Li2S testing
+
+For antifluorite Li2S with one S and two Li atoms per primitive cell,
+an ideal structure has 8 distinct nearest-neighbor Li–S *periodic*
+connections overall, but only 4 around each Li. A printed list of 8
+connections cannot all be called "Li1–S1" without inspecting atom indices.
+Verify the pair table, cell translations and bond lengths.
+
+A periodic self-image bond (e.g. S–S between reference S and a translated S)
+can contribute **twice** per distinct undirected connection to the local
+SBO. Therefore do not compare SBO with the simple unweighted sum of
+element-pair means, and do not call a small S–S BO a conventional sulfur
+covalent bond merely because the method printed it. Compare symmetry
+equivalent bonds of equal distances and flag conspicuously different BOs
+for follow-up; validate geometry and output parsing before interpreting.
+
+Retain all Chargemol-printed bond types without hiding weak entries.
+Every slide summary must identify whether the displayed error range is
+min–max across bonds/atoms, not statistical uncertainty.
 
 ## References
 

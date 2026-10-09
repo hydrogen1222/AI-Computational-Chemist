@@ -182,6 +182,10 @@ class DDEC6Tests(unittest.TestCase):
             atoms = list(csv.DictReader(fh))
         self.assertAlmostEqual(float(atoms[0]['ddec6_net_charge_e']), 0.8432)
         self.assertAlmostEqual(float(atoms[1]['sum_bond_orders']), 0.901058)
+        self.assertAlmostEqual(float(atoms[0]['sbo_from_printed_pairs']), 0.0882)
+        # One Cl self-image +/- pair appears once in the bond CSV but twice in SBO.
+        self.assertAlmostEqual(float(atoms[1]['sbo_from_printed_pairs']), 0.0882 + 2*0.0306)
+        self.assertAlmostEqual(float(atoms[1]['sbo_unprinted_remainder']), 0.901058 - 0.1494)
     def test_slide_figures_if_matplotlib_available(self):
         try:
             import matplotlib  # noqa: F401

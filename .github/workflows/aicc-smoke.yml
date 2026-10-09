@@ -29,6 +29,7 @@ jobs:
           python aicc/tests/smoke_test.py
           python aicc/tests/batch_bader_test.py
           python aicc/tests/ddec6_test.py
+          python aicc/tests/hirshfeld_test.py
           python aicc/tests/software_discovery_test.py
           python aicc/tests/retired_components_test.py
       - name: Verify clean install has no retired skills

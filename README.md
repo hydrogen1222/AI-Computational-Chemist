@@ -44,6 +44,7 @@ limitations, then build and audit the candidate structures. Do not submit VASP."
 | `procedures/scientific-modeling/` | Main modeling workflow |
 | `procedures/literature-to-calculation/` | Extract evidence and model choices from publications |
 | `procedures/batch-postprocessing/` | Batch analysis of existing calculations without manual scripts |
+| `tools/vasp/scripts/collect_hirshfeld.py` | Extract ordinary Hirshfeld/CM5 charges already computed by Chargemol; generate comparison CSV/PPT figures |
 | `tools/chargemol/` | DDEC6 charges, SBO, all printed periodic bond types, and paginated PPT-ready plots |
 | `tools/vasp/scripts/batch_bader.py` | Batch VASP Bader/AIM charges, per-atom and per-element CSV |
 | `procedures/review-response/` | Optional manuscript reviewer-response workflow |
