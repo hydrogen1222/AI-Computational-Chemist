@@ -68,6 +68,9 @@ def summarize(preflight,grid,condensed_files):
     lines+=["","## 凝聚 Fukui 指数（按原子电荷定义严格区分）",""]
     if condensed_files:
         for file in condensed_files:
+            provenance=file.with_suffix(".md")
+            if not provenance.is_file() or "**质量检查：** PASS" not in provenance.read_text(encoding="utf-8"):
+                raise ValueError(f"{file}: missing validated condensed report QC marker")
             with file.open(encoding="utf-8-sig",newline="") as fh:
                 entries=list(csv.DictReader(fh))
             if not entries:continue
@@ -99,7 +102,7 @@ def summarize(preflight,grid,condensed_files):
             "不同电荷模型不应混在一张表解释为同一物理量。"
             "Fukui 函数不能单独预测实际电解质–金属界面分解势垒。",
             ""]
-    if grid and grid.get("status")=="PASS_GRID_ARITHMETIC_ONLY_NOT_PBC_PHYSICS":
+    if grid and grid.get("status")=="PASS_GRID_ARITHMETIC_ONLY_NOT_PBC_PHYSICS" and comparison:
         lines+=["## 可用于组会的初步结论","",
                 "在给定的统一电子数扰动与网格规范下，现有三维 Fukui 输出"
                 "已经通过电子数归一化及所提供的跨程序空间算术检查。"

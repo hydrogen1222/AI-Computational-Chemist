@@ -68,6 +68,7 @@ class FukuiReportTests(unittest.TestCase):
             w.writerows([dict(atom_index=1,element="S",f_plus=0,f_minus=0,f_zero=0,dual=0),
                          dict(atom_index=2,element="Li",f_plus=.5,f_minus=.5,f_zero=.5,dual=0),
                          dict(atom_index=3,element="Li",f_plus=.5,f_minus=.5,f_zero=.5,dual=0)])
+        charges.with_suffix(".md").write_text("# Condensed QC\n\n**质量检查：** PASS\n")
         r=self.command("--grid-audit",grid,"--condensed",charges)
         self.assertEqual(r.returncode,0,r.stdout+r.stderr)
         content=self.out.read_text()

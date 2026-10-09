@@ -35,6 +35,7 @@ jobs:
           python aicc/tests/multiwfn_periodic_test.py
           python aicc/tests/periodic_cdft_test.py
           python aicc/tests/periodic_cdft_grid_test.py
+          python aicc/tests/periodic_cdft_report_test.py
           python aicc/tests/software_discovery_test.py
           python aicc/tests/retired_components_test.py
       - name: Verify clean install has no retired skills
@@ -53,6 +54,7 @@ jobs:
           test -f "$tmp/skills/periodic-cdft/scripts/condensed.py"
           test -f "$tmp/skills/periodic-cdft/scripts/grid_audit.py"
           test -f "$tmp/skills/periodic-cdft/scripts/make_critic2.py"
+          test -f "$tmp/skills/periodic-cdft/scripts/report.py"
           test -f "$tmp/skills/plotting/scripts/pubstyle.py"
           test -f "$tmp/skills/plotting/scripts/init_figure.py"
           test ! -e "$tmp/skills/research-orchestrator"
