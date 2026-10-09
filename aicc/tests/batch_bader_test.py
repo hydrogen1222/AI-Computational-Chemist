@@ -76,6 +76,10 @@ class BatchBaderTests(unittest.TestCase):
         with (out / "bader_elements.csv").open() as fh:
             elems = list(csv.DictReader(fh))
         self.assertEqual([v["element"] for v in elems], ["Na", "P"])
+        human = (out / "bader_summary.md").read_text(encoding="utf-8")
+        self.assertIn("可以放进 PPT", human)
+        self.assertIn("Na 的平均净电荷为 +0.3000 e", human)
+        self.assertIn("未验证", human)
 
     def test_execute_isolated_and_failures_do_not_block_others(self):
         bins = self.root / "bin"
@@ -98,6 +102,19 @@ class BatchBaderTests(unittest.TestCase):
             cases = {v["case"]: v for v in csv.DictReader(fh)}
         self.assertEqual(cases["ok"]["status"], "OK")
         self.assertEqual(cases["missing"]["status"], "ERROR")
+
+    def test_expected_charge_detects_inconsistent_bader_output(self):
+        (self.root / "case-list.txt").write_text("ok\n")
+        (self.good / "ACF.dat").write_text(ACF)
+        result = self.run_tool("--collect-only", "--manifest", self.root / "case-list.txt",
+                               "--net-charge", "0", "--charge-tol", "0.05")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Bader charge sum differs", result.stdout)
+        with (self.root / "postprocess_summary/bader_cases.csv").open() as fh:
+            row = next(csv.DictReader(fh))
+        self.assertEqual(row["status"], "ERROR")
+        self.assertNotIn("Na 的平均净电荷为", (
+            self.root / "postprocess_summary/bader_summary.md").read_text())
 
     def test_invalid_atom_count_rejected(self):
         (self.root / "case-list.txt").write_text("ok\n")

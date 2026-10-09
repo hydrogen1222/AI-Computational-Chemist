@@ -120,6 +120,9 @@ class PeriodicCharges(unittest.TestCase):
             quality=list(csv.DictReader(f))
         self.assertEqual({row["status"] for row in quality},{"OK"})
         self.assertIn("Hirshfeld-I", (output/"multiwfn_charge_comparison.md").read_text())
+        human = (output / "multiwfn_report_cn.md").read_text(encoding="utf-8")
+        self.assertIn("可以放进 PPT", human)
+        self.assertIn("逐方法质量状态", human)
 
     def test_bad_atom_order_rejected_no_surrogate(self):
         self.add_logs()

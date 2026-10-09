@@ -76,7 +76,7 @@ class ReadableCharges(unittest.TestCase):
         self.assertEqual(r.returncode,0,r.stderr)
         text=(self.output/"bader_summary.md").read_text()
         self.assertIn("未验证",text)
-        self.assertIn("未检查",text)
+        self.assertNotIn("已按给定目标检查",text)
 
     def test_ddec6_all_bond_types_and_bo_qc(self):
         write(self.output,"ddec6_cases.csv",[
