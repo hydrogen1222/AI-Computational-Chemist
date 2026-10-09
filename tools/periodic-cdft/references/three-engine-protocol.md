@@ -84,6 +84,32 @@ Compare at the same **nonzero** \`δ>0\` available on *both* sides, e.g.
 0.10 e. If electron counts are not symmetric, use separate positive
 and negative actual δ values. Prepare \`f+\` and \`f-\` in each engine.
 
+**Common field-output QA after each engine:** collect fplus, fminus,
+fzero and dual in individual Gaussian `.cube` files, with **positive
+grid counts (bohr units)** and identical axis/origin/sample order.
+Do not accept mismatched unit-convention cubes as equivalent.
+Our independent `scripts/grid_audit.py` compares all same-finite-
+difference engines pointwise and checks `∫f±≈1`, `∫f0≈1`,
+`∫dual≈0`, and both pointwise identities. Example:
+
+```bash
+python tools/periodic-cdft/scripts/grid_audit.py \
+  --cube critic2:fplus:/project/fukui_vasp/postprocess/periodic_cdft/critic2/fplus.cube \
+  --cube critic2:fminus:/project/fukui_vasp/postprocess/periodic_cdft/critic2/fminus.cube \
+  --cube critic2:fzero:/project/fukui_vasp/postprocess/periodic_cdft/critic2/fzero.cube \
+  --cube critic2:dual:/project/fukui_vasp/postprocess/periodic_cdft/critic2/dual.cube \
+  --cube multiwfn:fplus:/project/fukui_vasp/postprocess/periodic_cdft/multiwfn/fplus.cube \
+  --cube multiwfn:fminus:/project/fukui_vasp/postprocess/periodic_cdft/multiwfn/fminus.cube \
+  --out /project/fukui_vasp/postprocess/periodic_cdft/comparison/grid_audit.json
+```
+
+Add analogous `fukuigrid-fd` or `fukuigrid-interp` cubes when
+the local version is separately validated; interpolation is NOT
+subject to the exact finite-difference engine-agreement threshold.
+The script creates `grid_audit.json` and a Chinese
+`grid_audit.md`, and never edits input cubes. This does not
+replace source NELECT preflight or validate PBC electrostatics.
+
 **Multiwfn** (already installed on user's machine):
 - Use local executable and installed manual to load one VASP density as
   cube through **grid-data main function 13** and convert other CHGCARs
@@ -97,7 +123,21 @@ and negative actual δ values. Prepare \`f+\` and \`f-\` in each engine.
   CHGCAR conversion or cube export differ in the installed build, STOP
   and label **UNVERIFIED**, do not try main function 22 on a VASP grid.
 
-**Critic2** (external executable, not bundled), verified syntax from
+**Critic2** (external executable, not bundled). The agent may
+generate its validated one-shot four-field input by:
+```bash
+python tools/periodic-cdft/scripts/make_critic2.py \
+  --root /project/fukui_vasp \
+  --preflight /project/fukui_vasp/postprocess/periodic_cdft/comparison/preflight.json \
+  --plus-label p010 --minus-label m010 \
+  --workdir /project/fukui_vasp/postprocess/periodic_cdft/critic2
+```
+Use explicit `--execute` only after the researcher authorized local
+postprocessing and the installed syntax has been confirmed, then check
+all four cube files with `grid_audit.py` before scientific reporting.
+Reference protocol is **not evidence of having locally run Critic2**.
+
+**Critic2** syntax template (external executable), from
 upstream LOAD and CUBE GRID docs; example for two INPUT CHGCAR paths
 with \`δ+ = 0.10\`:
 

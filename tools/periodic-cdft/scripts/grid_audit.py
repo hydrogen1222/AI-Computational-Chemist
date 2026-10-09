@@ -77,6 +77,13 @@ def same_grid(a,b,tol=1e-7):
         x,y=a[key],b[key]
         if key=="origin":
             if any(not near(u,v) for u,v in zip(x,y)):return False
+        elif key=="atoms":
+            # Cube nuclear-charge / pseudopotential labels can differ by
+            # exporter; compare element number and POSITION, not label charge.
+            if any(not near(u[0],v[0]) or
+                   any(not near(m,n) for m,n in zip(u[2:],v[2:]))
+                   for u,v in zip(x,y)):
+                return False
         elif any(any(not near(u,v) for u,v in zip(r,s)) for r,s in zip(x,y)):
             return False
     return True

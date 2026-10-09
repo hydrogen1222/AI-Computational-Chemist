@@ -29,7 +29,9 @@ covers f+, f-, f0, dual Fukui response and conditional condensed indices
 from the existing VASP/Bader/Chargemol/Multiwfn outputs. Three independently
 installed grid engines (Multiwfn, Critic2, FukuiGrid) can be compared on
 matching VASP states; FukuiGrid's fractional-electron interpolation is
-a separately labeled approximation. AICC provides read-only CHGCAR/
+a separately labeled approximation. AICC includes reproducible Critic2 input generation,
+a signed Gaussian-cube cross-engine grid auditor, and per-site
+condensed response reports. AICC provides read-only CHGCAR/
 NELECT/geometry preflight and condensed charge-table checks; actual
 third-party computation, output integrity checks and any charged-cell
 physical correction must be locally validated. No external binaries,

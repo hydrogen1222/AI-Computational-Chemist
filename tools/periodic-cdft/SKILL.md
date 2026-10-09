@@ -70,6 +70,9 @@ Fukui over a fixed Bader basin (basins shift with density).
    independently chosen 4-or-more matching density points on each side.
    The two FukuiGrid *potential* corrections (electrodes / SCPC) are
    conditional, **not** two extra density-Fukui definitions.
+   For Critic2, `scripts/make_critic2.py` writes a reproducible
+   four-field input from the vetted preflight manifest (default: no
+   external execution; explicit `--execute` runs local Critic2).
 4. From validated f±, use the **same engine** to produce f0 and dual:
    no additional VASP run. Never substitute f0 for a spin-specific
    radical-attack barrier. For each exported grid verify cell integral,
