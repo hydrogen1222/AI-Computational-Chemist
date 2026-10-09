@@ -13,15 +13,14 @@ Before self-building, check only the project-local input scope:
 - the current project root or current working directory;
 - obvious project subdirectories such as `inputs/`, `input/`, `structures/`, `models/`,
   `work/structures/`, and `work/models/`;
-- files or directories explicitly named by the user, a task input, or `.research`
-  artifact/path metadata.
+- files or directories explicitly named by the user or documented in the existing project.
 
 Use bounded listing/search commands from that scope, for example `rg --files` or
 `find . -maxdepth 3` with structure suffixes such as `POSCAR`, `CONTCAR`, `*.vasp`,
 `*.cif`, `*.xyz`, `*.pdb`, `*.mol`, and `*.sdf`. Do not search `$HOME`, `/home`,
 `/opt`, `/`, shared software trees, scratch roots, or unrelated archives for hidden
 structures. If no usable structure is found in the bounded project-local scope, record
-`initial-structure-decision: not_supplied` and build the model from declared database,
+`source: not supplied` in the model report and build the model from declared database,
 literature, manuscript, or builder assumptions.
 
 Key APIs and conventions:

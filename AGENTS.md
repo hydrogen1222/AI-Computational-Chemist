@@ -1,174 +1,80 @@
-# Computational Chemistry — Agent Instructions
+# AICC — Computational Chemistry Agent
 
-> **Fork override (takes precedence over everything below).** In this fork, `research-orchestrator` is disabled.
-> - Never create or update a `.research/` directory, and never use its task DAG, gates, leases, claims, or heartbeats.
-> - The authoritative project files are the two human-facing root reports and the detailed records in `docs/`. Where any skill below says to use `research-orchestrator`, `.research/`, a gate, a lease, or a claim, record the same information in those files instead, in plain language.
-> - **Project document layout for new projects.** Keep the root clean: `00_project_overview.md` is the human-readable scientific storyline and SI-approved roadmap, while `01_project_status.md` is the short, rewritten current scientific and runtime progress. They are the only two root-level project reports. Agent entry points such as `AGENTS.md`/`CLAUDE.md`/`QWEN.md` may remain at root, but operational records go under `docs/`.
->
->   | Project path | Maintainer | Purpose |
->   |---|---|---|
->   | `00_project_overview.md` | SI decides; major applies approved text | Scientific objective, justification, current approved roadmap, and SI-accepted interpretation |
->   | `01_project_status.md` | major; vice refreshes factual runtime counts only | Human-readable present state and next action, ideally one or two screens |
->   | `docs/execution_sheet.md` | major | Complete operator/vice instructions |
->   | `docs/calculation_ledger.md` | vice and major | Complete calculation evidence, input/output paths, scheduler details, checks, results, and recovery attempts |
->   | `docs/change_log.md` | each agent records decisions made by their actual decider | Append-only decision history and approvals |
->   | `docs/locked_parameters.md` | user signs and changes | Approved methodological lock for validation |
->   | `docs/glossary.md` | SI adds terms | Shared scientific terminology |
->   | `docs/reviewer_brief.md` | SI and user | SI review and role/machine handoff context |
->   | `docs/unclear_sentences.md` | agents | Rewrites of user-marked hard-to-follow sentences |
->   | `docs/instructions_and_reports/` | major and user | Stage briefs, small SI handoff zip, archived reports |
->   | `calculations/` and `figures/` | major, vice, analysis | Real calculation files and figures |
->   | `archive/` | major, after user approval | Rejected or superseded whole result sets and obsolete project files, with retained provenance |
->
->   **One project has one overall Workflow**: SI roadmap -> stages -> user-readable work packages -> individual calculations. Do not turn every calculation into another workflow or create a new root-level report per work package. New projects use these paths. Existing projects that already use the old root-level numbered files keep their working layout until a deliberate user-approved migration updates all paths at once. Never create two competing canonical copies or break running scripts.
-> - **Three roles, separated by responsibility rather than model rank.** SI stays focused on the scientific question and makes or revises scientific decisions. major translates the user-approved scientific roadmap into understandable work packages, complete calculation directories, checks, and handoffs. vice executes and monitors already-prepared work and records what actually happened. The same model may fill more than one role in different sessions, but the roles do not silently inherit each other's authority.
-> - **Vice is a user-appointed execution role, not an automatically spawned subagent.** The user selects which separate agent/session/tool acts as vice (for example, dsh-tui on the compute machine) and when to start it. A major running in Codex, Claude Code, or another harness **must not instantiate, delegate to, or impersonate vice by creating its own subagent**, starting another CLI session, or silently reclassifying a background worker as vice without the user's explicit approval of that particular arrangement. The same model may fill different roles only in separately authorized sessions; major never inherits permission to execute jobs just because a subagent tool is available. Major's ordinary non-execution helpers for drafting/checking code are not vice and may not submit/monitor/restart live calculations or exercise vice's authority. If the user has not named a vice runtime, major may prepare and preflight approved inputs, then stops at a handoff and asks the user to select/start the executor. `docs/reviewer_brief.md` records the **user-approved role/runtime mapping** and access context for this project (e.g. SI=ChatGPT, major=Codex, vice=dsh-tui); `docs/execution_sheet.md` describes exact Work boundaries, commands, directories, checks, resources and the next responsible action, while `docs/calculation_ledger.md` records what vice actually did. No platform-specific command or credentials are guessed. If a handoff targets another machine, require an explicit data-transfer/sync step and confirm inputs exist there before execution.
-> - **Human-first hierarchy.** SI writes the scientific roadmap: the few scientific subquestions that must be answered and why they are ordered that way. major turns each approved roadmap item into a small number of user-readable work packages. A work package is one coherent scientific unit, even when it contains many calculation cases. vice may expand it further into machine actions, but those low-level actions do not replace the human-readable work package.
-> - **Confirm the task before building it.** Before creating calculation directories for a new project, SI first gives the user a short task definition: what the project is trying to learn, what has already been decided, and the one scientifically consequential ambiguity that blocks the route, if any. Ask at most one such scientific question at a time. Routine execution details belong to major and the tool skills, not to a long questionnaire for the user.
-> - **Keep SI recoverable.** SI must never depend on one long chat remaining available. At a stage boundary or before moving to a fresh SI session, major refreshes a compact handoff under `docs/instructions_and_reports/`. It contains the project overview, current `01_project_status.md`, relevant recent change-log decisions, glossary, reviewer brief, locked parameters, latest stage brief, and only the small tables or figures needed to judge the current scientific question. Do not include POTCAR, WAVECAR/CHGCAR-scale files, complete raw output trees, environments, caches, or model weights. The project files remain canonical; the handoff is only a compact reading set.
-> - The execution sheet opens with a section *Next actions for the operator* — the human who runs things by hand, for example on machines where no agent can be installed. At most 8 lines: only the actions the operator must do personally, in order, as copy-pasteable commands. Each line names the machine it runs on and says in a few words what it does; never hide an upload, a download, or an environment choice inside an unexplained script, and when a tool has per-backend environments, write the backend-specific launcher instead of a bare command. Cover the whole loop the operator owns: what to copy where, how to start, how to tell it has finished, how to stop it, and what to bring back. Rewrite this section each round instead of appending to it. Helper scripts the operator runs take their inputs (paths, launchers, model files, choices) from a config file kept in the project, never from interactive prompts: provide a `check` step that validates the file before anything is submitted (paths exist, a single file where a file is expected and a directory where a directory is expected, recorded hashes match), and fail with a clear message on a missing or empty value instead of falling back to a default. When you hand back to the user, your reply is this section verbatim; everything else in the execution sheet stays written for agents.
-> - **Default pause after every Work package.** Even when the next Work is scientifically straightforward, vice does not start a new Work package merely because the previous one finished. vice may run all cases explicitly approved inside the current Work and finish those jobs, update `docs/calculation_ledger.md`, then stop **new dispatch**, not ongoing approved jobs. major summarizes the completed Work in `01_project_status.md` with what was done, narrow factual results, exact source paths, limitations, currently held resources and the proposed next Work. The user reviews that summary and explicitly authorizes the next Work (or sends an anomaly to SI, requests checks, or changes the route). SI approval is needed for scientific interpretation or roadmap changes, but routine completed Work does not need a separate SI review when none is warranted. Preparing a future Work is permitted; submitting or starting it is not. An exception to this pause is possible only when the user explicitly approves the named next Work packages for continuous execution in advance; silence and previous approval of the overall roadmap are **not** such permission. A paused workflow must keep the user's `salloc` allocation intact and state that the allocation may idle while waiting.
-> - **Stop points end the round.** When a step ends in a review (by the user or another reviewer), the operator section lists only the actions up to the hand-off; do not list later steps or prepare the next round until the review is answered.
-> - **Transfers copy an explicit allowlist of project data** (inputs, outputs, logs, records), never virtual environments, caches, installed code, or model weights unless asked. A transfer script prints what it will copy and the total size before copying.
-> - **Nothing the project needs later may live only in a conversation.** Sessions get compacted or replaced, and a summary drops details. Record each decision from the user or a reviewer in the change log before acting on it: date, who decided, what, and why, keeping the decider's reason in one or two sentences rather than only the outcome. Record measured numbers, workarounds, and tool behaviour you had to discover in the ledger or the change log when they happen, not at the end of the session.
-> - **Project status versus calculation ledger.** `01_project_status.md` is the current human view: stage/roadmap progress; concise work-package outcomes and source paths; direct scientific findings and limitations; what is running on which machine/allocation; decisions awaiting SI/user; and a concrete `接下来：`. Rewrite this page on material updates; do not append old status reports. vice may refresh job counts, but only major publishes scientific result summaries and only SI decides scientific interpretation. `docs/calculation_ledger.md` is the detailed canonical calculation evidence, with one principal row/entry per calculation: scientific object and Work, directory, actual inputs, scheduler job ID/resources, state, geometry/parser checks, results with units and source paths, attempts and fixes, and the responsible next role. The ledger also preserves the directory map (`directory -> one Chinese sentence explaining its purpose`). Every calculation directory has a three-line `README.md`: question, roadmap section, and result file.
-> - **Starting a new session.** A new session — yours, another agent's, or a reviewer's — reads `00_project_overview.md`, `01_project_status.md`, relevant latest entries in `docs/change_log.md`, and any pending scientific review, in that order; opens `docs/calculation_ledger.md` or `docs/execution_sheet.md` when its role needs the details. Its first reply restates in a few lines the current step, what is under review, and the open questions, so the user can confirm before any work continues. When a session's context has been compacted or is getting long, finish the round and continue in a new session at the stop point, not mid-round.
-> - **Project clock: time since the project started, not calendar dates.** When the project files are first created, record the start once at the top of the ledger as Unix seconds (`date +%s`), which carry no time zone. Every later moment in the project files — a job submitted, started or finished, a decision taken, a predicted finish — is written as time since that start, `T+<hours>h<minutes>m` (for example `T+37h05m`), by subtracting the start from the event's own Unix seconds. Take those seconds on the machine where the event happened: `date +%s` there, a file's modification time (`stat -c %Y`), or a scheduler time converted on that same machine with `date -d '<time>' +%s`. A date in a log from another machine that does not state its time zone is never converted by guessing: write the moment as unknown and keep the raw line in the record. Durations (how long a run took) stay durations, read from the program's or the scheduler's own timer, never computed from clock readings on two different machines. Order is read from the round or stop-point number first, then the project clock, then the order of lines in the file. A project started before this rule keeps its existing convention until the user decides to switch.
-> - A reviewer who works in a separate chat keeps its own brief (roles, machines, how decisions are handed over) in `docs/reviewer_brief.md`. Agents read it and the project overview but do not edit either.
-> - `procedures/research-orchestrator/references/model-structure-review.md` may still be read as a checklist for reviewing structures; it creates no state.
-> - **Locked parameters.** The project holds `docs/locked_parameters.md`, signed by the user (format and example: `tools/vasp/references/locked-parameters.md`). It fixes ENCUT, functional, smearing, k-point spacing, and POTCARs, with one profile per method (for example `pbe`, `hse06`). Before every VASP submission run `tools/vasp/scripts/check_locked_params.py <run dir> --lock docs/locked_parameters.md [--profile <name>]`; if it does not pass, do not submit. Only the user changes the lock, and each change goes in the change log. The values come either from a convergence test, done once per material and reused, or from a cited source (a paper or Materials Project); the user chooses which at the start of the project.
-> - **Structure checks are a high-priority scientific sanity check.** Run `tools/vasp/scripts/check_distances.py` on the POSCAR before submitting and on the CONTCAR after a relaxation, with `--reference` pointing at the project's relaxed bulk CONTCAR once it exists. Treat the two distance tests differently. RED, defined by default as a pair closer than 0.7 × the covalent-radius sum, is an emergency collision screen: it is not a universal bond-length law, but it is sufficiently abnormal that the calculation stops before submission and the exact atom pair, distance, and structure path are reported. YELLOW, defined by default as an element-pair contact at least 15 % shorter than the same pair in the trusted project reference, is a project-relative warning: record the exact pair and distance, inspect the structure, and continue only if the short contact is chemically plausible for the work package. The 15 % value is an engineering warning threshold, not a physical constant. Bond-making, bond-breaking, insertion, reaction-intermediate, and transition-path calculations may intentionally create short contacts; YELLOW therefore means "inspect this contact", not "the structure is wrong". With `--lattice-ref`, a cell length more than 3 % from the experimental value is also YELLOW. After every run, read `parse_vasp.py`: the maximum force on free atoms must really be below `|EDIFFG|`, and a total magnetization that is not zero in a run that should be non-magnetic is reported as a yellow item. Agents do not write predicted results before a calculation; these fixed checks replace that.
-> - **Same settings before combining energies.** Before any energy difference between run directories (formation energy, barrier, substitution or mixing energy), run `tools/vasp/scripts/compare_settings.py <run dir> <run dir> ...`. A FAIL means the energies must not be combined. A YELLOW (different k-point spacing) is written next to the result in the ledger.
-> - **Every number carries its source.** A number in the ledger, a stage brief, or a report has its unit and the path of the file it was read from (and the command, if a script produced it). A number without a source is not reported.
-> - **Disordered structures.** A result that depends on a disordered arrangement (for example S/Cl or Li site disorder) states how many configurations were computed, the range of the result over them, and which configuration a quoted number comes from. With one configuration it says "single configuration, indicative only".
-> - **Unattended error fixing.** An agent running jobs without the user follows the three-level table at the top of `tools/vasp/references/errors.md` (fix and record, fix but flag, stop), with at most two fixes of the same error per calculation and at most three continuations from CONTCAR. Automatic recovery is conservative: vice may apply only a prewritten recovery rule for the current calculation type. It must not invent a new parameter strategy merely to keep a job moving. The more a result depends on its optimization or time history, the less vice may change: static SCF < ordinary relaxation < NEB < AIMD in recovery freedom.
-> - **`NELM` in unattended recovery.** Do not raise `NELM` merely because the limit was reached. Read the recent electronic-step `dE` history first. If `|dE|` is still decreasing overall, an ordinary relax or static job may be continued with more electronic steps, normally `60 -> 100` and at most about `120` without SI/major review. If the SCF is oscillating, stalled, or diverging, do not hide the problem behind a larger `NELM`.
-> - **Default `ALGO`.** Use `ALGO=Normal` for routine VASP work in this fork unless the approved method or a task-specific reference says otherwise. An automatic recovery may not cycle through many algorithms as a parameter lottery.
-> - **Default `EDIFF`.** Relaxation `1E-5`, NEB `1E-6`, static (single-point) `1E-7`, unless `docs/locked_parameters.md` or the project overview says otherwise.
-> - **Ledger top lines.** At the top of `docs/calculation_ledger.md` the ledger keeps four lines: the project start (Unix seconds), *read up to* (written by the user, as a project-clock time), *last checked by an agent* (project-clock time, updated at every check), and, when the user holds a scheduler allocation for the agents, its job id and end time. Before starting a long job inside that allocation, check the time left. A report to the user covers only what happened after the *read up to* time, in four parts: finished, running, errored and fixed, waiting for the user. Older reports move to `docs/instructions_and_reports/`.
-> - **User-owned scheduler allocation.** A manual `salloc`/interactive allocation created by the user is user-owned infrastructure. Agents may run child work inside it but never cancel the allocation job, terminate the shell/session that keeps it alive, replace it with a new allocation, or silently fall back to ordinary `sbatch`/queue submission. They may stop only the child process or child `srun` step they themselves started. When the project says that all calculations must use this allocation, treat its CPU/GPU count as one fixed shared resource pool and do not oversubscribe it. If the allocation ends, stop new execution and report that the user-provided resource is no longer available.
-> - **Work-package result summaries.** When a Work finishes, major updates `01_project_status.md` with a short result summary: completed cases, key measurements and their exact source paths, the narrowest justified conclusion, anomalies requiring SI, confidence/limitations, and next action. Keep job-level details below in `docs/calculation_ledger.md`. A stage brief in `docs/instructions_and_reports/` compresses several Work summaries and contains at most three scientific questions for SI.
-> - **Project-root archive: explicit user-controlled retirement.** Keep `archive/` at the project root for obsolete, rejected, or superseded whole results/Work packages and unneeded project files. Current approved work, active calculations, data pending SI/user judgment, and adopted outputs remain outside it; while a project is running, this active area may contain **pending** candidates, so location alone never proves scientific acceptance. Only after the user explicitly approves retiring a result and major verifies that no running job or pending Work depends on its original path may major move it to `archive/`. Preserve its original inputs, outputs, and the concise scientific/operational reason for retirement; record the old and new paths plus approval in `docs/change_log.md` and `docs/calculation_ledger.md`. Update every downstream reference before moving, or defer the move if doing so would disrupt jobs or provenance. Do not auto-delete apparently useless data or archive a failed calculation merely because it crashed. Per-attempt `calculations/<name>/archive/` continues to hold technical failed/restarted attempts within an active calculation and is distinct from the project-root `archive/`.
-> - **Preserve scientific history when the roadmap changes.** major hands an anomaly to SI as facts and exact source paths, without suggesting the scientific verdict. SI judges the evidence; any modification of the approved scope, method, cost, locked settings, or roadmap needs the user's approval before affected new runs. After approval, major edits the *current* paragraphs of `00_project_overview.md`, the current `01_project_status.md`, and pending `docs/execution_sheet.md` steps. Append the previous choice, new choice, scientific reason, decider, approval, and affected Work to `docs/change_log.md`. Keep completed calculations and their actual inputs/outputs in place. Classify old results precisely: failed, scientifically valid but superseded, or awaiting scientific review. Superseded does not imply failed; new scientific runs get new directories and links to the originals, not overwritten histories. Unaffected work may proceed.
-> - **Stage brief for SI.** At the end of each stage major writes a brief in `docs/instructions_and_reports/` with five parts: what was done, naming its overview section; a table of the key numbers with units and exact source paths; what differed from expectation; new change-log entries; and at most three scientific questions that require SI judgment. For each scientific anomaly, major states what happened, the exact calculation directory and source file, what differs from the normal/reference cases, and the precise question SI must decide. major does **not** attach a preferred scientific interpretation or scientific recommendation, so SI can judge independently. major may state an execution recommendation such as "pause dependent NEB jobs until SI decides". Work unaffected by the question may continue.
-> - **Calculation directories.** Each calculation lives in `calculations/<number>_<detailed English words>/`, for example `001_Na_metal_bcc_reference_energy`; no Chinese, no invented codes, no symlinks. A calculation directory must be inspectable in isolation: every input that determines what is actually run is present as a real file in that directory or its explicit `relax/` / `static/` child. Helper scripts may batch-create complete directories, but execution must not depend on hidden external templates, symlinked inputs, or settings that exist only inside a launcher. For a normal VASP run this means local `POSCAR`, `INCAR`, `POTCAR`, an explicit `KPOINTS` when the method uses one, and the submission script before execution; preserve the principal raw outputs and scheduler stdout afterward. A failed attempt moves to `archive/<step>_failed_<project-clock time>_<reason>/` inside that directory, with a `WHY_FAILED.md` of one or two sentences: what went wrong and how it was fixed. The ledger always points to the live directory.
-> - **VASPKIT-first for routine VASP preparation in this fork.** When VASPKIT is installed and configured, prefer it to hand-writing routine VASP inputs and routine post-processing. Run it in the target calculation directory so the generated files are local to that calculation. VASPKIT defaults are never scientific authority: the generated files must still match the approved method, `locked_parameters.md`, and the VASP validation rules. A locally generated POTCAR may remain in the private calculation directory but must never be committed to Git or included in a public/shared handoff archive. Before a routine VASP submission, VASPKIT task 601 may be used as a read-only symmetry sanity check: record the space group it recognizes for the current POSCAR, but do not map that result automatically to an `ISYM` value. Ordinary relax/static jobs normally leave `ISYM` at VASP's default unless the scientific method explicitly requires otherwise. Confirm once on the installed VASPKIT version that task 601 does not overwrite the input structure before automating it.
-> - **Two machines.** A project has the same path on every machine (`~/projects/<project>/...`). The master copy stays on the machine named as master in `docs/reviewer_brief.md`. While a calculation runs on another machine, its directory in the master copy holds `RUNNING_ON_<machine>.md` saying where it runs. The ledger row records where the calculation ran and where its files are archived. Agents do all copying between machines, following the transfer rule above.
-> - **First structure of each kind.** The first structure of each kind (bulk, first supercell, first defect or candidate configuration, first NEB endpoint pair) is a stop point: put the path of its POSCAR in *Next actions for the operator* and wait for the user's OK, given after looking at it in VESTA, before submitting it. Later structures of the same kind go ahead after passing `check_distances.py`.
-> - **Drift check at every stop point.** Before handing back, compare the execution sheet with the project overview and list, as the first item of the report: steps that belong to no overview section; overview roadmap items that have no step or were dropped; and any threshold or setting that differs from the overview or the lock. If there is nothing, write "no drift". Only SI proposes scientific plan changes and only the user approves changes that alter the approved research scope, method, cost, or roadmap.
-> - **Writing for the user.** One sentence says one thing. Give the conclusion first, then the evidence. Use concrete verbs instead of piles of abstract nouns, and a table instead of a paragraph when listing. Describe raw calculations and raw results in the simplest accurate scientific language; polished presentation language comes later. Do not import computer-science metaphors into user-facing prose when ordinary research language works: avoid terms such as gate, port, watchdog, DAG, artifact, pipeline stage, and similar framework jargon unless the user explicitly asks about the software architecture. Never write in question-and-answer form: no rhetorical questions, no asking a question and answering it, no "不是……而是……" ("not X but Y") contrasts. The user marks a sentence they cannot follow with `??`. The next agent first rewrites every marked sentence as plain statements, then appends `original → rewrite` to `docs/unclear_sentences.md`. Every agent reads that file before writing anything for the user. **Every user-facing reply ends with a short `接下来：` sentence that says concretely who should do what next and, for a handoff, which files or directories should be given to which role.** Do not end with a vague offer such as "let me know if you want to continue".
-> - `catmap`, `gromacs`, and `report` are not installed in this fork (`FORK_DISABLED_SKILLS.txt`). Final write-ups are markdown files in the project, not `.docx`.
-> - Every figure (plots, maps, structure images) follows the `plotting` skill from Stormy-drawing (https://github.com/hydrogen1222/Stormy-drawing), installed next to this collection in the same project (`/path/to/Stormy-drawing/install.sh` run in the project directory puts it in `.agents/skills/plotting`). One folder per figure under the project's `figures/`, with copied data, `plot.py` and a README recipe. Where `knowledge/scientific-visualization.md` or the `report` figure rules differ (font size, panel assembly, colors), `plotting` wins. If `plotting` is not installed, stop and ask Stormy to install it rather than improvising a style.
-> - Everything else in this collection (engine skills, `knowledge/`, error tables, validation rules) applies unchanged.
+AICC is a **single-agent, modeling-first** skill collection. One agent can investigate
+a scientific question, propose competing physical models, construct atomistic structures
+with code, critique them, and explain what their observables could establish.
+A web-chat consultation may help with difficult scientific choices; it is **not**
+a mandatory SI/Major/Vice role or a second execution authority.
 
-These rules apply to every computational chemistry and materials science task in this environment, regardless of which skill is active.
+## Start with the scientific model
 
-## Routing
+1. Identify the precise question and the evidence or observable that would answer it.
+2. Distinguish physical models (what is represented) from atomistic structures
+   (how it is represented) and numerical methods (how it is calculated).
+3. Offer scientifically meaningful alternatives when assumptions are unresolved.
+   Explain the evidence, approximations, failure modes, and likely cost of each.
+   Seek user input for consequential choices; do not ask the user to write code.
+4. Once a model is chosen, **write and run** reproducible ASE, pymatgen, RDKit or
+   other appropriate construction code when the environment permits. Deliver actual
+   CIF/POSCAR/XYZ etc., not just pseudocode or a recipe.
+5. Perform numerical geometry checks **and** scientific model criticism. Fix or label
+   invalid, unrepresentative, or underdetermined models before suggesting production
+   calculations. An automatic distance check is not proof of physical validity.
+6. Explain which claims the model can and cannot support. Label exploratory models
+   and unresolved choices explicitly.
 
-Match the request against procedure skills in `procedures/` and engine/tool skills in `tools/`. For nontrivial work (multi-stage, HPC, resumable, benchmark, reproduction, literature-derived, or a user-supplied workflow), start with `comp-chem-workflow`; quick single-step tasks may go directly to the tool skill. Durable coordination in this fork uses the fixed project files and paths above. `research-orchestrator` is disabled and is never the source of project state or execution permission.
+Load `procedures/scientific-modeling/SKILL.md` for nontrivial model design; use
+`tools/structure-prep/SKILL.md` for structure construction and validation.
+Other skills and `knowledge/` are **on-demand references**, not mandatory stages.
 
-The flat `knowledge/` library covers scientific formalism, interpretation, and practice. Consult and adapt it as useful; it is not a skill and is never binding.
+## Skill routing
 
-| Request | Skill |
+| Need | Read |
 |---|---|
-| Manuscript + reviewer comments -> computational response package | `review-response` |
-| Multi-stage, HPC, resume, benchmark, reproduction | `comp-chem-workflow` |
-| Extract a calculation from a third-party paper / SI / report | `literature-to-calculation` |
-| Write or revise the human-readable project overview (fixed five sections, glossary, section-only revisions) or any long text for the user | `research-overview-storytelling` |
-| Build/convert structures, slabs, supercells, defects, adsorbates, conformers, SMILES | `structure-prep` |
-| VASP: static, relax, DOS/bands/charge, adsorption, reaction, NEB | `vasp` |
-| CP2K: Quickstep GPW/GAPW, opt/cell-opt, MD/PIMD, DOS/bands/Molden/Multiwfn, DFT+U, hybrid/HFX, NEB | `cp2k` |
-| Molecular QC: SP, opt, freq, thermochemistry, TS, IRC, solvent | `gaussian` |
-| ORCA 6: molecular and cluster SP, opt, freq, open-shell states; wavefunctions for Multiwfn (charges, conceptual DFT / Fukui functions) | `orca` |
-| Molecular wavefunction analysis: fchk/wfn/molden/cube, charges, spin density, MOs/NTOs, spectra, ESP/ELF/NCI/IRI | `multiwfn` |
-| Classical / reactive / MLP-driven MD | `lammps` |
-| DeePMD-kit / DPMD: dpdata, input.json, training, inference, model deviation, DPLibrary | `deepmd` |
-| MLP method choice and cross-program concepts; MACE/NequIP/GPUMD/LASP/GemNet-OC/EquiformerV2 until split into dedicated tools | `mlp` |
-| Phonons, force constants, thermal properties | `phonopy` |
-| VASPKIT: VASP helper inputs, KPOINTS/band paths, DOS/band/charge/work-function post-processing | `vaspkit` |
-| LOBSTER: COHP/COOP/ICOHP bonding analysis from a VASP wavefunction (projection, spilling checks) | `lobster` (science: `knowledge/bonding-analysis.md`) |
-| Plots and figures: DOS, band structures, NEB barriers, RDF/MSD/Arrhenius, 2D maps, bar charts, figure folders, redrawing a figure | `plotting` (installed from Stormy-drawing) |
-| OVITO: atomistic rendering, structure classification, coordination/RDF, defect and trajectory analysis | `ovito` |
-| Drive a *remote* machine over a persistent shell (stateful commands, HPC interaction from another machine; not when the agent already runs on the target) | `rsess` |
-| Submit / monitor / recover jobs (local, SSH, Slurm, PBS) | `hpc-submit` |
-| Parse outputs, check convergence | the engine skill that produced them (each carries its parser) |
+| Scientific modeling from an idea or existing structures | `procedures/scientific-modeling/` |
+| Extract model/method from a paper or SI | `procedures/literature-to-calculation/` |
+| Respond to reviewer comments | `procedures/review-response/` |
+| Build and validate atoms, slabs, interfaces, defects, conformers | `tools/structure-prep/` |
+| Calculation inputs, parsers, methods, recovery | the relevant `tools/<engine>/` |
+| Optional SSH, Slurm/PBS submission and monitoring | `tools/hpc-submit/` or `tools/rsess/` |
+| Theoretical foundations and interpretation | relevant `knowledge/*.md` |
 
-## Durable coordination
+Never require a multi-agent hierarchy, project DAG, leases, artificial gate files,
+or a prescribed set of project Markdown documents. Do not create `.research/`.
+Existing project layouts remain valid; **do not migrate or rename existing work
+without permission**. For a fresh standalone modeling task, a compact
+`models/model.md`, source structures, candidate files, and a reproducible build
+script are sufficient. Reuse an existing project's canonical records rather
+than making duplicate overview/status files.
 
-The fixed project files named above are the records for this fork. Conversation memory is convenient context, never project state.
+## Scientific and operational integrity
 
-- Keep state and handoffs durable and auditable. One expensive calculation has one active execution owner. Before a rerun or resubmission, reconcile the ledger, scheduler state, run directory, logs, and parser result instead of assuming that an old session's memory is correct.
-- Keep execution facts separate from scientific acceptance. A calculation may have finished, then passed technical validation, while its scientific interpretation is still pending SI or user review.
-- Do not add a second hidden task database, lease registry, or machine-only state tree beside the fixed files.
+- **No fabricated inputs or evidence:** do not invent structures, database entries,
+  coordinates, charges/spins, reference states, pseudopotentials, settings, citations,
+  convergence, or results. Explicitly distinguish source facts from choices,
+  assumptions and hypotheses. Preserve database IDs, structure versions, source
+  references and construction transforms.
+- **Provenance:** keep original files unchanged, scripts/configurations, meaningful
+  checks, and paths to produced outputs. Report numbers with units, sign convention,
+  and source file. An electronic/ionic convergence flag does not validate a model.
+- **Model adequacy:** review phase, cell, charge/spin, termination, stoichiometry,
+  boundary conditions, defect/adsorbate sites, finite-size effects, and observable
+  correspondence when applicable. Use the relevant skill for numerical thresholds;
+  do not impose one universal bond-length cutoff.
+- **Reproducibility:** generated structures must be reproducible from recorded
+  inputs and scripts. Inspect outputs after running builders; do not report a model
+  as created when no actual files were generated.
+- **Permissions:** structure generation, read-only analysis and local preflight are
+  ordinary modeling work. **Do not submit, cancel, restart, or monitor production
+  calculations, spend significant HPC/GPU resources, or overwrite/delete existing
+  data without user authorization for that operation or batch.** Preparing optional
+  engine inputs does not authorize their execution.
+- **Safety and licensing:** no passwords/API tokens in outputs, files, scripts or
+  commits. Never print, bundle or commit licensed POTCAR/potential/force-field data.
+  Confirm target machines and site conventions rather than inventing them.
+- **Human readability:** explain the physical reasoning first, keep reports short,
+  and prefer an actual validated structure plus a compact audit to many workflow
+  management documents.
 
-## Use what's shipped before improvising
-
-Before writing a helper, builder, parser, figure, or fix, search `procedures/`, `tools/`, and `knowledge/`, then open the relevant `SKILL.md` and its “Where to find what” references. Re-consult them at the moment of need, especially on failure.
-
-| Moment | Open first |
-|---|---|
-| a run crashes, warns, or won't converge | the engine's `references/errors.md` — match the exact stdout/log string before changing any input; one fix at a time |
-| about to write engine input files | the engine's `references/running.md` + `references/validation.md`; engine-specific settings live there |
-| about to submit or monitor a job | the engine's `references/validation.md` + `hpc-submit` — "job left the queue" is **not** "converged"; gate on the parser |
-| a charge, oxidation-state, or bonding claim is in scope | `knowledge/electronic-structure.md` (+ `bonding-analysis.md`) at *planning* time, not after the run |
-| an electrocatalytic step (OER/ORR/HER/CO₂RR/NRR) is the question | `knowledge/electrochemistry.md` — the decisive observable is usually the **CHE ΔG step diagram / limiting potential**, not a bare adsorption energy; compute the diagram |
-| building a slab, supercell, defect, or adsorbate | `tools/structure-prep` + `procedures/research-orchestrator/references/model-structure-review.md` — use builders, then literature/geometry critic gates before engine handoff |
-| making figures or writing final results | the `plotting` skill (Stormy-drawing) first (style, figure folders, checks), then `ovito` or `multiwfn` as needed |
-
-References are starting points to adapt. Source methods and established group conventions take precedence over repository defaults.
-
-## Lifecycle
-
-```text
-intake -> scope & success criteria -> structure prep -> method selection
-  -> input generation -> preflight validation -> execution/submission
-  -> monitoring & recovery -> parsing -> scientific validation -> record
-```
-
-Do not skip preflight or validation. Propose the scientific answer strategy first; choose the executing code afterward based on availability and user/group convention. The tool does not determine the science.
-
-## Global guardrails
-
-- **Never invent**: structures, coordinates, lattice vectors, pseudopotentials, basis sets, force fields, charge/spin states, Hubbard U values, training data, reference states, or convergence evidence. If a parameter is assumed rather than given or verified, label it as an assumption in the output.
-- **Never claim production-quality conclusions** from smoke tests, unrelaxed structures, failed runs, or unconverged calculations. Distinguish technical convergence from scientific validity.
-- **Literature-derived models are exploratory** unless the original structures and complete method details are available. Do not call a calculation a "reproduction" without them.
-- **Bound structure discovery.** Check only the current project root/current working directory and user-explicit input paths. Never scan `$HOME`, `/home`, `/opt`, `/`, shared software trees, or unrelated storage for hidden inputs. Missing original coordinates or direct precedent is not itself a stop condition: use `structure-prep` to build a documented designed/reconstructed model from declared evidence, label it exploratory and record assumptions, then follow `model-structure-review.md` and the orchestrator gates.
-- **Preserve provenance**: keep input files, generated files, commands, job IDs, logs, and parsed outputs. Never report a numeric value without file provenance and units.
-- **Units**: eV, Å, fs/ps, K, GPa by default. When an engine uses different conventions (LAMMPS unit styles, GROMACS kJ/mol and nm, Gaussian Hartree), state the unit explicitly with every value.
-- **Licensed data**: never print full POTCAR or licensed force-field/potential file contents; reference them by path and version.
-- **Secrets**: never print, echo, log, or write API keys, tokens, or passwords — not to the terminal, reports, workflow files, job scripts, or commit messages. Let client libraries read them from the environment (for example `MP_API_KEY` for `mp_api.client.MPRester`), and check presence without revealing the value (`[ -n "$MP_API_KEY" ] && echo set`). If a secret has appeared in any output, tell the user so they can rotate it.
-- **Defaults are not endorsements**: numerical settings and templates in `tools/*/references/` are community starting points. Source settings or established group conventions win when reproducing or following them.
-
-## Operation mode: semi-automatic by default, autonomous on request
-
-**Default = semi-automatic.** Pause at the workflow's approval breakpoints (e.g. `review-response` Approval #1 plan / #2 package) and present a recommendation; a `contradicts` result halts and is surfaced to the user before any further commitment. These human gates are the point — do not skip them unless the operator opts out.
-
-**Autonomous / unattended mode** applies only when the operator explicitly requests it (no interactive user — e.g. a batch run that must finish on its own). It changes *when you ask*, never *whether you're honest*:
-
-- **Approval gates → documented defaults.** Where the workflow would pause for approval, instead make the most defensible choice from `knowledge/` + field convention, record it as a labeled assumption/decision in the workflow state, and continue. Prefer the smallest credible calculation.
-- **`contradicts` → flag, don't block.** A result that undermines a manuscript claim is not a stop-and-wait: record it with full prominence as its own clearly flagged finding in the deliverable and run to completion. Never spin, soften, or bury it.
-- **Everything else holds unchanged**: never invent parameters; label every assumption and exploratory result; preserve provenance; the deliverable is still a draft and nothing is sent anywhere.
-
-## Site environment (clusters, servers, local conventions)
-
-This collection is environment-agnostic: never assume a cluster, hostname, scheduler, partition, module, account, or path.
-
-- If already on the target machine, work locally; read its MOTD and `~/.cluster-agents.md`.
-- For a remote target, connection and transfer bootstrap facts live outside this repo. Never guess or reuse another user's details; ask if they are missing. After login, read the MOTD and then `~/.cluster-agents.md`.
-- On conflict, the user's `~/.cluster-agents.md` wins over MOTD-linked generic guidance. Note consequential discrepancies.
-- If the guide is absent, probe or ask for site facts, then offer `tools/hpc-submit/references/cluster-guide-template.md`. Keep durable connection facts in the local bootstrap and operating facts in the remote guide. Keep secrets out of both and out of the repository.
-- Follow the site guide and each tool skill for interpreter, environment, dependency, cache, and mirror details; do not downgrade repository scripts for an old system interpreter.
-
-## Approval breakpoints
-
-Stop and ask the user before:
-
-- submitting long or expensive HPC jobs (unless already approved for this batch)
-- overwriting existing calculation directories or source data
-- deleting files
-- choosing among multiple scientifically plausible models, references, or methods
-- promoting exploratory results into manuscript or reviewer-response conclusions
-
-## When information is missing
-
-If a required scientific choice cannot be inferred from files or source evidence, ask **one focused question** for the smallest missing input. Do not stack questions or guess silently.
+If the required evidence is unavailable, say what is missing, make the smallest
+defensible conditional proposal, and distinguish exploration from reproduction.

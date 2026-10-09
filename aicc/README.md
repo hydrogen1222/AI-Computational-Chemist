@@ -1,11 +1,17 @@
 # AICC CLI
 
-The CLI is an optional extension to the skill collection. It provides `status`, `task`,
-`job`, `skill`, and `doctor` commands; run `aicc --help` and each command's `--help` for
-the current interface.
+The CLI is **optional**. It manages installed skill discovery and offers local
+collection diagnostics; it no longer implements a scientific project state
+machine, task claims/leases or job scheduling.
 
-`aicc.py` and `launcher.sh` provide routing and installation. Built-in commands live in
-`commands/`, while research protocol logic remains in
-`procedures/research-orchestrator/scripts/`. Keep the CLI thin: reuse canonical helpers,
-avoid scientific logic in command modules, and cover changes in `tests/smoke_test.py`.
-Behavioral and write-safety boundaries are recorded in [`CONTRACT.md`](CONTRACT.md).
+```bash
+aicc skill --help
+aicc doctor
+```
+
+The main entry is `aicc.py`, the trusted installed launcher is `launcher.sh`,
+and subcommands live in `commands/`. `skill` only edits managed skill
+configuration/symlinks; `doctor` is read-only. Scientific model generation and
+checks are handled by the procedure/tool skills, not the CLI.
+
+See [CONTRACT.md](CONTRACT.md) for safe mutation boundaries.

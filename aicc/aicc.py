@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["PyYAML>=6.0"]
+# dependencies = []
 # ///
-"""Unified command-line interface for the AICC skill collection."""
+"""Optional CLI for AICC skill management and installation diagnostics."""
 
 from __future__ import annotations
 
 import argparse
 
-from core.paths import ensure_orchestrator_imports
-
-ensure_orchestrator_imports()
-
-from commands import COMMAND_MODULES  # noqa: E402 - bootstrap sibling helper modules first
+from commands import COMMAND_MODULES
 
 
 def build_parser() -> argparse.ArgumentParser:

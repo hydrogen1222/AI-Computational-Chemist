@@ -171,13 +171,13 @@ do
 done
 
 # Safe fallback for standard discovery directories: resolve the already-installed
-# research-orchestrator skill symlink, then validate its collection before running.
+# scientific-modeling skill symlink, then validate its collection before running.
 for skills_dir in \
   "${CODEX_HOME:-$HOME/.codex}/skills" \
   "$HOME/.codex/skills" \
   "$HOME/.claude/skills"
 do
-  skill_dir="$skills_dir/research-orchestrator"
+  skill_dir="$skills_dir/scientific-modeling"
   if [ -d "$skill_dir" ]; then
     resolved_skill=$(cd "$skill_dir" 2>/dev/null && pwd -P) || resolved_skill=
     if [ -n "$resolved_skill" ]; then
