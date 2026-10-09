@@ -5,6 +5,15 @@
 Each task below is a post-processing run from a converged static. Keep settings consistent across
 the runs you compare. The *meaning* of every output lives in the knowledge doc above.
 
+## DDEC6 charge and bond order (Chargemol)
+
+For DDEC6 atomic net charges and bond orders, use
+`tools/chargemol/SKILL.md` and `scripts/batch_ddec6.py`.
+Require CHGCAR, AECCAR0, AECCAR2 and POTCAR from the same converged
+VASP density, plus separately installed Chargemol binary and reference
+densities. Pymatgen provides a parser/wrapper, **not** an independent
+DDEC6 engine. Preserve periodic translation vectors in pair BOs.
+
 ## Bader charge
 
 All-electron reference, then partition:

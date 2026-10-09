@@ -23,6 +23,7 @@ description: Prepare, validate, run, and troubleshoot VASP DFT calculations for 
 | fork checks: locked settings before submission, too-close atoms before and after relaxation, same settings before combining energies | `scripts/check_locked_params.py`; `scripts/check_distances.py`; `scripts/compare_settings.py`; `references/locked-parameters.md` |
 | match crashes, warnings, or convergence failures | `references/errors.md` |
 | DOS, bands, PDOS, and d-band analysis | `references/dos-band.md`; `tools/vaspkit/references/dos-band.md`; `knowledge/electronic-structure.md` |
+| DDEC6 charges/SBO/pair BO with Chargemol and PPT figures | tools/chargemol/SKILL.md; scripts/batch_ddec6.py |
 | batch Bader/AIM charges from many existing runs | `scripts/batch_bader.py`; `procedures/batch-postprocessing/SKILL.md` |
 | charge, Bader, spin, partial charge, work function, ELF, or fields | `references/electronic-analysis.md`; `references/volumetric-visualization.md`; `scripts/bader_summary.py`; `tools/vaspkit/references/electronic-analysis.md` |
 | DFT+U and magnetism | `references/u-values-magmom.md`; `knowledge/hubbard-u-and-magnetism.md` |

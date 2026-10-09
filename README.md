@@ -41,6 +41,7 @@ limitations, then build and audit the candidate structures. Do not submit VASP."
 | `procedures/scientific-modeling/` | Main modeling workflow |
 | `procedures/literature-to-calculation/` | Extract evidence and model choices from publications |
 | `procedures/batch-postprocessing/` | Batch analysis of existing calculations without manual scripts |
+| `tools/chargemol/` | DDEC6 charges, SBO, periodic bond orders, batch analysis and PPT-ready plots |
 | `tools/vasp/scripts/batch_bader.py` | Batch VASP Bader/AIM charges, per-atom and per-element CSV |
 | `procedures/review-response/` | Optional manuscript reviewer-response workflow |
 | `tools/structure-prep/` | ASE/pymatgen/RDKit structure building, enumeration, audits |
