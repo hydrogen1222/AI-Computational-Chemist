@@ -15,13 +15,31 @@ Multiwfn validates nothing about the upstream calculation. Start by checking the
 
 | Result | Minimum validation |
 |---|---|
-| atomic charge table | scheme named; basis/method stated; trend compared under identical settings |
+| atomic charge table | scheme named; basis/method stated; trend compared under identical settings; periodic CHGCAR uses true POTCAR ZVAL, grid and charge-closure checks (`references/periodic-stockholder.md`) |
 | spin density | open-shell or broken-symmetry state verified; sign convention and isovalue recorded |
 | MO/NTO figure | orbital/state index, occupation/transition, isovalue, and phase/color convention recorded |
 | TD spectrum | state list, oscillator/rotatory strengths, broadening, conformer weights recorded |
 | conceptual DFT (Fukui, dual descriptor, global indices) | N/N+1/N-1 use one QM geometry, level **and fixed external embedding**; selected charge/spin states checked; condensed population convention and sum tested; bound-state/basis sensitivity, EA sign, hardness convention and cluster/boundary limitations stated (`references/conceptual-dft.md`) |
 | ESP/ELF/LOL/NCI/IRI/AIM | scalar function, grid/cutoff/isovalue, and interpretation limit stated |
 | cube/VMD figure | cube type, isovalue, color sign, camera/render path, and source file recorded |
+
+## Solid-state stockholder validation
+
+- Original CHGCAR was from a converged calculation; staged Nval first
+  line matches the **actual** POTCAR TITEL/ZVAL sequence and OUTCAR NELECT.
+  For Li_sv use ZVAL=3, not the common Li 1-valence assumption.
+- Save per-method Multiwfn version, full interactive menu logs and
+  atomrad reference library used in Hirshfeld-I. Verify H-I actually
+  converged by reading its iterative log; an end-of-run charge table
+  is not sufficient by itself.
+- Enforce one atom/order mapping, finite charges, and charge-sum closure.
+  Calculate sensitivity to grid spacing for representative dense/ionic
+  systems before interpreting small differences.
+- Cross-check Multiwfn H and CM5 against Chargemol's separately
+  computed H/CM5; **differences are diagnostics, not necessarily bugs**,
+  because input reconstruction, free-atom references and grids can differ.
+  H-I and DDEC6 are distinct definitions, not numerical replicas.
+- MBIS and Multiwfn bond-index calculations are not part of this task.
 
 ## Interpretation limits
 

@@ -44,6 +44,16 @@ scientific normalization, and absence of menu/runtime error messages.
 Do not turn a genuine error into an accepted result because the
 Fortran process exited successfully.
 
+## Periodic VASP population analysis
+
+For direct periodic density population analysis, use
+`references/periodic-stockholder.md` and the included Nval preparation
+and CSV comparison scripts. Never infer PAW ZVAL from the element's
+common valence; read the actual POTCAR, e.g. Li_sv = 3. The program
+version determines the validated menu transcript. This is distinct
+from all-electron Chargemol's DDEC6 analysis and from an embedded-cluster
+wavefunction run.
+
 ## Input preparation
 
 Gaussian checkpoint handoff:

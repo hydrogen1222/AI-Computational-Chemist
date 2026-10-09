@@ -1,6 +1,6 @@
 ---
 name: multiwfn
-description: Run and interpret Multiwfn wavefunction analyses for molecular quantum-chemistry outputs. Use for fchk/wfn/molden/cube-based orbital plots, population/charge analysis, spin density, NTO and TD-DFT state analysis, conceptual DFT (Fukui functions, dual descriptor, global reactivity indices), electrostatic potential, ELF/LOL/AIM/NCI/IRI-style analyses, spectra post-processing, and VMD/cube handoff.
+description: Run and interpret Multiwfn molecular wavefunction analysis and periodic VASP CHGCAR-based Hirshfeld, CM5 and Hirshfeld-I charges. Use for fchk/wfn/molden/cube-based orbital plots, population/charge analysis, spin density, NTO and TD-DFT state analysis, conceptual DFT (Fukui functions, dual descriptor, global reactivity indices), electrostatic potential, ELF/LOL/AIM/NCI/IRI-style analyses, spectra post-processing, and VMD/cube handoff.
 ---
 
 # Multiwfn
@@ -23,6 +23,7 @@ Inputs from ORCA: convert the validated `.gbw` with `orca_2mkl <job> -molden` (s
 | choosing and running common Multiwfn analyses | `references/running.md` |
 | orbital/NTO, charge, spin density, ESP/ELF/NCI/IRI, UV/ECD spectrum workflows | `references/orbital-charge-spectra.md` |
 | conceptual DFT: Fukui functions, dual descriptor, condensed indices, IP/EA/hardness/electrophilicity | `references/conceptual-dft.md` |
+| periodic VASP CHGCAR: Hirshfeld, CM5, Hirshfeld-I and Chargemol comparisons | `references/periodic-stockholder.md`; `scripts/prepare_periodic_chgcar.py`; `scripts/collect_periodic_charges.py` |
 | conceptual DFT for a periodic solid via an embedded cluster | `references/conceptual-dft.md` + `tools/orca/references/running.md` (embedded-crystal section), with periodic VASP cross-checks |
 | ORCA output as Multiwfn input (`.gbw` -> Molden) | `tools/orca/references/running.md` ("Wavefunction files for Multiwfn") |
 | checking whether a Multiwfn result is usable | `references/validation.md` |
@@ -36,9 +37,16 @@ Inputs from ORCA: convert the validated `.gbw` with `orca_2mkl <job> -molden` (s
 
 1. Validate the upstream calculation with the engine skill.
 2. Convert/check the input file: Gaussian `.chk` -> `.fchk` with `formchk`; ORCA `.gbw` -> `.molden.input` with `orca_2mkl <job> -molden`.
-3. Choose the narrow analysis path from `references/orbital-charge-spectra.md` or `references/running.md`.
+3. Choose the narrow analysis path from `references/orbital-charge-spectra.md`, `references/running.md` or **`references/periodic-stockholder.md` for periodic VASP densities**.
 4. Record menu path/options, file provenance, isovalues/cutoffs, grid settings, and state/orbital indices.
 5. Interpret with the relevant `knowledge/` file; do not overclaim from a single population or picture.
+
+**Scope note:** Multiwfn can compute ordinary Hirshfeld, CM5 and iterative
+Hirshfeld-I from a compatible periodic CHGCAR. For DDEC6 net charges,
+SBO and periodic pairwise DDEC6 BO retain **Chargemol**; Multiwfn does
+not replace Chargemol's DDEC6 implementation. MBIS is intentionally
+not added in this workflow. Never mix all-electron reconstructed
+densities and VASP valence grids without reporting the distinction.
 
 ## Hard guardrails
 

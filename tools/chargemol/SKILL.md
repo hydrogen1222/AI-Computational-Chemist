@@ -35,6 +35,18 @@ when the original system is confirmed neutral, to verify charge closure.
 - If the Chargemol log lacks a uniquely labeled first-iteration block,
   report missing evidence; never guess charges from the final DDEC6 XYZ.
 
+## Cross-validation with Multiwfn
+
+For independent periodic CHGCAR population analysis,
+`tools/multiwfn/references/periodic-stockholder.md` explains how to
+compute ordinary Hirshfeld, CM5 and **genuine Hirshfeld-I** using
+the matching POTCAR-derived Nval. The Multiwfn analysis reads
+VASP valence density whereas Chargemol has separate core/reference
+density conventions: unequal results must be investigated, not
+silently corrected. This is useful cross-validation of the *workflow*,
+not mathematical equality of distinct charge partitions.
+**DDEC6 q, SBO and periodic pairwise BO remain Chargemol outputs.**
+
 ## Scientific meaning
 
 - **DDEC6 net atomic charge q (e):** positive means electron-deficient,
