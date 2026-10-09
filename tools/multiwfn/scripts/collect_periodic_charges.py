@@ -13,6 +13,8 @@ from pathlib import Path
 import re
 import sys
 from prepare_periodic_chgcar import valence_metadata,manifest_cases
+# Existing validated Chargemol parsers live in the VASP software-tool folder.
+sys.path.insert(0,str(Path(__file__).resolve().parents[2]/"vasp"/"scripts"))
 from batch_ddec6 import xyz_properties,CHARGE_FILE
 from collect_hirshfeld import read_first_partition,find_log
 
