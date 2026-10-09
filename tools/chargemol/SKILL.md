@@ -37,8 +37,13 @@ original pseudopotentials without understanding the implications.
 
 ## Agent workflow
 
-1. Preflight user-provided VASP directories and check files, expected total
-   cell charge and installed Chargemol executable / atomic_densities directory.
+1. Preflight VASP results and find Chargemol plus its **separate reference
+   density library automatically** using PATH, environment variables, and a
+   bounded search of `~/apps`, `/opt/apps`, `~/.local/bin`, and related
+   common locations. A user-supplied path is a *fallback*, not a requirement.
+   If several installations are found, report the choices instead of
+   silently selecting one. Verify actual `c2_*.txt` reference files.
+   This software discovery can be reused by Bader and chgsum.pl.
 2. Default batch action is read-only and does not start Chargemol.
 3. With explicit approval for this bounded post-processing operation, run
    Chargemol with DDEC6 and compute BOs enabled, one case at a time.
@@ -59,13 +64,27 @@ Preflight: python tools/vasp/scripts/batch_ddec6.py CALC_ROOT
 Collect output: python tools/vasp/scripts/batch_ddec6.py CALC_ROOT --collect-only --net-charge 0
 
 Execute approved Chargemol postprocessing:
-python tools/vasp/scripts/batch_ddec6.py CALC_ROOT --execute --net-charge 0 --binary /path/to/chargemol --atomic-densities /path/to/atomic_densities
+python tools/vasp/scripts/batch_ddec6.py CALC_ROOT --execute --net-charge 0
+
+The script finds the executable and `atomic_densities/` automatically when
+possible. If the executable/library is installed elsewhere, set one-time
+`AICC_CHARGEMOL_BIN` / `DDEC6_ATOMIC_DENSITIES_DIR` or provide
+`--binary` / `--atomic-densities`. Optional `AICC_SOFTWARE_ROOTS`
+(colon-separated on Linux) adds other search roots without editing code.
+The agent can diagnose discovery with
+`python tools/vasp/scripts/software_locator.py chargemol`.
 
 Select specific folders: --manifest case_list.txt, one relative folder per line.
 Use different batches for distinct charge states; do not assume all cells neutral.
 
 Regenerate figures: python tools/vasp/scripts/plot_ddec6.py CALC_ROOT/postprocess_summary
-Optionally supply --case NAME for one selected case or --max-cases 0 for all.
+All cases and all Chargemol-reported bond types are included by default.
+If the slide has too many categories, the plotter adds `_part02`, `_part03`
+pages instead of dropping categories; use `--items-per-figure 10` to
+control pagination. `--max-cases N` is an opt-in limit only. Molecular
+pairs absent from the Chargemol printed bond list are **not** silently
+classified as zero: the output has a print threshold, and only reported
+bond classes appear. Use the full raw BO table for detailed analysis.
 
 ## Output contract
 

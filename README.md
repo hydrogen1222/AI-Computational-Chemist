@@ -10,7 +10,10 @@ the question into real, reproducible atomistic structures.
 AICC also provides **batch post-processing** for previously calculated datasets:
 identify the requested observable, invoke the relevant program/skill on many run
 folders, check missing or invalid cases, and produce comparable tabular results.
-The user should not need to write shell loops or Python scripts.
+The user should not need to write shell loops, Python scripts, or hunt
+down installed Chargemol/Bader executables by hand. AICC searches the
+current PATH and common user/application directories first and asks
+for a path only if discovery is impossible or ambiguous.
 
 The researcher decides what to calculate and manually submits, monitors and
 restarts production jobs. AICC prepares inspectable inputs and optional manual
@@ -41,7 +44,7 @@ limitations, then build and audit the candidate structures. Do not submit VASP."
 | `procedures/scientific-modeling/` | Main modeling workflow |
 | `procedures/literature-to-calculation/` | Extract evidence and model choices from publications |
 | `procedures/batch-postprocessing/` | Batch analysis of existing calculations without manual scripts |
-| `tools/chargemol/` | DDEC6 charges, SBO, periodic bond orders, batch analysis and PPT-ready plots |
+| `tools/chargemol/` | DDEC6 charges, SBO, all printed periodic bond types, and paginated PPT-ready plots |
 | `tools/vasp/scripts/batch_bader.py` | Batch VASP Bader/AIM charges, per-atom and per-element CSV |
 | `procedures/review-response/` | Optional manuscript reviewer-response workflow |
 | `tools/structure-prep/` | ASE/pymatgen/RDKit structure building, enumeration, audits |

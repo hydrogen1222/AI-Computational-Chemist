@@ -77,11 +77,16 @@ element/atom mapping intact and compare like-with-like. The original
 
 ### DDEC6 net atomic charge and bond orders
 
-Load tools/chargemol/SKILL.md and use tools/vasp/scripts/batch_ddec6.py.
+`tools/chargemol/SKILL.md` and `tools/vasp/scripts/batch_ddec6.py`.
 Chargemol, not pymatgen, performs the DDEC6 computation. Keep each atom's
 net charge, SBO and the pairwise periodic BO information separate. The
 batch reports source-traceable CSVs, readable Markdown and optional PPT-ready
 SVG/PNG. Preserve density input provenance and charge-balance checks.
+Chargemol and Bader executables are auto-discovered in PATH or typical
+installation roots; `--binary` flags and environment overrides are
+fallbacks. For DDEC6 show **every printed bond type by default**,
+paginate dense slides instead of picking scientifically arbitrary bonds,
+and never impute unprinted bond orders as zero.
 
 ### Other tools
 
