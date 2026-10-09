@@ -11,5 +11,5 @@ Verified 2026-06-15, ASE-EMT, macOS, Python 3.12 (via uv).
 
 **Pass criteria:** both E_v positive and ~1 eV; **E_v(Au) < E_v(Cu)**. EMT values are
 run-to-run deterministic. Because the claim requires E_v(Au) > E_v(Cu), this result is a
-**`contradicts`** outcome — the pipeline must halt at Phase 4 and produce `escalation.md`,
-not a `response-package.md`.
+**`contradicts`** outcome — the agent should flag the contradiction, defer to the researcher, and present
+`escalation.md` instead of a misleading positive response package.

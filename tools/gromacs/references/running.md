@@ -103,7 +103,7 @@ Rules:
 
 ## Parallel and GPU execution
 
-The execution command comes from `~/.cluster-agents.md` and `hpc-submit`. Examples are illustrative only:
+The researcher chooses the execution command and manually submits any production job. Examples are illustrative only:
 
 ```bash
 gmx mdrun -deffnm prod -ntmpi <ranks> -ntomp <threads> -pin on

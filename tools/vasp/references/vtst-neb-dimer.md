@@ -36,10 +36,9 @@ A common conservative workflow is therefore:
 4. enable climbing image and continue from those images to refine the saddle.
 
 CI-NEB can often be enabled from the beginning when the initial path is already good,
-so a plain-NEB stage is not a universal requirement. In this fork, however, whether a
-project uses plain NEB first or starts directly with CI-NEB is decided by SI/major in
-the approved workflow. vice does not enable `LCLIMB` on its own because doing so
-changes the optimization objective of the highest-energy image.
+so a plain-NEB stage is not a universal requirement. Choose plain NEB versus direct CI-NEB from the scientific model and the
+initial path quality. Present the choice to the researcher; changing
+`LCLIMB` changes the highest-energy image's optimization objective.
 
 For VTST-based VASP, `LCLIMB=.TRUE.` requires the appropriate VTST-enabled build.
 Stock VASP's standard NEB implementation does not provide the VTST `LCLIMB` tag.
@@ -136,32 +135,20 @@ When CI-NEB is infeasible (no converged endpoints, a saturated cluster, an uncle
 - **Robust alternative if unsure:** a manual relaxed scan — a series of jobs, each with the two (or three) defining atoms frozen by **selective dynamics** at the target separation, relaxing everything else. The scan maximum is a TS *guess*; refine it with Dimer or CI-NEB.
 - A constrained-opt barrier is a path/thermodynamic estimate, **not a validated TS** — refine and confirm with a frequency calculation (exactly 1 imaginary mode along the reaction coordinate) when the claim matters.
 
-## Unattended recovery boundary
+## Researcher-controlled NEB continuation
 
-NEB is path-dependent, so vice has much less recovery freedom than for an ordinary
-relaxation.
+NEB/CI-NEB paths are history-dependent. An agent may diagnose an interrupted
+calculation but must not restart, monitor or dispatch images. Before any
+researcher-controlled continuation verify endpoint identity, atom mapping,
+image continuity, minimum contacts and the last valid band structures.
+Changing image count, interpolation, `SPRING`, `LCLIMB`, optimizer or force
+criteria requires a new explicit scientific decision.
 
-vice may automatically continue an interrupted NEB/CI-NEB only when the interruption
-is operational (walltime, node failure, scheduler interruption) and the existing band
-still passes the structure/path sanity checks. Continue from the existing image
-structures with the same approved `IMAGES`, endpoints, atom mapping, `SPRING`,
-`LCLIMB`, optimizer, and convergence criteria.
+A multi-peak energy profile is not itself an error: it may reflect a
+physical intermediate. Discuss each possible mechanism with the researcher
+rather than blindly reinterpolating or smoothing the band.
 
-vice must stop and hand the evidence to major when any of these occurs:
-
-- endpoint identity or atom mapping is in doubt;
-- one image develops an abnormal short contact or obvious structural failure;
-- neighboring images become structurally discontinuous;
-- an image shows an unexplained energy/force jump inconsistent with the rest of the
-  band;
-- changing image count, interpolation, `SPRING`, `LCLIMB`, `IOPT/IBRION`, or the
-  force criterion appears necessary.
-
-A multi-peak NEB energy profile is **not by itself an error**. It can represent a real
-intermediate or a multi-step path. Flag discontinuity or bad geometry; leave the
-scientific interpretation of multiple barriers/intermediates to major/SI.
-
-## Monitoring CI-NEB
+## Manual inspection of CI-NEB outputs
 
 Common VTST monitors:
 

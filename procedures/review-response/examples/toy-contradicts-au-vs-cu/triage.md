@@ -13,7 +13,7 @@
 - **satisfaction criterion:** both E_v positive and physically sane (~1 eV). The claim
   is supported only if **E_v(Au) > E_v(Cu)**. Reported either way — **E_v(Au) ≤ E_v(Cu)
   would contradict the manuscript's central argument and halt for the authors** (Phase 4).
-- **route:** structure build (ASE) → `comp-chem-workflow`
+- **route:** structure build (ASE) → `scientific-modeling`
 - **method delta:** none (uses the fingerprint as-is)
 - **cost:** seconds, local, no scheduler
 

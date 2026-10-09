@@ -15,7 +15,7 @@ Command examples use the modern `gmx` wrapper. On MPI installations the executab
 - Starting structure provenance; intended protonation, termini, disulfides, missing atoms/residues, ligands, ions and non-standard components.
 - Force-field family/version, water model, ion parameters, small-molecule parameters and charge method with compatibility rationale.
 - Ensemble, target temperature/pressure, timestep/constraints, simulation length, output cadence, non-bonded settings and boundary conditions.
-- Execution target and rough cost; for multi-stage/HPC work start with `comp-chem-workflow` and use `hpc-submit` after preflight.
+- Execution target and rough cost; for HPC execution the researcher uses a verified, self-contained manual job script after preflight.
 
 ## Where to find what
 

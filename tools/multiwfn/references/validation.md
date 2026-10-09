@@ -36,7 +36,7 @@ A successful operating-system exit code from Multiwfn does **not** guarantee
 successful analysis. A supplied real ORCA 6.1.1 / Multiwfn 2026.10.1
 integration example exhibited a zero-byte cube after a hidden submenu question
 consumed the next scripted menu response, while the program returned 0.
-For unattended runs, validate:
+Before scripted post-processing batches, validate:
 - exact expected output file names and plausible nonzero sizes;
 - numeric/text format completeness (cube grid header and count, atom count
   and table rows, state/charge identity, computed units and signs);
