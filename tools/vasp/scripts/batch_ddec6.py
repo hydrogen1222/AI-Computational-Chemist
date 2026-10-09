@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import argparse
 import csv
-import json
 import math
 import os
+import importlib.util
 from pathlib import Path
 import re
 import shutil
@@ -353,6 +353,21 @@ def main(argv=None):
             "not evidence that trends are statistically independent.\n",
             encoding="utf-8")
         print(f"Outputs: {out}")
+        if importlib.util.find_spec("matplotlib") is not None:
+            plotter = Path(__file__).with_name("plot_ddec6.py")
+            if plotter.is_file():
+                env = os.environ.copy()
+                env.setdefault("MPLBACKEND", "Agg")
+                fig = subprocess.run([sys.executable, str(plotter), str(out)],
+                                     text=True, capture_output=True, check=False, env=env)
+                if fig.returncode:
+                    print("WARNING: slide chart generation failed; CSVs retained:",
+                          (fig.stderr or fig.stdout)[-600:])
+                else:
+                    print(fig.stdout.strip())
+        else:
+            print("NOTE: CSV and Markdown ready; install matplotlib to add PPT PNG/SVG charts.")
+
     print(f"Passed {len(dirs)-errors}/{len(dirs)}; failed {errors}")
     return 1 if errors else 0
 
