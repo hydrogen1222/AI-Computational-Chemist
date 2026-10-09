@@ -98,8 +98,8 @@ atomistic candidate as suitable for the intended calculations, review:
 Use `references/model-review.md` for the scientific checklist. Keep deterministic
 audit JSON/details as files if generated, but give the user only a concise
 decision and warning summary. The same agent can perform the independent
-reasoning pass: no separate structure-critic role, YAML approval gate,
-`.research/` artifact registry or execution lease is required.
+reasoning pass: store the scientific conclusion in the model report rather
+than creating extra task state or gate files.
 
 Mark models **usable**, **revise**, **exploratory/limited**, or **invalid**,
 with reasons rather than declaring every numerically passing structure fit

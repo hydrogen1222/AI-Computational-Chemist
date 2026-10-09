@@ -19,53 +19,34 @@ LAMMPS for longer MD. If the target is high-temperature diffusion, transport, or
 reactive sampling, include high-temperature AIMD or annealing frames; do not train only
 on low-temperature structures and then run hot DPMD.
 
-## One-chain execution default
+## Manual training and subsequent validation
 
-DeepMD is a fixed chain by default, not an interactive QA mode. Once DFT labels have
-been converted and split into DeepMD `npy` datasets, continue through training,
-freezing, held-out testing, required plots, DFT-all PCA, and the machine QA verdict in
-one local command or one submitted job. Do not pause after `lcurve`, `dp test`, parity
-plotting, or PCA just to ask the user whether to continue. Stop only when a command
-fails, required data are missing, a real scientific choice is unresolved, or a
-long/expensive DPMD submission has not already been approved.
+The researcher owns all training and deployment launches, including use of
+compute nodes, Slurm/PBS and restart decisions. The agent prepares `input.json`,
+checks datasets and creates an inspectable manual command list or batch script.
+It does **not** automatically chain train/freeze/test/MD or monitor jobs.
 
-Use the chain runner inside the DeepMD environment or inside the cluster batch script:
+For example, the researcher may run the following in a configured environment:
 
 ```bash
-python tools/deepmd/scripts/run_deepmd_chain.py \
-  --run-dir <deepmd-run-dir> \
-  --data-root data
-```
-
-For an already trained model, keep the same diagnostics and skip only the completed
-compute phases:
-
-```bash
-python tools/deepmd/scripts/run_deepmd_chain.py \
-  --run-dir <deepmd-run-dir> \
-  --data-root data \
-  --skip-train \
-  --skip-freeze
-```
-
-The runner performs:
-
-```text
 dp train input.json
-  -> dp freeze -o graph.pb
-  -> dp test on every discovered test split with aggregated detail_file.* outputs
-  -> plot_deepmd_postprocess.py
-  -> deepmd_descriptor_pca.py over DFT train/val/test frames
-  -> check_deepmd_qa.py --json
-  -> analysis/deepmd_chain/deepmd_chain_summary.json
+dp freeze -o graph.pb
 ```
 
-It discovers common `data/<split>/<system>/set.000` and
-`data/<system>/<split>/set.000` layouts. Use repeated `--test-system <path>` only when
-the held-out test dataset uses a nonstandard directory name. If the DeepMD Python can
-load the model but lacks `matplotlib`, pass a plotting-capable interpreter with
-`--plot-python <python>` for lcurve/parity plots and `--pca-plot-python <python>` for
-the PCA figure, or run individual helpers only for debugging.
+When the researcher provides completed model and test datasets, the agent can
+carry out bounded analysis and diagnostics using the software's regular tools:
+
+```bash
+dp test -m graph.pb -s ./test_data -n 0 -d detail_file
+python tools/deepmd/scripts/plot_deepmd_postprocess.py --work-dir .
+python tools/deepmd/scripts/deepmd_descriptor_pca.py --model graph.pb --data-root data
+python tools/deepmd/scripts/check_deepmd_qa.py --project-root .
+```
+
+Match installed DeePMD-kit syntax, model format, type map, data layout, and
+expected runtime before providing commands. Tests and diagnostic results
+must be checked for scientific significance; a QA script does not certify
+the potential beyond its validated data distribution.
 
 ## Label generation and dataset design
 
@@ -295,10 +276,9 @@ dp train input.json > log
 dp train --restart model.ckpt input.json
 ```
 
-For long `dp train`/`dp test` jobs or GPU training, prepare the batch script
-through `tools/hpc-submit`: read the target `~/.cluster-agents.md` before writing
-the script, and take the module/conda environment, GPU partition, launcher,
-scratch, and checkpoint/restart policy from that guide.
+For long `dp train`/GPU training, prepare an inspectable manual batch script
+using the researcher's verified cluster environment, resource limits and
+checkpoint/restart policy. The researcher submits and monitors it.
 
 Expected outputs:
 
@@ -437,8 +417,8 @@ builder. Without an explicit request, first spend the compute budget on more AIM
 coverage from distinct initial models and temperatures.
 
 LAMMPS mechanics live in `tools/lammps`; MD statistical interpretation lives in `knowledge/molecular-dynamics.md`.
-Batch scripts for DPMD deployment inherit the LAMMPS + `hpc-submit` rule: read
-the target `~/.cluster-agents.md` before writing the script.
+For DPMD deployment, reuse the LAMMPS skill and the researcher's verified
+site settings when preparing a manual submission script.
 
 ## Diffusion post-processing
 

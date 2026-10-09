@@ -2,7 +2,7 @@
 
 The CLI is **optional**. It manages installed skill discovery and offers local
 collection diagnostics; it no longer implements a scientific project state
-machine, task claims/leases or job scheduling.
+machine or scheduler/remote execution.
 
 ```bash
 aicc skill --help

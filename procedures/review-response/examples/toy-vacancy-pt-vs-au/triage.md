@@ -12,7 +12,7 @@
 - **satisfaction criterion:** both E_v positive and physically sane (~1 eV), and
   **E_v(Pt) > E_v(Au)** → supports the claim. Reported either way — a smaller or equal
   Pt value would **contradict** the claim and halt for the authors.
-- **route:** structure build (ASE) → `comp-chem-workflow`
+- **route:** structure build (ASE) → `scientific-modeling`
 - **method delta:** none (uses the fingerprint as-is)
 - **cost:** seconds, local, no scheduler
 

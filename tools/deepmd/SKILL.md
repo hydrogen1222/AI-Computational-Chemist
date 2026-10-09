@@ -20,11 +20,11 @@ description: DeePMD-kit and Deep Potential Molecular Dynamics workflows. Use for
 |---|---|
 | design/convert datasets, configure training, and deploy DPMD | `references/running.md` |
 | decide model readiness, metrics, stability, and model-deviation use | `references/validation.md` |
-| run the chained train-to-QA workflow | `scripts/run_deepmd_chain.py` |
+| prepare training inputs and manual training commands | `references/running.md` |
 | generate individual diagnostics or verify the QA package | `scripts/plot_deepmd_postprocess.py`; `scripts/deepmd_descriptor_pca.py`; `scripts/check_deepmd_qa.py` |
 | map dataset coverage with DPA1/PCA/t-SNE | `references/dataset-embedding.md` |
 | diagnose training, data, type-map, or MD failures | `references/errors.md` |
-| submit training/deployment jobs | `tools/hpc-submit/SKILL.md` |
+| draft manual training/deployment scripts | `references/running.md`; `tools/lammps/SKILL.md` |
 | interpret MLP and MD results | `knowledge/machine-learning-potentials.md`; `knowledge/molecular-dynamics.md` |
 | consult DeePMD/DP-GEN/DPLibrary resources | `references/resources.md` |
 
@@ -32,12 +32,13 @@ description: DeePMD-kit and Deep Potential Molecular Dynamics workflows. Use for
 
 1. Define the production domain, assemble/filter labels according to
    `references/running.md`, and preserve the method fingerprint and type order.
-2. Convert and split data, configure `input.json`, then use
-   `scripts/run_deepmd_chain.py` for the default train/freeze/test/diagnostic chain.
+2. Convert and split data, configure `input.json`, and hand the researcher
+   explicit commands for manual training. Afterward, analyze the existing
+   checkpoints and test results with the dedicated QA scripts.
 3. Apply `references/validation.md` and `scripts/check_deepmd_qa.py`; expand data or
    revise one cause at a time when a gate fails.
-4. Hand a passing or explicitly waived model to LAMMPS DPMD through `hpc-submit`, then
-   validate short stability runs before production sampling.
+4. Prepare a validated LAMMPS DPMD input and optional batch script. The
+   researcher decides when to submit short validation and production runs.
 
 ## Hard guardrails
 

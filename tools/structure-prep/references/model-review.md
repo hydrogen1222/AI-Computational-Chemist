@@ -54,5 +54,4 @@ Write a *short* note in the existing model report:
 
 Report the model files and full audit paths, the decisive checks, unresolved
 alternatives, and claims that **cannot** be made from this model. A geometry
-checker alone cannot approve a scientific interpretation. No task DAG,
-machine-readable gate, lease or artificial approval report is necessary.
+checker alone cannot approve a scientific interpretation. No task database or artificial approval report is necessary.

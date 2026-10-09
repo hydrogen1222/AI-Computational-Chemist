@@ -2,28 +2,25 @@
 
 > Load this when: deciding whether a drafted report `.docx` is ready to hand to the authors.
 
-"Near-submission" means a human can read it without decoding raw output and edit it into the manuscript. Gate the document against every item below — these are the recurring failures real reviewers complained about.
+"Near-submission" means a human can read it without decoding raw output and edit it into the manuscript. Check the document against every item below — these are the recurring failures real reviewers complained about.
 
-## Workflow gate
-- [ ] The report task consumes only accepted `scientific-claim` artifacts for formal conclusions.
-- [ ] Every consumed claim has a visible outcome: `addresses`, `inconclusive`, or `contradicts`.
-- [ ] A machine-readable `report_gate` verdict passed, or a waiver with explicit `.research/decisions.jsonl` provenance is recorded.
-- [ ] Claims supported only by weaker evidence than the reviewer/project criterion are labeled `inconclusive` or limitation, not written as resolved.
-- [ ] The report mode is explicit: `stage-synthesis` or `final`.
-- [ ] For `stage-synthesis`, validated-but-not-accepted evidence is labeled interim and
-  all open `needs-follow-up` proposals are listed with task IDs or decision blockers.
-- [ ] For `final`, no unresolved `needs-follow-up` proposal blocks a formal conclusion;
-  each remaining gap has accepted evidence, a human waiver, or a visible limitation.
+## Scientific evidence review
+- [ ] Each formal conclusion has directly relevant, converged and traceable evidence.
+- [ ] Each result visibly addresses, contradicts, or fails to decide the stated
+  scientific question. No weak proxy is promoted into a definitive answer.
+- [ ] Unresolved concerns, method differences and assumptions are labeled in text.
+- [ ] Interim findings are visibly preliminary. A final **draft** includes all
+  known limitations and awaits human review before dissemination.
 
-## Pre-report soft gate: missing low-cost analyses
+## Pre-report checks: missing low-cost analyses
 
-Run this before writing the final report manifest. It is a soft gate: it should trigger an analysis or a visible waiver/limitation, not automatic scope creep.
+Run this before writing the final report manifest. It should prompt a bounded analysis or a visible limitation, not uncontrolled scope growth.
 
 - [ ] **High-temperature or gas-reservoir claim checked for free-energy corrections.** If the result is interpreted at non-ambient/high temperature, variable pressure, catalytic operating conditions, surface stability, oxygen/CO/H2/H2O chemical potentials, defect formation, Wulff/phase diagrams, or reaction/adsorption free energies, decide whether `G(T,p)` is required rather than electronic `E`. For VASP-based work, use `tools/vaspkit/references/thermochemistry.md` for VASPKIT 501/502 where applicable, with the science and equations in `knowledge/thermochemistry-and-free-energy.md` and `knowledge/surface-thermodynamics.md`.
 - [ ] **Free-energy omission is explicit.** If only electronic energies are reported for a case where thermal/entropy/chemical-potential terms could matter, the report states the omission and why it is acceptable for the claim. Do not call such a result a Gibbs/free energy.
 - [ ] **Electronic-structure mechanism checked for DOS/PDOS or charge evidence.** If the text claims orbital hybridization, d-band shifts, band-gap/band-edge changes, charge transfer, oxidation state, reducibility, work function, or conductive/semiconductive behavior, decide whether DOS/PDOS, Bader/charge-density difference, work function, ELF, or related analysis is needed. Use `tools/vasp/references/dos-band.md`, `tools/vaspkit/references/dos-band.md`, and `knowledge/electronic-structure.md` as appropriate.
 - [ ] **Easy post-processing is not silently skipped.** If the required evidence is a low-cost post-processing step from existing validated VASP outputs (VASPKIT DOS/PDOS, gas thermochemistry from completed frequencies, planar average/work function, Bader summary, structure render), do it before report assembly unless there is a recorded reason not to.
-- [ ] **Soft-gate decision recorded.** The workflow notes or report provenance record contains one line per trigger: `needed/done`, `not applicable`, or `waived with reason`.
+- [ ] **Analysis decision recorded.** The report provenance notes contain one line per consideration: `needed/done`, `not applicable`, or `omitted with reason`.
 
 ## Energies
 - [ ] **No bare total energies.** Every reported energy is a *relative* quantity — adsorption energy, binding energy, reaction energy, barrier, ΔG. (The builder flags table cells > 50 eV in magnitude; resolve each.)

@@ -76,13 +76,8 @@ the DeepMD chain, not an interactive stop after every figure:
   model path, dataset paths, frame counts, type_map, plotted files, exclusions, and
   interpretation limits.
 
-Run the default chain after the DFT labels are converted/split:
-
-```bash
-python tools/deepmd/scripts/run_deepmd_chain.py --run-dir <run> --data-root data
-```
-
-Use the individual helpers only to rerun or debug one part of the chain:
+After the researcher has trained and frozen the model, use the individual
+helpers for bounded post-processing and quality checks:
 
 ```bash
 uv run tools/deepmd/scripts/plot_deepmd_postprocess.py --work-dir <run> --detail-prefix detail_file
@@ -96,14 +91,11 @@ PCA by compatible type_map and list the excluded data in the summary. Optional D
 trajectory overlays are useful after production runs, but they do not replace the
 DFT-all coverage map.
 
-Missing diagnostics or a failed QA verdict give the model a `pilot/incomplete`
-**maturity verdict**, not a workflow status, unless the user records an explicit
-waiver. In `.research/`, keep the model artifact `draft` while remediation is open or
-mark it `rejected` when abandoned; use legal task states such as `blocked` or `failed`.
-Never persist `pilot` or `incomplete` in a task/artifact `status` field. A passing QA
-package may support artifact status `validated`, but it still does not prove scientific
-validity or acceptance; it only clears the fixed DeepMD regression and coverage
-diagnostics.
+Missing diagnostics or a failed QA verdict mean the model remains
+**pilot/incomplete** until the researcher accepts the missing evidence or
+repairs the scientific issue. A passing QA report checks regression and
+coverage diagnostics; it does **not** prove scientific validity outside
+the sampled domain.
 
 ## Model Deviation
 

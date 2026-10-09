@@ -94,6 +94,6 @@ LAMMPS is MPI-parallel; launch with the scheduler's MPI wrapper and keep the log
 srun lmp -in in.production -log log.lammps    # or mpirun -np $SLURM_NTASKS lmp ...
 ```
 
-Scheduler templates and queue mechanics live in the `hpc-submit` skill. Before
-writing a batch script, read the target `~/.cluster-agents.md`; the binary name,
-module, MPI wrapper, GPU policy, and scratch conventions come from that guide.
+The researcher submits and monitors any long LAMMPS jobs. When writing an
+optional manual batch script, verify the local binary, module, MPI wrapper,
+GPU policy and scratch settings with the researcher; never assume defaults.

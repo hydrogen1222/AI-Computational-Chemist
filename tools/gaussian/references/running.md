@@ -41,9 +41,9 @@ Use `nosymm` only when coordinate orientation, external-field direction, fragmen
 
 Gaussian is usually shared-memory on one node, unless a site-specific Linda setup is explicitly available. Scheduler request should match `%nprocshared`:
 
-Before preparing the scheduler script, route through `tools/hpc-submit` and read
-the target `~/.cluster-agents.md`. `%mem`, `%nprocshared`, module/load command,
-`GAUSS_SCRDIR`, scratch cleanup, and any Linda policy come from that guide.
+When preparing a batch script for the researcher, obtain the actual site
+settings for `%mem`, `%nprocshared`, modules, `GAUSS_SCRDIR`, scratch
+cleanup and any Linda policy. Do not invent them or submit the script.
 
 ```bash
 export GAUSS_SCRDIR="$SCRATCH/gauss.$SLURM_JOB_ID"; mkdir -p "$GAUSS_SCRDIR"

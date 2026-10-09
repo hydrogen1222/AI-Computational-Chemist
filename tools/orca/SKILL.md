@@ -9,9 +9,9 @@ Written for ORCA 6 (checked against the 6.1 manual). ORCA 5 inputs mostly run, b
 defaults changed between major versions; when an input fails on a keyword, check the manual of the
 installed version before anything else.
 
-Machine facts (install path, cores, memory, scratch, how to launch) are not in this skill. They live
-in each machine's `~/.cluster-agents.md` (template: `tools/hpc-submit/references/cluster-guide-template.md`,
-section ORCA). Different users and machines differ; never assume one.
+Machine facts (install path, cores, memory, scratch, launch command) are
+site-specific. Request the researcher's known configuration rather than
+relying on removed scheduler templates or inventing settings.
 
 ## Required inputs
 
@@ -41,7 +41,9 @@ section ORCA). Different users and machines differ; never assume one.
 1. Decide the quantity first, then the level of theory (`knowledge/molecular-qc-practical-rules.md`).
 2. Write the input from `references/running.md`; record where charge and multiplicity come from.
 3. Run `uv run scripts/check_orca_input.py JOB.inp` (add `--mem-gb` with the machine's free memory). Fix every FAIL. A WARN for `* pdbfile`/QM/MM means **the checker has NOT validated the QM electron count or embedded-region assignment**; resolve this with the structural/model checklist before submitting.
-4. Run through `hpc-submit` or the machine guide: ORCA called by its **full path**, never under `mpirun`, output redirected to `JOB.out`.
+4. Give the researcher a manual command or script using ORCA's **full path**,
+   never directly under `mpirun`, with output redirected to `JOB.out`.
+   The agent does not submit or monitor ORCA jobs.
 5. Run `uv run scripts/parse_orca.py JOB.out`; apply `references/validation.md`. On failure go to `references/errors.md` and change one thing at a time.
 6. Hand validated `.gbw` / molden files to Multiwfn only after step 5 passes.
 
