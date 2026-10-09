@@ -13,7 +13,7 @@ of a separate work copy* to identify true PAW valence nuclear charges.
 | Observable | Engine |
 |---|---|
 | Standard Hirshfeld / CM5 | Multiwfn; also in Chargemol's first noniterative DDEC6 log |
-| True iterative Hirshfeld-I | **Multiwfn** with the installed \`atomrad/\` ionic reference database |
+| True iterative Hirshfeld-I | **Multiwfn** with the installed `atomrad/` ionic reference database |
 | DDEC6 q, DDEC6 SBO and periodic DDEC6 pair BO | **Chargemol** only |
 | Other bond indices in Multiwfn | Different definitions — do not relabel them DDEC6 BO |
 
@@ -24,56 +24,56 @@ Bader remains handled by the existing Bader Skill.
 ## Source checks before touching files
 
 1. Require the **same converged VASP static calculation's**
-   \`CHGCAR\`, \`POTCAR\`, and (recommended) \`OUTCAR\`. Do not mix files
+   `CHGCAR`, `POTCAR`, and (recommended) `OUTCAR`. Do not mix files
    from different relax/static steps or different PAW datasets.
-   VASP \`CHGCAR\` contains valence density, and the PAW one-center
+   VASP `CHGCAR` contains valence density, and the PAW one-center
    occupancy records are not a substitute for AECCAR all-electron
    reconstruction. Multiwfn's charges from a valence grid and
    Chargemol's reconstructed/reference-density analysis may differ
    for justified method-dependent reasons.
 2. Inspect the VASP5 CHGCAR **species order and per-species atom counts**.
-   Parse \`TITEL\` and actual \`ZVAL\` for *each* POTCAR dataset in the
-   **same order**. Don't assume Li always has ZVAL=1; \`Li_sv\` normally
-   has ZVAL=3. If the local cell contains \`S\` then \`Li_sv\`,
+   Parse `TITEL` and actual `ZVAL` for *each* POTCAR dataset in the
+   **same order**. Don't assume Li always has ZVAL=1; `Li_sv` normally
+   has ZVAL=3. If the local cell contains `S` then `Li_sv`,
    the three-atom Li2S CHGCAR work copy's first line should be
-   \`Nval S 6 Li 3\` (valence sum 12, consistent with NELECT=12).
+   `Nval S 6 Li 3` (valence sum 12, consistent with NELECT=12).
 3. Never edit the source CHGCAR or POTCAR. AICC's
-   \`scripts/prepare_periodic_chgcar.py\` streams a byte-for-byte density
-   body into \`<case>/postprocess/multiwfn/CHGCAR_Nval\`, replacing
+   `scripts/prepare_periodic_chgcar.py` streams a byte-for-byte density
+   body into `<case>/postprocess/multiwfn/CHGCAR_Nval`, replacing
    **only its first title line**. It prints the derived Nval,
    valence-electron sum, OUTCAR NELECT and inferred net charge.
-   Default invocation is read-only; \`--prepare\` is explicit.
+   Default invocation is read-only; `--prepare` is explicit.
    Existing work copies are not overwritten. No CHGCAR or POTCAR
    is uploaded or committed.
 4. If the PAW species is ambiguous or POTCAR missing, stop and ask
    the researcher to locate the matching local POTCAR. Do **not**
-   fabricate \`Nval\` from atomic numbers.
+   fabricate `Nval` from atomic numbers.
 
 ## Multiwfn execution (the local agent does this)
 
 Discover installed Multiwfn in PATH or standard local application roots.
 Record its actual version, location, and the matching manual.
-\`Multiwfnpath\` points to the directory containing \`settings.ini\`,
+`Multiwfnpath` points to the directory containing `settings.ini`,
 not necessarily to the executable. Work in the per-case isolated folder.
 
 **First validate the installed menu with one small real example.**
 The reference tutorial's main function 7 ("Population analysis")
 uses **1** = ordinary Hirshfeld, **16** = CM5, and **15 → 1** =
 Hirshfeld-I with default settings; run H-I only after locating the
-installed Multiwfn \`examples/atomrad/\` charge-state radial-density
+installed Multiwfn `examples/atomrad/` charge-state radial-density
 reference folder in the current analysis working directory (may
 symlink the unmodified installed folder). Treat these menu numbers as
 **documented reference values**, not a guarantee across installations.
 
 For each method the agent:
 - Tests prompts interactively on a single Li2S case; notes the actual
-  \`y\` prompt for reading Nval from the file's first line, the menu
+  `y` prompt for reading Nval from the file's first line, the menu
   path, the return/exit prompts, and how to decline optional CHG export.
 - Saves the actual validated **stdin menu transcript** and executes
-  \`Multiwfn CHGCAR_Nval < METHOD.commands > METHOD.log 2>&1\` in
+  `Multiwfn CHGCAR_Nval < METHOD.commands > METHOD.log 2>&1` in
   the isolated working directory. Filename aliases in that directory
-  should be exactly \`hirshfeld.log\`, \`cm5.log\`,
-  \`hirshfeld_i.log\`. Retain \`*.commands\` and Multiwfn version.
+  should be exactly `hirshfeld.log`, `cm5.log`,
+  `hirshfeld_i.log`. Retain `*.commands` and Multiwfn version.
   Do not assume a fixed command transcript is compatible with all
   Multiwfn versions, or accept an exit code of 0 without checking
   the result table.
@@ -94,7 +94,7 @@ The user can simply say: "用Multiwfn重新计算所有 VASP CHGCAR 的
 Hirshfeld、CM5 和 Hirshfeld-I 电荷，与 Chargemol 做交叉验证，输出
 CSV 和 PPT 图。" The agent implements the batch with:
 
-\`\`\`bash
+```bash
 # Read-only scan: verify species order and true ZVAL from local POTCAR
 python tools/multiwfn/scripts/prepare_periodic_chgcar.py CALC_ROOT
 
@@ -103,24 +103,24 @@ python tools/multiwfn/scripts/prepare_periodic_chgcar.py CALC_ROOT --prepare
 
 # AFTER the agent has run version-validated menus and archived logs:
 python tools/multiwfn/scripts/collect_periodic_charges.py CALC_ROOT --net-charge 0
-\`\`\`
+```
 
-Use a newline-separated \`--manifest cases.txt\` for selected cases
+Use a newline-separated `--manifest cases.txt` for selected cases
 and separate batches for cells with different total charges.
 Do not force a neutral-charge check on a charged system.
 The postprocessor accepts **no guessed/surrogate method**: unavailable
 logs produce clear per-method ERROR/blank data.
 It also reads existing Chargemol first-step Hirshfeld/CM5 from
-\`VASP_DDEC_analysis.output\` plus final DDEC6 charges, when available,
+`VASP_DDEC_analysis.output` plus final DDEC6 charges, when available,
 without rerunning Chargemol.
 
-**Output:** under \`CALC_ROOT/postprocess_summary\`:
-- \`multiwfn_atoms.csv\` — every atom with H, CM5, H-I from
+**Output:** under `CALC_ROOT/postprocess_summary`:
+- `multiwfn_atoms.csv` — every atom with H, CM5, H-I from
   Multiwfn beside existing Chargemol H, CM5 and DDEC6 values;
-- \`multiwfn_elements.csv\` — per-element means/min/max;
-- \`multiwfn_qc.csv\` — method-by-method status, charge closure and logs;
-- \`multiwfn_charge_comparison.md\` — all-atom readable comparison;
-- \`ppt_figures/*_pageNN.{svg,png}\` — 16:9 vector/300-dpi figures
+- `multiwfn_elements.csv` — per-element means/min/max;
+- `multiwfn_qc.csv` — method-by-method status, charge closure and logs;
+- `multiwfn_charge_comparison.md` — all-atom readable comparison;
+- `ppt_figures/*_pageNN.{svg,png}` — 16:9 vector/300-dpi figures
   when matplotlib is installed.
 
 ## Interpretation, not overvalidation

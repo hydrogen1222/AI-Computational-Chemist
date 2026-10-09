@@ -19,6 +19,23 @@
   next menu number. Before automating a new version, capture a small manual
   transcript and recheck output names/content with a known example.
 
+## Periodic CHGCAR input traps
+
+- The **first line of the work-copy CHGCAR** should start with
+  `Nval` then the exact species/ZVAL pairs in CHGCAR order.
+  Use `scripts/prepare_periodic_chgcar.py`, not hand-edited
+  pseudopotential assumptions. The Li_sv dataset generally
+  has ZVAL=3 whereas ordinary Li may use ZVAL=1.
+- An apparent sign reversal between Multiwfn and Chargemol Hirshfeld
+  populations is not automatically an electron-flow reversal: check
+  reference densities, effective nuclear charges, CHGCAR vs AECCAR,
+  normalization and exact method before inferring mechanism.
+- Hirshfeld-I needs the correct installed `atomrad/` references and
+  demonstrable iteration convergence. Failing to provide atomrad must
+  not silently yield ordinary Hirshfeld values labeled H-I.
+- CM5 and H-I require distinct menu sequences; exit code 0 may not
+  mean the intended method was run. Use method-labeled logs.
+
 ## Common symptoms
 
 | Symptom | Likely cause | Fix |

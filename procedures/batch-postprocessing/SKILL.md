@@ -100,6 +100,17 @@ optionally plot Hirshfeld vs CM5 vs DDEC6 for the same density.
 Do not confuse this with **Hirshfeld-I**, which requires a separate
 iterative charged-reference algorithm.
 
+### Periodic Multiwfn Hirshfeld / CM5 / Hirshfeld-I
+
+Use `tools/multiwfn/references/periodic-stockholder.md` and its
+`prepare_periodic_chgcar.py` / `collect_periodic_charges.py`.
+The agent prepares Nval using the matching POTCAR, independently
+runs each validated Multiwfn menu, then exports all atom/element
+charges and compares against the existing Chargemol outputs.
+Do **not** label Chargemol's initial Hirshfeld iteration as H-I, nor
+substitute an unrelated Multiwfn bond-index method for DDEC6 BO.
+MBIS is out of scope.
+
 ### Other tools
 
 - VASPKIT: `tools/vaspkit/`; determine the installed version and exact

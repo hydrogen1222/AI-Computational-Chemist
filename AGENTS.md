@@ -40,6 +40,7 @@ not the user. Parsing existing data is separate from running new simulations.
 | Build and validate atoms, slabs, interfaces, defects, conformers | `tools/structure-prep/` |
 | Batch analysis of existing calculation results | `procedures/batch-postprocessing/` + the relevant tool skill |
 | DDEC6 atomic charges and periodic bond orders | `tools/chargemol/SKILL.md` |
+| Periodic Hirshfeld, CM5, Hirshfeld-I independent analysis | `tools/multiwfn/references/periodic-stockholder.md` |
 | Calculation inputs, parsers, methods, recovery | the relevant `tools/<engine>/` |
 | Preparing an inspectable manual run script | The chosen engine skill; the researcher executes it |
 | Theoretical foundations and interpretation | relevant `knowledge/*.md` |
