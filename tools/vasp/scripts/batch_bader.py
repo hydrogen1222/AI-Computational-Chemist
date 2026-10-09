@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+import math
+from charge_report import generate as generate_charge_report
 import re
 import shutil
 from software_locator import find_executable
@@ -36,6 +38,8 @@ def arguments(argv=None):
     parser.add_argument("--chgsum-bin", help="chgsum.pl path; auto-discover when omitted")
     parser.add_argument("--force", action="store_true", help="Explicitly replace generated Bader outputs only")
     parser.add_argument("--timeout", type=int, default=0, help="Seconds per external tool (0 = no timeout)")
+    parser.add_argument("--net-charge", type=float, help="Optional expected cell net charge (e) for conservation QC")
+    parser.add_argument("--charge-tol", type=float, default=0.05, help="Max abs(sum q - expected), e")
     return parser.parse_args(argv)
 
 
@@ -126,6 +130,8 @@ def parse_acf(path: Path, expected: int) -> list[float]:
             value = float(tokens[4])
         except ValueError as exc:
             raise ValueError(f"invalid ACF.dat charge row in {path}") from exc
+        if not math.isfinite(value):
+            raise ValueError("nonfinite Bader electron population")
         charge.append(value)
     if len(charge) != expected:
         raise ValueError(f"ACF.dat has {len(charge)} atoms; structure has {expected}")
@@ -225,6 +231,9 @@ def main(argv=None):
     if not root.is_dir():
         print(f"ERROR: root does not exist: {root}", file=sys.stderr)
         return 2
+    if opts.charge_tol <= 0 or (opts.net_charge is not None and not math.isfinite(opts.net_charge)):
+        print("ERROR: charge-tol must be positive and net-charge finite", file=sys.stderr)
+        return 2
     if opts.force and not opts.execute:
         print("ERROR: --force requires --execute", file=sys.stderr)
         return 2
@@ -244,6 +253,7 @@ def main(argv=None):
     for folder in cases:
         case = "." if folder == root else folder.relative_to(root).as_posix()
         status, source, detail = "READY", "", ""
+        total_q, delta_q = None, "NOT_CHECKED"
         try:
             if not (folder / "CHGCAR").is_file() and not opts.collect_only:
                 raise ValueError("missing CHGCAR")
@@ -253,6 +263,11 @@ def main(argv=None):
             if opts.execute:
                 acf, action = prepare_and_run(folder, opts)
                 atoms, elems = atomic_rows(folder, case, acf, opts.zval)
+                total_q = sum(a["net_charge_e"] for a in atoms)
+                if opts.net_charge is not None:
+                    delta_q = total_q - opts.net_charge
+                    if abs(delta_q) > opts.charge_tol:
+                        raise ValueError(f"Bader charge sum differs from expected by {delta_q:+.6f} e")
                 all_atoms.extend(atoms)
                 all_elems.extend(elems)
                 status, source, detail = "OK", str(acf), action
@@ -262,6 +277,11 @@ def main(argv=None):
                 if acf is None:
                     raise ValueError("ACF.dat not found in run or postprocess/bader")
                 atoms, elems = atomic_rows(folder, case, acf, opts.zval)
+                total_q = sum(a["net_charge_e"] for a in atoms)
+                if opts.net_charge is not None:
+                    delta_q = total_q - opts.net_charge
+                    if abs(delta_q) > opts.charge_tol:
+                        raise ValueError(f"Bader charge sum differs from expected by {delta_q:+.6f} e")
                 all_atoms.extend(atoms)
                 all_elems.extend(elems)
                 status, source, detail = "OK", str(acf), "collected"
@@ -275,19 +295,29 @@ def main(argv=None):
             status, detail = "ERROR", str(exc)
         print(f"{status:<6} {case}: {detail}")
         summary.append({"case": case, "status": status, "detail": detail,
-                        "acf_path": source})
+                        "acf_path": source,
+                        "sum_bader_q_e": round(total_q, 7) if total_q is not None else "",
+                        "expected_net_charge_e": opts.net_charge if opts.net_charge is not None else "",
+                        "charge_balance_error_e": round(delta_q, 7) if isinstance(delta_q, float) else delta_q})
 
     if opts.execute or opts.collect_only:
         dest = root / "postprocess_summary"
         dest.mkdir(parents=True, exist_ok=True)
         write_csv(dest / "bader_cases.csv",
-                  ["case", "status", "detail", "acf_path"], summary)
+                  ["case", "status", "detail", "acf_path", "sum_bader_q_e",
+                   "expected_net_charge_e", "charge_balance_error_e"], summary)
         write_csv(dest / "bader_atoms.csv",
                   ["case", "atom_index", "element", "bader_electrons", "zval",
                    "net_charge_e", "acf_path"], all_atoms)
         write_csv(dest / "bader_elements.csv",
                   ["case", "element", "count", "mean_q_e", "min_q_e",
                    "max_q_e", "spread_e", "acf_path"], all_elems)
+        try:
+            report = generate_charge_report(dest, "bader")
+            print(f"中文报告：{report}")
+        except (OSError, ValueError, KeyError) as exc:
+            failures += 1
+            print(f"ERROR: Bader 人类可读报告生成失败：{exc}", file=sys.stderr)
         print(f"CSV: {dest} (cases, atoms, elements)")
     print(f"Completed {len(cases) - failures}/{len(cases)}; failed {failures}")
     return 1 if failures else 0

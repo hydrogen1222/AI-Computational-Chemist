@@ -17,6 +17,7 @@ from prepare_periodic_chgcar import valence_metadata,manifest_cases
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/"vasp"/"scripts"))
 from batch_ddec6 import xyz_properties,CHARGE_FILE
 from collect_hirshfeld import read_first_partition,find_log
+from charge_report import generate as generate_charge_report
 
 NUM=r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[EeDd][+-]?\d+)?"
 ATOM=re.compile(r"Atom\s+(\d+)\(\s*([A-Z][a-z]?)\s*\)\s*:\s*("+NUM+r")")
@@ -216,6 +217,12 @@ def main(argv=None):
         f.write("\nMethod-dependent charges are not oxidation states. "
                 "For Hirshfeld-I, confirm genuine iterative convergence from "
                 "its complete Multiwfn log. No MBIS is computed.\n")
+    try:
+        report = generate_charge_report(folder, "multiwfn")
+        print(f"中文报告：{report}")
+    except (OSError, ValueError, KeyError) as exc:
+        failures += 1
+        print(f"ERROR: Multiwfn 中文报告生成失败：{exc}", file=sys.stderr)
     plot(folder/"ppt_figures",rows)
     print(f"Output: {folder}; failed or missing methods: {failures}")
     return 1 if failures else 0

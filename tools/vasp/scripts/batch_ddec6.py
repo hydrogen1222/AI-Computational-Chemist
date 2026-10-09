@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from charge_report import generate as generate_charge_report
 import math
 import os
 import importlib.util
@@ -450,6 +451,12 @@ def main(argv=None):
                      "the minimum and maximum, **not** confidence intervals. "
                      "Specify the model composition, sample sizes, and any "
                      "comparison controls before presenting trends.\n")
+        try:
+            report = generate_charge_report(out, "ddec6")
+            print(f"中文报告：{report}")
+        except (OSError, ValueError, KeyError) as exc:
+            errors += 1
+            print(f"ERROR: DDEC6 中文报告生成失败：{exc}", file=sys.stderr)
         print(f"Outputs: {out}")
         if importlib.util.find_spec("matplotlib") is not None:
             plotter = Path(__file__).with_name("plot_ddec6.py")
