@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Slide-size DDEC6 charts from batch_ddec6.py CSV tables.
+"""Create slide-ready DDEC6 summaries for EVERY reported bond type.
 
-Requires matplotlib (only for plotting); writes vector SVG and 300-dpi PNG.
-All figures are descriptive, showing means AND atom/bond ranges.
+Requires matplotlib. Output: 16:9 editable-text SVG and 300-dpi PNG.
+Long plots are paginated (all classes retained; no hidden top-N filtering).
 """
 from __future__ import annotations
 
@@ -14,77 +14,80 @@ import re
 
 def args(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("summary", type=Path, help="Folder containing ddec6_elements.csv and ddec6_bond_types.csv")
-    p.add_argument("--case", help="Plot one case instead of every case")
-    p.add_argument("--max-cases", type=int, default=20,
-                   help="Safety limit, default 20; 0 means all cases")
+    p.add_argument("summary", type=Path, help="Directory with ddec6_elements.csv and ddec6_bond_types.csv")
+    p.add_argument("--case", help="Restrict to one case")
+    p.add_argument("--max-cases", type=int, default=0,
+                   help="Optional limit on models to chart (0, default = all)")
+    p.add_argument("--items-per-figure", type=int, default=10,
+                   help="Number of element/bond categories per slide; rest go on following pages")
     return p.parse_args(argv)
 
 
-def rows(path):
+def read_rows(path):
     with path.open(newline="", encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
 
 
-def safe_name(case):
-    return re.sub(r"[^a-zA-Z0-9_.-]", "_", case).strip("._")[:80] or "root"
+def safe_name(name):
+    return re.sub(r"[^a-zA-Z0-9_.-]", "_", name).strip("._")[:80] or "root"
 
 
-def chart(matplotlib, folder, case, data, charge):
-    if not data:
-        return
+def draw(folder, case, values, charge, page, pages):
+    """One slide; caller paginates every category instead of truncating data."""
     import matplotlib.pyplot as plt
-    plt.rcParams['svg.fonttype'] = 'none'  # keep text editable in vector export
 
-    if charge:
-        title = "DDEC6 atomic net charge"
-        subtitle = "Mean and atomic min–max range | +q = electron-deficient"
-        ylabel, label_col = "Net atomic charge q (e)", "element"
-        val, mini, maxi = "mean_charge_e", "min_charge_e", "max_charge_e"
-        suffix = "charges"
-    else:
-        title = "DDEC6 pair bond order"
-        subtitle = "Mean and printed bond min–max range | periodic images counted once"
-        ylabel, label_col = "DDEC6 bond order (dimensionless)", "element_pair"
-        val, mini, maxi = "mean_bond_order", "min_bond_order", "max_bond_order"
-        suffix = "bond_orders"
-    data = sorted(data, key=lambda x: x[label_col])
-    labels = [x[label_col] for x in data]
-    means = [float(x[val]) for x in data]
-    error = [[max(0, means[i]-float(x[mini])) for i,x in enumerate(data)],
-             [max(0, float(x[maxi])-means[i]) for i,x in enumerate(data)]]
+    plt.rcParams["svg.fonttype"] = "none"  # text remains editable in SVG
+    label_key = "element" if charge else "element_pair"
+    mean = "mean_charge_e" if charge else "mean_bond_order"
+    low = "min_charge_e" if charge else "min_bond_order"
+    high = "max_charge_e" if charge else "max_bond_order"
+    count = "n_atoms" if charge else "n_periodic_bonds"
+    suffix = "charges" if charge else "bond_orders"
+    title = "DDEC6 net atomic charge" if charge else "DDEC6 pair bond order"
+    unit = "Net atomic charge q (e)" if charge else "DDEC6 bond order (dimensionless)"
+    subtitle = ("+q denotes electron depletion" if charge else
+                "All Chargemol-printed pair classes; each periodic image counted once")
+    labels = [f"{v[label_key]} (n={v[count]})" for v in values]
+    means = [float(v[mean]) for v in values]
+    bounds = [[max(0, m-float(v[low])) for m,v in zip(means,values)],
+              [max(0, float(v[high])-m) for m,v in zip(means,values)]]
     fig, ax = plt.subplots(figsize=(12.8, 7.2), constrained_layout=True)
-    positions = list(range(len(data)))
-    ax.bar(positions, means, alpha=0.85)
-    ax.errorbar(positions, means, yerr=error, capsize=4, fmt="none", color="black", linewidth=1.1)
-    ax.axhline(0, color="black", alpha=0.4, linewidth=0.8)
+    positions = list(range(len(values)))
+    ax.bar(positions, means)
+    ax.errorbar(positions, means, yerr=bounds, fmt="none", capsize=4,
+                color="black", linewidth=1)
+    ax.axhline(0, linewidth=0.8, color="black", alpha=0.5)
     ax.set_xticks(positions)
-    ax.set_xticklabels(labels, rotation=25 if len(labels)>5 else 0, ha="right" if len(labels)>5 else "center")
-    ax.set_ylabel(ylabel)
-    ax.set_title(f"{title} — {case}\n{subtitle}", loc="left", fontsize=16, pad=20)
+    ax.set_xticklabels(labels, rotation=25 if len(labels)>5 else 0,
+                       ha="right" if len(labels)>5 else "center")
+    ax.set_ylabel(unit)
     ax.grid(axis="y", alpha=0.18)
     ax.set_axisbelow(True)
-    ax.text(0.99, -0.12, "Source: Chargemol DDEC6 | error bars: min–max, not statistical uncertainty",
+    ax.set_title(f"{title} — {case}   [{page}/{pages}]\n{subtitle}",
+                 loc="left", fontsize=15, pad=18)
+    ax.text(0.99, -0.14,
+            "Chargemol DDEC6 | min–max across atoms/printed bonds, NOT statistical error",
             transform=ax.transAxes, ha="right", va="top", fontsize=9)
-    stem = folder / f"{safe_name(case)}_{suffix}"
-    fig.savefig(stem.with_suffix(".svg"), bbox_inches="tight")
-    fig.savefig(stem.with_suffix(".png"), dpi=300, bbox_inches="tight")
+    name = safe_name(case) + "_" + suffix + (f"_part{page:02d}" if page>1 else "")
+    for ext, kwargs in ((".svg", {}), (".png", {"dpi": 300})):
+        fig.savefig(folder / (name + ext), bbox_inches="tight", **kwargs)
     plt.close(fig)
 
 
 def main(argv=None):
     opt = args(argv)
-    if not opt.summary.is_dir() or opt.max_cases < 0:
-        raise SystemExit("summary directory missing or invalid max-cases")
+    if not opt.summary.is_dir() or opt.items_per_figure < 1 or opt.max_cases < 0:
+        raise SystemExit("invalid summary directory / figure category count / case limit")
     try:
         import matplotlib  # noqa: F401
     except ImportError as e:
-        raise SystemExit("matplotlib is required for PNG/SVG; install it into your analysis environment") from e
+        raise SystemExit("Install matplotlib into the analysis environment to create PNG/SVG") from e
     try:
-        charges = rows(opt.summary / "ddec6_elements.csv")
-        bonds = rows(opt.summary / "ddec6_bond_types.csv")
+        charges = read_rows(opt.summary / "ddec6_elements.csv")
+        bonds = read_rows(opt.summary / "ddec6_bond_types.csv")
     except FileNotFoundError as e:
-        raise SystemExit(f"missing batch CSV: {e}") from e
+        raise SystemExit(f"missing DDEC6 CSV: {e}") from e
+
     cases = sorted(set(x["case"] for x in charges) | set(x["case"] for x in bonds))
     if opt.case is not None:
         if opt.case not in cases:
@@ -92,14 +95,27 @@ def main(argv=None):
         cases = [opt.case]
     elif opt.max_cases:
         if len(cases) > opt.max_cases:
-            print(f"NOTE: {len(cases)} cases, plotting first {opt.max_cases}; use --max-cases 0 for all")
+            print(f"WARNING: explicitly limited to {opt.max_cases}/{len(cases)} models")
         cases = cases[:opt.max_cases]
-    dest = opt.summary / "ppt_figures"
-    dest.mkdir(exist_ok=True)
+
+    destination = opt.summary / "ppt_figures"
+    destination.mkdir(exist_ok=True)
+    pages_created = 0
     for case in cases:
-        chart(None, dest, case, [x for x in charges if x["case"] == case], True)
-        chart(None, dest, case, [x for x in bonds if x["case"] == case], False)
-    print(f"Created up to {len(cases)*2} SVG/PNG figure pairs in {dest}")
+        for is_charge, all_rows, key in (
+            (True, charges, "element"),
+            (False, bonds, "element_pair"),
+        ):
+            subset = sorted((row for row in all_rows if row["case"] == case),
+                            key=lambda x: x[key])
+            page_count = (len(subset) + opt.items_per_figure - 1) // opt.items_per_figure
+            for page in range(page_count):
+                start = page*opt.items_per_figure
+                draw(destination, case, subset[start:start+opt.items_per_figure],
+                     is_charge, page+1, page_count)
+                pages_created += 1
+    print(f"Rendered {pages_created} figure pairs (SVG+PNG) across {len(cases)} models; "
+          f"all {len(charges)} element and {len(bonds)} reported bond-type rows retained")
     return 0
 
 
