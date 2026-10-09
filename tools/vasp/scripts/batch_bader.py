@@ -134,6 +134,9 @@ def parse_acf(path: Path, expected: int) -> list[float]:
 def run_tool(cmd: list[str], cwd: Path, logfile: Path, timeout: int):
     try:
         with logfile.open("w", encoding="utf-8") as log:
+            log.write("# Command: " + " ".join(cmd) + "\\n")
+            log.write("# Executable: " + str(shutil.which(cmd[0])) + "\\n")
+            log.flush()
             result = subprocess.run(cmd, cwd=cwd, stdout=log, stderr=subprocess.STDOUT,
                                     timeout=timeout if timeout > 0 else None, check=False)
     except subprocess.TimeoutExpired as exc:

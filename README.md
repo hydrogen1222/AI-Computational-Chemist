@@ -7,6 +7,11 @@ chemistry and materials science. It helps a researcher who has a scientific ques
 but may not know which physical model to use, or how to program ASE/pymatgen, turn
 the question into real, reproducible atomistic structures.
 
+AICC also provides **batch post-processing** for previously calculated datasets:
+identify the requested observable, invoke the relevant program/skill on many run
+folders, check missing or invalid cases, and produce comparable tabular results.
+The user should not need to write shell loops or Python scripts.
+
 The user owns scientific approval and decides whether or when to run expensive
 calculations. This collection **does not** launch a built-in SI/Major/Vice team,
 operate a task DAG, or run HPC jobs by default.
@@ -35,6 +40,8 @@ limitations, then build and audit the candidate structures. Do not submit VASP."
 | `AGENTS.md` | Short, harness-neutral single-agent contract |
 | `procedures/scientific-modeling/` | Main modeling workflow |
 | `procedures/literature-to-calculation/` | Extract evidence and model choices from publications |
+| `procedures/batch-postprocessing/` | Batch analysis of existing calculations without manual scripts |
+| `tools/vasp/scripts/batch_bader.py` | Batch VASP Bader/AIM charges, per-atom and per-element CSV |
 | `procedures/review-response/` | Optional manuscript reviewer-response workflow |
 | `tools/structure-prep/` | ASE/pymatgen/RDKit structure building, enumeration, audits |
 | `tools/vasp/`, `tools/cp2k/`, `tools/orca/`, etc. | Per-code methods, preflight, parsers, troubleshooting |
@@ -86,6 +93,8 @@ are not automatically migrated or deleted.**
   another person can regenerate candidate structures.
 - **Scientific skepticism.** Check both geometry and whether the chosen system
   can test the stated mechanism; describe competing models and confounders.
+- **Automated post-processing.** The agent runs existing software tools on many
+  cases, isolates failures and generates source-traceable summary tables.
 - **User-controlled execution.** Running simulations or changing approved
   methods/resources requires authorization; creating and auditing structures
   does not imply approval to submit.

@@ -26,6 +26,9 @@ a mandatory SI/Major/Vice role or a second execution authority.
 Load `procedures/scientific-modeling/SKILL.md` for nontrivial model design; use
 `tools/structure-prep/SKILL.md` for structure construction and validation.
 Other skills and `knowledge/` are **on-demand references**, not mandatory stages.
+For many completed calculations needing automated extraction, load
+`procedures/batch-postprocessing/SKILL.md`; the agent performs the batch,
+not the user. Parsing existing data is separate from running new simulations.
 
 ## Skill routing
 
@@ -35,6 +38,7 @@ Other skills and `knowledge/` are **on-demand references**, not mandatory stages
 | Extract model/method from a paper or SI | `procedures/literature-to-calculation/` |
 | Respond to reviewer comments | `procedures/review-response/` |
 | Build and validate atoms, slabs, interfaces, defects, conformers | `tools/structure-prep/` |
+| Batch analysis of existing calculation results | `procedures/batch-postprocessing/` + the relevant tool skill |
 | Calculation inputs, parsers, methods, recovery | the relevant `tools/<engine>/` |
 | Optional SSH, Slurm/PBS submission and monitoring | `tools/hpc-submit/` or `tools/rsess/` |
 | Theoretical foundations and interpretation | relevant `knowledge/*.md` |
