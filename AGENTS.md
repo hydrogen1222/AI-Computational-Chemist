@@ -29,6 +29,14 @@ Other skills and `knowledge/` are **on-demand references**, not mandatory stages
 For many completed calculations needing automated extraction, load
 `procedures/batch-postprocessing/SKILL.md`; the agent performs the batch,
 not the user. Parsing existing data is separate from running new simulations.
+**Atomic-charge deliverables are never CSV-only.** After Bader, DDEC6,
+Chargemol Hirshfeld/CM5 or Multiwfn charges, supply a short Chinese
+human-readable report containing: an evidence-grounded paragraph suitable
+for a PPT, full element and site tables, charge sign/units, the status of
+net-charge and method-specific quality checks, provenance, and limits on
+oxidation-state/mechanism claims. Use
+`tools/vasp/scripts/charge_report.py` for regeneration from existing CSVs.
+Never describe an unconverged Hirshfeld-I iteration as a calculated charge.
 For **any figure or image intended as a finished deliverable**, load
 `tools/plotting/SKILL.md` first: the vendored Stormy-drawing plotting
 rules are authoritative over older `tools/report/` and

@@ -78,6 +78,10 @@ class HirshfeldExtractionTest(unittest.TestCase):
         self.assertAlmostEqual(float(rows[0]["ddec6_net_charge_e"]), 0.843200)
         self.assertAlmostEqual(float(rows[1]["hirshfeld_net_charge_e"]), -0.204737)
         self.assertIn("not Hirshfeld-I", (out / "hirshfeld_summary.md").read_text())
+        human = (out / "hirshfeld_report_cn.md").read_text(encoding="utf-8")
+        self.assertIn("可以放进 PPT", human)
+        self.assertIn("普通 Hirshfeld", human)
+        self.assertIn("不包含 Hirshfeld-I", human)
 
     def test_unrecognized_log_does_not_report_hirshfeld(self):
         p = self.run / "postprocess/chargemol/VASP_DDEC_analysis.output"

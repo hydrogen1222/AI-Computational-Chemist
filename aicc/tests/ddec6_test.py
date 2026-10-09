@@ -79,6 +79,10 @@ class DDEC6Tests(unittest.TestCase):
         self.assertEqual(bonds[0]["translation_a"], "0")
         self.assertAlmostEqual(float(bonds[0]["ddec6_bond_order"]), 0.3)
         self.assertIn("Charge sum check: enabled", (out / "ddec6_summary.md").read_text())
+        human = (out / "ddec6_report_cn.md").read_text(encoding="utf-8")
+        self.assertIn("可以放进 PPT", human)
+        self.assertIn("Na 的平均净电荷为 +0.7000 e", human)
+        self.assertIn("Na-S", human)
         self.assertEqual((self.one / "CHGCAR").read_text().splitlines()[0], "NaS test")
 
     def test_no_fake_charge_balance_on_unspecified_q(self):

@@ -13,7 +13,7 @@ of a separate work copy* to identify true PAW valence nuclear charges.
 | Observable | Engine |
 |---|---|
 | Standard Hirshfeld / CM5 | Multiwfn; also in Chargemol's first noniterative DDEC6 log |
-| True iterative Hirshfeld-I | **Multiwfn** with the installed `atomrad/` ionic reference database |
+| True iterative Hirshfeld-I | **Multiwfn** with the installed `atmrad/` ionic reference database |
 | DDEC6 q, DDEC6 SBO and periodic DDEC6 pair BO | **Chargemol** only |
 | Other bond indices in Multiwfn | Different definitions — do not relabel them DDEC6 BO |
 
@@ -60,7 +60,7 @@ not necessarily to the executable. Work in the per-case isolated folder.
 The reference tutorial's main function 7 ("Population analysis")
 uses **1** = ordinary Hirshfeld, **16** = CM5, and **15 → 1** =
 Hirshfeld-I with default settings; run H-I only after locating the
-installed Multiwfn `examples/atomrad/` charge-state radial-density
+installed Multiwfn `examples/atmrad/` charge-state radial-density
 reference folder in the current analysis working directory (may
 symlink the unmodified installed folder). Treat these menu numbers as
 **documented reference values**, not a guarantee across installations.
@@ -115,6 +115,13 @@ It also reads existing Chargemol first-step Hirshfeld/CM5 from
 without rerunning Chargemol.
 
 **Output:** under `CALC_ROOT/postprocess_summary`:
+The human-facing Chinese report is required even when the user only
+requests numerical results. Do not hand off CSVs alone. Any failed
+H-I iteration is invalid as a reported charge and must remain
+an explicit method failure rather than a speculative numerical result.
+- `multiwfn_report_cn.md` — actual Chinese, presentation-ready
+  case descriptions, full element/atom comparisons, QC and status
+  interpretation; never quote a nonconverged H-I number.
 - `multiwfn_atoms.csv` — every atom with H, CM5, H-I from
   Multiwfn beside existing Chargemol H, CM5 and DDEC6 values;
 - `multiwfn_elements.csv` — per-element means/min/max;

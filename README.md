@@ -14,6 +14,15 @@ The user should not need to write shell loops, Python scripts, or hunt
 down installed Chargemol/Bader executables by hand. AICC searches the
 current PATH and common user/application directories first and asks
 for a path only if discovery is impossible or ambiguous.
+Every supported **atomic-charge** batch now exports an actual
+human-readable Chinese report, not just CSV values: a concise
+PPT-quotable sentence, full element/site data, QC results and
+scientific interpretation limits. The shared stdlib reporter can also
+refresh those reports without re-running Bader, Chargemol or Multiwfn:
+`python tools/vasp/scripts/charge_report.py CALC_ROOT/postprocess_summary --only-present`.
+It does not silently claim charge conservation if the expected
+cell net charge was not specified, and does not treat nonconverged
+Hirshfeld-I charges as valid.
 
 **Figures:** AICC includes the Stormy-drawing plotting Skill (source
 [Stormy-drawing](https://github.com/hydrogen1222/Stormy-drawing), snapshot
@@ -59,6 +68,7 @@ limitations, then build and audit the candidate structures. Do not submit VASP."
 | `procedures/batch-postprocessing/` | Batch analysis of existing calculations without manual scripts |
 | `tools/vasp/scripts/collect_hirshfeld.py` | Extract ordinary Hirshfeld/CM5 charges already computed by Chargemol; generate comparison CSV/PPT figures |
 | `tools/chargemol/` | DDEC6 charges, SBO, all printed periodic bond types, and paginated PPT-ready plots |
+| `tools/vasp/scripts/charge_report.py` | Chinese presentation-ready, source-traceable reports for Bader, DDEC6, Chargemol Hirshfeld/CM5 and Multiwfn; no scientific recalculation |
 | `tools/plotting/` | Stormy-drawing publication figure Skill, reusable `pubstyle.py`, figure-folder builder, templates and QA |
 | `tools/vasp/scripts/batch_bader.py` | Batch VASP Bader/AIM charges, per-atom and per-element CSV |
 | `procedures/review-response/` | Optional manuscript reviewer-response workflow |

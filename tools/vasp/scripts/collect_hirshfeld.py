@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from charge_report import generate as generate_charge_report
 import math
 from pathlib import Path
 import re
@@ -317,6 +318,12 @@ def main(argv=None):
     csv_out(output / "hirshfeld_atoms.csv", ATOMS, atoms)
     csv_out(output / "hirshfeld_elements.csv", ELEMENTS, elements)
     report(output / "hirshfeld_summary.md", statuses, elements, opts.net_charge)
+    try:
+        path = generate_charge_report(output, "hirshfeld")
+        print(f"中文报告：{path}")
+    except (OSError, ValueError, KeyError) as exc:
+        failures += 1
+        print(f"ERROR: Chargemol H/CM5 中文报告生成失败：{exc}", file=sys.stderr)
     make_plots(output, elements)
     print(f"Wrote {len(atoms)} atoms and {len(elements)} element groups to {output}")
     return 1 if failures else 0
