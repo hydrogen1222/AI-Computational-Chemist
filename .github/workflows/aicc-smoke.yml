@@ -1,0 +1,23 @@
+name: AICC modeling-first smoke
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "refactor/**"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Syntax check installer and CLI
+        run: |
+          bash -n install.sh
+          python -m compileall -q aicc
+      - name: Test one-agent routing and CLI
+        run: python aicc/tests/smoke_test.py
