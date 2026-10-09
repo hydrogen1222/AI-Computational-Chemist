@@ -4,7 +4,7 @@
 
 ## Build choice is a method decision
 
-Do not submit a CPU-only VASP MPI build to a GPU partition. For GPU nodes, use the site's OpenACC/GPU VASP module and launcher (record them in the private cluster guide, under its VASP/GPU section). If strict method reproduction requires a specific CPU VASP version that is unavailable as a GPU build, treat the CPU-vs-GPU choice as a method/runtime decision and ask before changing versions.
+Do not submit a CPU-only VASP MPI build to a GPU partition. For GPU nodes, use the site's OpenACC/GPU VASP module and launcher (confirm them with the researcher and preserve them in the human-reviewed run script). If strict method reproduction requires a specific CPU VASP version that is unavailable as a GPU build, treat the CPU-vs-GPU choice as a method/runtime decision and ask before changing versions.
 
 ## Binary choice
 

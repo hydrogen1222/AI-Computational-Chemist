@@ -23,11 +23,9 @@ core.*
 # local manual copies (linked, not versioned)
 manuals/
 
-# private site/cluster info — never committed.
-# Cluster knowledge lives outside the repo: the local bootstrap (how to
-# connect) in the operator's home or agent memory, the operating guide on the
-# cluster itself (~/.cluster-agents.md). These patterns are defensive — they
-# catch any such file accidentally written into the repo tree.
+# private site/cluster settings — never commit them.
+# The researcher manages their own scheduler/environment configurations;
+# these ignore patterns prevent accidental disclosure of local machine details.
 site-config.yaml
 site-config.*.yaml
 /cluster-guides/

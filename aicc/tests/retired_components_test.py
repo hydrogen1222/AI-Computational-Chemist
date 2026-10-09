@@ -24,6 +24,9 @@ RETIRED_FILES = [
     "procedures/review-response/examples/toy-vacancy-pt-vs-au/response-workflow.md",
     "procedures/review-response/examples/toy-contradicts-au-vs-cu/response-workflow.md",
 ]
+ROLE_PATTERNS = [
+    re.compile(r"\\bvice\\b|\\bsubagents?\\b|\\bSI\\s*/\\s*major\\b|\\bmajor\\s*/\\s*SI\\b", re.I),
+]
 RETIRED_STRINGS = [
     "research-orchestrator",
     "comp-chem-workflow",
@@ -61,6 +64,9 @@ class RetirementIntegrity(unittest.TestCase):
                 for term in RETIRED_STRINGS:
                     if term.lower() in line.lower():
                         violations.append(f"{path.relative_to(ROOT)}:{line_no}: {term}")
+                for pattern in ROLE_PATTERNS:
+                    if pattern.search(line):
+                        violations.append(f"{path.relative_to(ROOT)}:{line_no}: deprecated agent role")
         self.assertEqual([], violations, "retired paths or protocols referenced:\n" + "\n".join(violations))
 
     def test_skill_explicit_references_exist(self):
