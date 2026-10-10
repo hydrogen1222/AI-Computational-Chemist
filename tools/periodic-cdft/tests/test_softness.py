@@ -105,5 +105,25 @@ class TestSoftness(unittest.TestCase):
             self.invoke()
 
 
+class TestReportSoftness(unittest.TestCase):
+    def test_optional_report_section_and_rejects_unreviewed(self):
+        from report import summarize
+        pre = {'status':'INPUT_GRID_PASS_SCF_MANUAL_CHECK','reference':'N',
+               'n_atoms':2,'grid':[2,1,1],'states':[]}
+        ordinary = summarize(pre,None,[])
+        self.assertIn('NOT_VALIDATED_FOR_CHARGED_PBC',ordinary)
+        self.assertNotIn('额外的已审查能量模型',ordinary)
+        example = {'status':'ENERGY_MODEL_REVIEWED_NOT_PBC_CONVERGENCE_PROVEN_BY_SCRIPT',
+                   'model':'corrected_charged_supercell','reference':'test only',
+                   'source':'synthetic fixture', 'I_eV':7,'A_eV':3,
+                   'electronegativity_eV':5,'hardness_eV':2,'softness_inv_eV':0.5}
+        expanded = summarize(pre,None,[],example)
+        self.assertIn('额外的已审查能量模型',expanded)
+        self.assertIn('eta=2 eV',expanded)
+        example['status']='NOT_VALIDATED_FOR_CHARGED_PBC'
+        with self.assertRaisesRegex(ValueError,'provenance'):
+            summarize(pre,None,[],example)
+
+
 if __name__ == '__main__':
     unittest.main()
