@@ -7,7 +7,8 @@ This document complements `three-engine-protocol.md`. **CDFT means conceptual DF
 At fixed external potential and fixed nuclear geometry, the global electronic chemical potential is `mu=(dE/dN)_v` and conceptual electronegativity is `chi=-mu`. A conventional molecular *vertical* finite-difference approximation uses **integer** charge states:
 
 - `I = E(N-1)-E(N)`, `A = E(N)-E(N+1)`, after physically justified alignment and finite-size/electrostatic corrections.
-- `chi=(I+A)/2` (eV); `eta=(I-A)/2` (eV); `S=1/eta` (eV^-1) **by declared half-gap convention**. Other publications define `eta=I-A` and then `S=1/eta`: never silently mix conventions.
+- `chi=(I+A)/2` (eV). **For this executable's derivative-consistent local-softness route**, `eta_response=I-A` (eV), `S_response=1/(I-A)` (eV^-1), so `s(r)=S_response*f(r)` matches the approximate chain-rule `(d rho/d mu)_v=(d rho/d N)_v*(d N/d mu)_v`.
+- **Alternative common chemistry convention:** `eta_half=(I-A)/2` (eV), and some authors call `S_half=1/eta_half=2/(I-A)` the softness. This differs by a factor of two from `S_response`. PR #36 exports `hardness_eV=eta_response`, `hardness_half_gap_eV=eta_half`, `softness_inv_eV=S_response`; it **must not multiply f by S_half while claiming the derivative-consistent response**. When comparing with a paper or Multiwfn, always state the formulas, not just the words hardness/softness.
 - `s+(r)=S*f+(r)`; `s-(r)=S*f-(r)`; `s0(r)=S*f0(r)`; `s_dual(r)=S*(f+(r)-f-(r))`. The last is a *derived signed difference of local softness* and not a separate universal reactivity measure.
 - `s_A+=S*f_A+`, `s_A-=S*f_A-`, `s_A0=S*f_A0`, `s_A,dual=S*dual_A` **within each charge partition separately**.
 - Integral/sum QA: `integral(s+)=integral(s-)=S`, `integral(s_dual)=0`; `sum_A(s_A+)=sum_A(s_A-)=S`, `sum_A(s_A,dual)=0`. Negative local lobes remain signed and are not clipped.
@@ -81,4 +82,4 @@ Use whichever verified engine/condensed charge method is present; `--condensed` 
 
 `python3 -m unittest discover -s tools/periodic-cdft/tests -p 'test_softness.py' -v`
 
-The tests use only small synthetic cubes and CSVs; they verify I/A algebra, conservation, matching fingerprints, missing approvals, faulty charge grids, invalid gaps and overwrite refusal. Synthetic numbers do not constitute a scientific validation of periodic Li2S hardness or softness.
+The tests use only small synthetic cubes and CSVs; they verify I/A algebra, conservation, matching fingerprints, missing approvals, faulty charge grids, invalid gaps and overwrite refusal. They also check the response-consistent factor-of-two against the separately reported half-gap hardness. Synthetic numbers do not constitute a scientific validation of periodic Li2S hardness or softness.
