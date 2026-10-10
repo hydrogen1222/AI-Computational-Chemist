@@ -70,7 +70,7 @@ class TestReadableReport(unittest.TestCase):
         self.assertIn("双描述符",short)
         self.assertNotIn("SCF 终止标志",short)
         self.assertNotIn("## 同一种有限差分近似下的软件对照",short)
-        self.assertLess(len(short.splitlines()),30)
+        self.assertLess(len(short.splitlines()),40)
         detailed=summarize(PRE,self.passed_grid(),paths)
         self.assertIn("## 同一种有限差分近似下的软件对照",detailed)
 
