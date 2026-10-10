@@ -337,10 +337,10 @@ files in the research root.
 
 ## 3b. Concise results report by default (no extra slide file)
 
-The existing \`scripts/report.py\` CLI now writes **one short Chinese
-research-results report** by default, still named \`periodic_cdft_report.md\`.
-The same source \`preflight.json\`, \`grid_audit.json\` and validated
-\`condensed_*.csv\` are required. It reports which spatial f+/f-/f0/dual
+The existing `scripts/report.py` CLI now writes **one short Chinese
+research-results report** by default, still named `periodic_cdft_report.md`.
+The same source `preflight.json`, `grid_audit.json` and validated
+`condensed_*.csv` are required. It reports which spatial f+/f-/f0/dual
 actually passed QC, pointwise agreement for matching finite differences,
 and element-mean condensed f_A values from representative population
 partitions (Hirshfeld/CM5, DDEC6 and Bader when present). Original CSVs
@@ -348,7 +348,7 @@ retain all per-atom values and independent variants; no data are deleted.
 
 Example for the validated Li2S datasets:
 
-\`\`\`bash
+```bash
 python tools/periodic-cdft/scripts/report.py \
   --preflight postprocess/periodic_cdft/comparison/preflight.json \
   --grid-audit postprocess/periodic_cdft/comparison/grid_audit_round2.json \
@@ -358,17 +358,17 @@ python tools/periodic-cdft/scripts/report.py \
   --system Li2S \
   --warning 'Bader equivalent Li atoms: charge/basin symmetry WARN, unresolved' \
   --out postprocess/periodic_cdft/comparison/periodic_cdft_report.md
-\`\`\`
+```
 
 The output destination must **not already exist**; keep the existing
 report safe and use a separately named destination for a new run, or ask
-the researcher before replacing it. Use \`--detailed\` only when a
+the researcher before replacing it. Use `--detailed` only when a
 full numeric audit is explicitly needed; do not routinely generate
 both modes or append large logs to the default report.
 
 The report generator checks input QC before summarizing; it does **not**
 independently infer whether chemically equivalent atoms are symmetric.
-Pass observed scientific cautions with \`--warning\`, preserve signed
+Pass observed scientific cautions with `--warning`, preserve signed
 values, and never imply that method-dependent condensed indices are
 unique observables. Do not calculate global/local softness from raw
 charged-PBC total energies merely to fill a report.
