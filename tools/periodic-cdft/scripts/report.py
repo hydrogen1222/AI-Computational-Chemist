@@ -7,6 +7,7 @@ a planned input file; only successfully QC'd files count as computed.
 from __future__ import annotations
 import argparse
 import csv
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -159,6 +160,8 @@ def main(argv=None):
         if a.out.exists() or not a.out.parent.is_dir():
             raise ValueError("report path exists or parent missing; refusing overwrite")
         soft=json.loads(a.softness_json.read_text(encoding="utf-8")) if a.softness_json else None
+        if soft and soft.get("source_preflight_sha256")!=hashlib.sha256(a.preflight.read_bytes()).hexdigest():
+            raise ValueError("softness evidence not bound to this preflight.json")
         report=summarize(pre,grid,a.condensed,soft)
         a.out.write_text(report,encoding="utf-8")
         print(f"中文报告：{a.out}")
