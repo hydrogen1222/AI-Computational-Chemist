@@ -147,6 +147,120 @@ def summarize(preflight,grid,condensed_files,softness=None):
         lines.extend("- "+clean(x) for x in grid["warnings"])
     return "\n".join(lines)+"\n"
 
+
+def summarize_readable(preflight,grid,condensed_files,softness=None,system="周期性体系",warnings=()):
+    """A short, plain-Chinese results report; full QA remains in source JSON/CSV.
+
+    Reuse all strict original validity checks rather than silently relaxing
+    the science requirements merely to generate a shorter document.
+    """
+    summarize(preflight,grid,condensed_files,softness)  # validates before summarizing
+    states=preflight["states"]
+    state_text="、".join(f"{float(s['delta_electrons']):+g}" for s in states)
+    lines=[
+        f"# {clean(system)}｜周期性概念 DFT 结果",
+        "",
+        f"**计算对象：** 固定结构，电子数扰动 ΔN={state_text} e；"
+        f"{preflight['n_atoms']} 个原子。",
+        "",
+        "**计算内容：** 三维 Fukui 函数 f⁺、f⁻、f⁰，双描述符 Δf=f⁺−f⁻；"
+        "以及基于原子电荷的凝聚 Fukui 指数 f_A⁺、f_A⁻、f_A⁰、Δf_A。",
+        "",
+        "## 主要结果",
+        "",
+    ]
+    fields=(grid or {}).get("fields",{})
+    engines=("multiwfn","critic2","fukuigrid-fd")
+    passed=[e for e in engines if all(f"{e}:{k}" in fields for k in FIELDS)]
+    comparisons=[
+        r for r in (grid or {}).get("engine_comparisons",[])
+        if r.get("status")=="PASS"
+        and r.get("reference") in passed and r.get("other") in passed
+        and r.get("field") in ("fplus","fminus")
+    ]
+    names={"multiwfn":"Multiwfn","critic2":"Critic2","fukuigrid-fd":"FukuiGrid"}
+    if passed:
+        lines.append("**空间 Fukui：** 已通过网格检查：" +
+                     "、".join(names[e] for e in passed) +
+                     "；f⁺、f⁻、f⁰ 的积分约为 1，Δf 的积分约为 0。")
+        if len(passed)>1 and comparisons:
+            maxerr=max(float(r["max_abs"]) for r in comparisons)
+            if not math.isfinite(maxerr):
+                raise ValueError("nonfinite pointwise comparison error")
+            lines.append(
+                f"**软件一致性：** 已验收的有限差分逐点最大差 {maxerr:.3g} e/bohr³；"
+                "表明相同输入下的数值后处理一致，不代表反应机理已获验证。")
+        elif len(passed)>1:
+            lines.append("**软件一致性：** 尚缺少已通过的成对逐点对照，不宣称一致。")
+    else:
+        lines.append("**空间 Fukui：** 尚未获得完整的已验收网格。")
+
+    labels={
+        "condensed_chargemol_h":"Hirshfeld (Chargemol)",
+        "condensed_multiwfn_h":"Hirshfeld (Multiwfn)",
+        "condensed_chargemol_cm5":"CM5 (Chargemol)",
+        "condensed_multiwfn_cm5":"CM5 (Multiwfn)",
+        "condensed_ddec6":"DDEC6",
+        "condensed_bader":"Bader",
+    }
+    by_name={p.stem:p for p in condensed_files if p.stem in labels}
+    # Show representative charge partitions; the full CSVs preserve all
+    # individually resolved atoms, independent implementations and CM5.
+    priority=("condensed_chargemol_h","condensed_multiwfn_h",
+              "condensed_chargemol_cm5","condensed_multiwfn_cm5",
+              "condensed_ddec6","condensed_bader")
+    selected=[]
+    for prefix in (("condensed_chargemol_h","condensed_multiwfn_h",
+                    "condensed_chargemol_cm5","condensed_multiwfn_cm5"),
+                   ("condensed_ddec6",),("condensed_bader",)):
+        match=next((key for key in prefix if key in by_name),None)
+        if match: selected.append(match)
+    lines+=["","**原子凝聚 Fukui 指数（元素平均；逐原子详见 CSV）：**",""]
+    if selected:
+        lines+=["| 电荷划分 | 元素 | f_A⁺ | f_A⁻ | f_A⁰ | Δf_A |",
+                "|---|---|---:|---:|---:|---:|"]
+        for key in selected:
+            with by_name[key].open("r",encoding="utf-8-sig",newline="") as fh:
+                atoms=list(csv.DictReader(fh))
+            groups={}
+            for atom in atoms:
+                groups.setdefault(atom["element"],[]).append(atom)
+            for element,group in groups.items():
+                vals=[]
+                for k in ("f_plus","f_minus","f_zero","dual"):
+                    nums=[float(a[k]) for a in group]
+                    if not all(math.isfinite(x) for x in nums):
+                        raise ValueError("nonfinite condensed Fukui")
+                    vals.append(math.fsum(nums)/len(nums))
+                lines.append(f"| {labels[key]} | {clean(element)} | "+
+                             " | ".join(f"{v:+.3f}" for v in vals)+" |")
+        lines+=["","**怎么看：** 同一种原子电荷划分下比较各原子的响应；"
+                "不同划分方法数值可能不同，不能据此判定哪一种更准确。"
+                "元素平均不能替代不等价位点的逐原子分析。"]
+    else:
+        lines.append("尚无已通过检查的原子凝聚指数。")
+
+    lines+=["","## 适用范围与待确认事项",""]
+    if softness is None:
+        lines.append("**全局/局部软度：** 目前没有经过验证的同体系整数电子 I/A，"
+                     "不输出绝对电负性、硬度或局部软度。")
+    else:
+        lines.append(f"**经审核的全局指标：** χ={softness['electronegativity_eV']:.3g} eV，"
+                     f"η={softness['hardness_eV']:.3g} eV，"
+                     f"S={softness['softness_inv_eV']:.3g} eV⁻¹"
+                     "（能量参考、校正与收敛依据须见原始证据）。"
+                     "局部软度输出还应单独检查对应 cube/CSV。")
+    lines.append("Fukui 函数体现的是所选电子数扰动下的电子密度响应，"
+                 "不能单凭它确定实际反应位点、反应能垒或界面分解机理。")
+    for warning in warnings:
+        lines.append(f"**待核查：** {clean(warning)}")
+    if preflight.get("warnings") or (grid or {}).get("warnings"):
+        lines.append("原始网格/输入另有 QC 提醒，详见 preflight.json 与 grid_audit.json。")
+    lines+=["","*计算证据与全部逐原子数值保留在 preflight.json、grid_audit.json、"
+            "condensed_*.csv 等原始结果文件中；这里不重复打印日志。*",""]
+    return "\n".join(lines)
+
+
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--preflight",type=Path,required=True)
@@ -154,6 +268,9 @@ def main(argv=None):
     p.add_argument("--softness-json",type=Path,help="Optional reviewed global_indices.json from softness.py")
     p.add_argument("--condensed",action="append",type=Path,default=[],
                    help="Any validated condensed_*.csv (repeat)")
+    p.add_argument("--system",default="周期性体系",help="Human-friendly system name")
+    p.add_argument("--warning",action="append",default=[],help="Important unresolved numerical issue")
+    p.add_argument("--detailed",action="store_true",help="Legacy long-form numerical audit report")
     p.add_argument("--out",type=Path,required=True)
     a=p.parse_args(argv)
     try:
@@ -166,7 +283,8 @@ def main(argv=None):
         soft=json.loads(a.softness_json.read_text(encoding="utf-8")) if a.softness_json else None
         if soft and soft.get("source_preflight_sha256")!=hashlib.sha256(a.preflight.read_bytes()).hexdigest():
             raise ValueError("softness evidence not bound to this preflight.json")
-        report=summarize(pre,grid,a.condensed,soft)
+        report=(summarize(pre,grid,a.condensed,soft) if a.detailed else
+                summarize_readable(pre,grid,a.condensed,soft,a.system,a.warning))
         a.out.write_text(report,encoding="utf-8")
         print(f"中文报告：{a.out}")
         return 0
