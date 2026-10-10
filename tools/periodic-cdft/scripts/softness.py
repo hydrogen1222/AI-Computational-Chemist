@@ -35,10 +35,14 @@ def validated_energy(evidence, preflight_bytes):
         raise ValueError('I_eV/A_eV must be explicitly supplied') from exc
     if not (math.isfinite(i) and math.isfinite(a) and i > a):
         raise ValueError('I/A must be finite and I>A; otherwise hardness/softness invalid')
-    eta = (i - a)/2
+    # Use the response-consistent convention eta = d(mu)/dN ~ I-A,
+    # S = dN/d(mu) ~ 1/(I-A), so local softness s(r)=S*f(r).
+    # Some chemistry literature instead reports eta_half=(I-A)/2.
+    eta = i - a
     return {'I_eV': i, 'A_eV': a, 'electronegativity_eV': (i+a)/2,
-            'hardness_eV': eta, 'softness_inv_eV': 1/eta,
-            'hardness_convention': '(I-A)/2', 'softness_convention': '1/eta',
+            'hardness_eV': eta, 'hardness_half_gap_eV': eta/2,
+            'softness_inv_eV': 1/eta,
+            'hardness_convention': 'I-A (response-consistent)', 'softness_convention': '1/(I-A)',
             'model': evidence['physical_model'], 'reference': evidence['reference'],
             'source': evidence['source'], 'correction_record': evidence['correction_record'],
             'charge_state_protocol': evidence['charge_state_protocol'],
