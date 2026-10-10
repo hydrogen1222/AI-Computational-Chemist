@@ -32,7 +32,8 @@ class FukuiReportTests(unittest.TestCase):
                                "--preflight",str(self.pre),"--out",str(self.out),*map(str,args)],
                               capture_output=True,text=True,check=False)
     def test_unrun_methods_not_claimed_as_finished(self):
-        r=self.command()
+        # These assertions target the preserved verbose legacy report.
+        r=self.command("--detailed")
         self.assertEqual(r.returncode,0,r.stdout+r.stderr)
         content=self.out.read_text()
         self.assertIn("未提供已验收结果",content)
@@ -69,7 +70,7 @@ class FukuiReportTests(unittest.TestCase):
                          dict(atom_index=2,element="Li",f_plus=.5,f_minus=.5,f_zero=.5,dual=0),
                          dict(atom_index=3,element="Li",f_plus=.5,f_minus=.5,f_zero=.5,dual=0)])
         charges.with_suffix(".md").write_text("# Condensed QC\n\n**质量检查：** PASS\n")
-        r=self.command("--grid-audit",grid,"--condensed",charges)
+        r=self.command("--detailed","--grid-audit",grid,"--condensed",charges)
         self.assertEqual(r.returncode,0,r.stdout+r.stderr)
         content=self.out.read_text()
         for word in ("已通过网格检查","RMSE","multiwfn vs critic2",
