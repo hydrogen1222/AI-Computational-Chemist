@@ -188,6 +188,33 @@ identical to user-selected Bader/Chargemol atomic charge models.
   zero-valued data. **Treat it as a BLOCKER until a local fixed upstream
   release or an independently verified noncorrupt writing path is used.**
   Do not make changes to the researcher's clone silently.
+  Before any local FukuiGrid run, the AICC agent can execute this **read-only
+  known-regression guard**, substituting the user's real installation path:
+
+  ```bash
+  python tools/periodic-cdft/scripts/check_fukuigrid_writer.py \
+    --source ~/apps/FukuiGrid/FukuiGrid.py
+  ```
+
+  Exit 1 means a known zero-filter writer was detected: STOP that branch;
+  exit 2 means unsupported/invalid source: UNVERIFIED. Exit 0 means
+  **only that this known static defect was not found**, NOT that the writer
+  passed scientific regression. Before accepting an output, test a synthetic
+  CHGCAR-grid with an **interior true zero, a signed negative value, and
+  a final partially filled row**; read the output back and verify exactly
+  Ngrid ordered samples including zeros, matching cell/grid header and
+  expected integrated sum. For a real Fukui field also compare all grid
+  samples with the independently audited Critic2/Multiwfn finite difference.
+  Do not mark FukuiGrid PASS from source scan or scalar integral alone.
+
+  Suggested minimal *upstream* fix: write every genuine data sample,
+  including zeros, but never serialize artificial padding values:
+  `for i in range(0, fukui.size, 5):` followed by
+  `row=fukui[i:i+5]`, and
+  `" ".join(f"{v: .11E}" for v in row)` per row.
+  A GitHub issue/PR belongs in **cacarden/FukuiGrid**, not in AICC; any
+  published patch must include the tiny round-trip regression above.
+
 - **Interpolation:** Use separate 4-point sets on EACH side if
   available; menu `1 -> 11` for f- with default δN
   `[-0.15,-0.10,-0.05,0]`, `1 -> 12` for f+ with
