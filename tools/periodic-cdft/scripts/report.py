@@ -111,8 +111,9 @@ def summarize(preflight,grid,condensed_files,softness=None):
         if not all(math.isfinite(x) for x in vals) or vals[0]<=vals[1] or vals[3]<=0 or vals[4]<=0:
             raise ValueError("nonphysical global softness numbers")
         if (abs(vals[2]-(vals[0]+vals[1])/2)>1e-6 or
-                abs(vals[3]-(vals[0]-vals[1])/2)>1e-6 or
-                abs(vals[4]-1/vals[3])>1e-6):
+                abs(vals[3]-(vals[0]-vals[1]))>1e-6 or
+                abs(vals[4]-1/vals[3])>1e-6 or
+                abs(float(softness['hardness_half_gap_eV'])-vals[3]/2)>1e-6):
             raise ValueError("global softness algebra inconsistent")
         lines+=["## 额外的已审查能量模型：全局与局部软度","",
                 "**注意：** 这里只复述经过研究者独立审核的同体系能量输入；"
@@ -120,7 +121,10 @@ def summarize(preflight,grid,condensed_files,softness=None):
                 f"**物理模型/参考：** {clean(softness.get('model'))} / {clean(softness.get('reference'))}。",
                 f"**能量证据：** {clean(softness.get('source'))}。",
                 f"**I={vals[0]:.6g} eV，A={vals[1]:.6g} eV，"
-                f"chi={vals[2]:.6g} eV，eta={vals[3]:.6g} eV，S={vals[4]:.6g} eV^-1。**",
+                f"chi={vals[2]:.6g} eV，eta_response={vals[3]:.6g} eV，"
+                f"eta_half={vals[3]/2:.6g} eV，S_response={vals[4]:.6g} eV^-1。**",
+                "**公式约定：** S_response=1/(I-A)，此处 s(r)=S_response*f(r)；"
+                "若文献采用 eta_half=(I-A)/2、S_half=1/eta_half，需注意倍数差异。",
                 "局部软度 s±(r)=S*f±(r)，原子软度 s_A±=S*f_A±；"
                 "若未附相应 cube/CSV 与检查记录，则不得声称已输出或校验。",
                 ""]
