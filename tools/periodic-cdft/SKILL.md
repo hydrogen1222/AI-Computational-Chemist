@@ -113,6 +113,15 @@ Fukui over a fixed Bader basin (basins shift with density).
    checked condensed CSVs to generate one evidence-grounded Chinese
    summary. Agent then adds physical interpretation and installed-version
    information; never claim missing methods ran.
+   **For human-facing slides, also run `scripts/ppt_summary.py` using the
+   SAME validated artifacts** to create one short
+   `postprocess/periodic_cdft/comparison/ppt_summary.md` (do not overwrite).
+   It summarizes f+/f-/f0/dual, the same-grid agreement and element-mean
+   condensed f_A by Bader/Hirshfeld/DDEC6, deliberately omitting redundant
+   H/CM5 rows. Add concrete anomalies using `--warning` (e.g., Bader
+   symmetry WARN) rather than silently implying all atom basins passed.
+   Keep the short version to one slide, full evidence in the original report;
+   neither may invent values or call nonvalidated periodic chi/softness PASS.
    Quantitative statements must be generated from actual measured files;
    do **not** publish placeholder output as a result. Plotting final
    figures follows `tools/plotting/SKILL.md`.
