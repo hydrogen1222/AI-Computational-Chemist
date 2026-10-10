@@ -69,7 +69,11 @@ Fukui over a fixed Bader basin (basins shift with density).
    (A) Multiwfn grid module **13**, density-grid arithmetic, for f±;
    (B) Critic2 VASP LOAD/LOAD AS/CUBE GRID, for f±;
    (C) FukuiGrid finite-difference grid arithmetic for f± **only if its
-   installed writer has passed zero-valued-grid regression**.
+   installed writer has passed zero-valued-grid regression**. Run the
+   read-only `scripts/check_fukuigrid_writer.py --source PATH/FukuiGrid.py`
+   first to block the known upstream zero-filter implementation; a
+   non-blocking scan is NOT sufficient without a real zero-valued data
+   round-trip and pointwise comparison.
    FukuiGrid's separate **fractional-occupation interpolation** uses
    independently chosen 4-or-more matching density points on each side.
    The two FukuiGrid *potential* corrections (electrodes / SCPC) are
