@@ -335,6 +335,35 @@ SCF/localization/PBC evidence, reproducible commands and scientifically
 qualified interpretation to that **single** report, not extra Markdown
 files in the research root.
 
+## 3b. Optional PPT-ready Chinese summary (one slide)
+
+The existing `report.py` emits detailed scientific evidence. To avoid
+copying long audit logs into slides, use the separate **non-computational**
+`ppt_summary.py` on the **same** QC-passed inputs. It reports f+/f-/f0
+and dual, same-grid engine agreement, and condensed f_A indices by a
+small set of nonredundant atomic charge models. It preserves negative
+values, marks missing calculations, and does not claim physical reaction
+mechanisms. It does not derive a physical local softness without validated
+global softness.
+
+```bash
+python tools/periodic-cdft/scripts/ppt_summary.py \
+  --preflight /project/Li2S/postprocess/periodic_cdft/comparison/preflight.json \
+  --grid-audit /project/Li2S/postprocess/periodic_cdft/comparison/grid_audit_round2.json \
+  --condensed /project/Li2S/postprocess/periodic_cdft/comparison/condensed_chargemol_h.csv \
+  --condensed /project/Li2S/postprocess/periodic_cdft/comparison/condensed_ddec6.csv \
+  --condensed /project/Li2S/postprocess/periodic_cdft/comparison/condensed_bader.csv \
+  --system Li2S \
+  --warning 'Bader equivalent Li sites: charge/basin symmetry WARN, not resolved' \
+  --out /project/Li2S/postprocess/periodic_cdft/comparison/ppt_summary.md
+```
+
+Include the charge method label beside each atomic index and report
+`f_A0` and `dual_A` explicitly. Never interpret successful charge-sum QC
+as proof that equivalent atoms have equal basins. The agent should read
+`ppt_summary.md`, verify it against full QC and (if needed) hand-place
+the concise table on a PPT slide; no bulky root reports.
+
 ## 4. Failure-mode checklist and ownership
 
 `CHGCAR` vs `CHG` vs all-electron densities are not interchangeable.
