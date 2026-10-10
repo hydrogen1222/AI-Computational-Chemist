@@ -206,9 +206,6 @@ def summarize_readable(preflight,grid,condensed_files,softness=None,system="å‘¨æ
     by_name={p.stem:p for p in condensed_files if p.stem in labels}
     # Show representative charge partitions; the full CSVs preserve all
     # individually resolved atoms, independent implementations and CM5.
-    priority=("condensed_chargemol_h","condensed_multiwfn_h",
-              "condensed_chargemol_cm5","condensed_multiwfn_cm5",
-              "condensed_ddec6","condensed_bader")
     selected=[]
     for prefix in (("condensed_chargemol_h","condensed_multiwfn_h",
                     "condensed_chargemol_cm5","condensed_multiwfn_cm5"),
