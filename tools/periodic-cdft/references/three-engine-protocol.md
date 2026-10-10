@@ -247,14 +247,16 @@ summary, not CSV only. Different population definitions must remain
 distinct; Hirshfeld-I is currently **blocked** unless convergence has
 been independently validated — Li2S case was not converged.
 
-**Additional CDFT global indices:** vertical ionization energy,
-electron affinity, electronegativity, hardness, softness and Parr
-electrophilicity can be derived only from **justifiable total
-energy differences with a physical vacuum/reference and PBC charged
-cell correction**. Report `NOT_VALIDATED_FOR_CHARGED_PBC` by default;
-do NOT compute a table of spurious `I`, `A` and `η` from arbitrary
-background-charged VASP TOTEN. Same for physical reaction rates or
-barriers; a Fukui map alone cannot predict them.
+**Additional CDFT global indices:** see
+`references/global-local-softness.md`. A physically defensible SAME-system
+integer vertical `I/A` with electrostatic corrections, finite-size tests
+and common energy reference as appropriate is mandatory before `chi`,
+`eta`, `S` or `s(r)=S*f(r)` can be claimed quantitatively. The auxiliary
+`scripts/softness.py` refuses arbitrary background-charged PBC TOTEN,
+fractional `N±0.1` energies, KS band gap proxies and unrelated cluster
+results. Without evidence mark all energy-dependent indices
+`NOT_VALIDATED_FOR_CHARGED_PBC`; do not interpret kinetic barriers
+from Fukui maps.
 
 ## 3. What the comparison report must include
 
