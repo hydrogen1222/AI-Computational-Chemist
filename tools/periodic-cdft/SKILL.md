@@ -109,19 +109,20 @@ Fukui over a fixed Bader basin (basins shift with density).
    case and filenames, method names/δN, all requested available results,
    QC/integrals/side-by-side figures, scientifically qualified findings,
    `NOT_AVAILABLE`/failed statuses, and reproducible commands.
-   Use `scripts/report.py` with validated preflight/grid-audit JSON and
-   checked condensed CSVs to generate one evidence-grounded Chinese
-   summary. Agent then adds physical interpretation and installed-version
-   information; never claim missing methods ran.
-   **For human-facing slides, also run `scripts/ppt_summary.py` using the
-   SAME validated artifacts** to create one short
-   `postprocess/periodic_cdft/comparison/ppt_summary.md` (do not overwrite).
-   It summarizes f+/f-/f0/dual, the same-grid agreement and element-mean
-   condensed f_A by Bader/Hirshfeld/DDEC6, deliberately omitting redundant
-   H/CM5 rows. Add concrete anomalies using `--warning` (e.g., Bader
-   symmetry WARN) rather than silently implying all atom basins passed.
-   Keep the short version to one slide, full evidence in the original report;
-   neither may invent values or call nonvalidated periodic chi/softness PASS.
+   Use `scripts/report.py` with the validated preflight/grid-audit
+   JSON and condensed CSVs to generate **one concise Chinese scientific
+   results report** (`comparison/periodic_cdft_report.md`, default).
+   Readers should see what was calculated, the main numerical findings,
+   method-dependent atomic Fukui values and outstanding physical limits
+   without reading raw logs or dozens of per-atom tables.
+   All raw QC data remain in the existing JSON/CSV files; optional
+   `--detailed` produces the legacy verbose report, **not** a second
+   mandatory Markdown artifact. Provide an explicit `--warning` for
+   issues found during manual scientific review, e.g. Bader symmetry
+   WARN; software sum-rule checks alone do not establish equivalence.
+   Do not auto-add large appendices or create a separate slide/PPT report.
+   Neither format may invent values or call nonvalidated periodic
+   electronegativity/hardness/softness PASS.
    Quantitative statements must be generated from actual measured files;
    do **not** publish placeholder output as a result. Plotting final
    figures follows `tools/plotting/SKILL.md`.
