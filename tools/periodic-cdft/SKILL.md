@@ -35,6 +35,10 @@ potential:
 - `f- = [rho(N) - rho(N−δ-)]/δ-` (δ- > 0; electron **removal**);
 - `f0 = (f+ + f-)/2` (declared averaged-response convention);
 - `dual = f+ − f-` (sign convention mandatory);
+  `dual>0` is **electron-accepting/electrophilic site** (susceptible to
+  nucleophilic attack); `dual<0` is **electron-donating/nucleophilic site**
+  (susceptible to electrophilic attack). Never reverse a site label with
+  the name of the reagent attacking it.
 - `f_A+ = [q_A(N)−q_A(N+δ+)]/δ+`,
   `f_A- = [q_A(N−δ-)−q_A(N)]/δ-`, q = ZVAL − population,
   and condensed f_A0 / dual analogous.
