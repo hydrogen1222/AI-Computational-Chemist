@@ -1,6 +1,6 @@
 ---
 name: periodic-cdft
-description: Use for periodic VASP charge-density Fukui functions f+/f-/f0, dual descriptor, condensed atomic Fukui indices and optional Fukui potentials, using independently installed Multiwfn, Critic2, and FukuiGrid. Scientific preflight and method-by-method comparison; no external code bundled.
+description: Use for periodic VASP Fukui functions f+/f-/f0, dual descriptor, condensed atomic Fukui indices, and evidence-gated electronegativity, hardness, global and local softness. Independent Multiwfn, Critic2, FukuiGrid; strict charged-PBC science checks; no external code bundled.
 ---
 
 # Periodic conceptual DFT / Fukui functions (three external engines)
@@ -35,6 +35,10 @@ potential:
 - `f- = [rho(N) - rho(N−δ-)]/δ-` (δ- > 0; electron **removal**);
 - `f0 = (f+ + f-)/2` (declared averaged-response convention);
 - `dual = f+ − f-` (sign convention mandatory);
+  `dual>0` is **electron-accepting/electrophilic site** (susceptible to
+  nucleophilic attack); `dual<0` is **electron-donating/nucleophilic site**
+  (susceptible to electrophilic attack). Never reverse a site label with
+  the name of the reagent attacking it.
 - `f_A+ = [q_A(N)−q_A(N+δ+)]/δ+`,
   `f_A- = [q_A(N−δ-)−q_A(N)]/δ-`, q = ZVAL − population,
   and condensed f_A0 / dual analogous.
@@ -65,7 +69,11 @@ Fukui over a fixed Bader basin (basins shift with density).
    (A) Multiwfn grid module **13**, density-grid arithmetic, for f±;
    (B) Critic2 VASP LOAD/LOAD AS/CUBE GRID, for f±;
    (C) FukuiGrid finite-difference grid arithmetic for f± **only if its
-   installed writer has passed zero-valued-grid regression**.
+   installed writer has passed zero-valued-grid regression**. Run the
+   read-only `scripts/check_fukuigrid_writer.py --source PATH/FukuiGrid.py`
+   first to block the known upstream zero-filter implementation; a
+   non-blocking scan is NOT sufficient without a real zero-valued data
+   round-trip and pointwise comparison.
    FukuiGrid's separate **fractional-occupation interpolation** uses
    independently chosen 4-or-more matching density points on each side.
    The two FukuiGrid *potential* corrections (electrodes / SCPC) are
@@ -108,6 +116,45 @@ Fukui over a fixed Bader basin (basins shift with density).
    Quantitative statements must be generated from actual measured files;
    do **not** publish placeholder output as a result. Plotting final
    figures follows `tools/plotting/SKILL.md`.
+
+## Additional global and local softness (validated energy models only)
+
+Read **`references/global-local-softness.md`** BEFORE claiming any periodic
+electronegativity, chemical hardness, global softness, local softness, or
+atomic condensed softness. To retain the chain-rule definition
+`s(r)=(d rho(r)/d mu)_v=S*f(r)`, the executable uses the
+**response-consistent** `eta=I-A`, `S=1/(I-A)` convention and also
+reports `eta_half=(I-A)/2` as a separate, explicitly named chemistry
+convention. `chi=(I+A)/2`, `s±(r)=S*f±(r)`, `s_A±=S*f_A±`.
+**Never conflate `S=1/eta_half` with `(dN/dmu)_v`; it differs by two.**
+The space/atom dual softness is `S*(f+−f−)`, not a new independently
+measured property. There is no model-independent `atomic chi` obtained
+from Bader/Hirshfeld/DDEC6 charges, and local hardness must **not** be
+invented as `1/s(r)` or `1/s_A`.
+
+- `N±0.1` charged periodic VASP `TOTEN` is **not** vertical integer
+  `I/A`. Raw background-charged PBC total energies, an uncorrected PBE
+  band gap, or unrelated cluster `I/A` cannot certify periodic `chi/eta/S`.
+  Physical charge corrections, finite-size convergence, common vacuum/
+  electrode reference as applicable, same model and independent review
+  are required. If missing: **NOT_VALIDATED_FOR_CHARGED_PBC**; retain the
+  already verified Fukui results without inventing energy-based indices.
+- Only after evidence review, use `scripts/softness.py` with the same
+  case's `preflight.json`, `grid_audit.json`, an evidence file containing
+  reviewed vertical `I/A` and optionally QC-passed condensed charge CSVs.
+  It exports `global_indices.json`, signed 3-D `s` cubes, and atom-wise
+  `s_A` CSVs; source files remain untouched. A checksum binding and
+  fail-closed guards prevent most accidental mismatches; no script can
+  prove the supplied physical `I/A` are correct without researcher review.
+- Check `integral(s±)=S`, `sum_A(s_A±)=S`, dual integrals/sums zero,
+  unit eV^-1 per spatial volume, negative lobes and per-partition methods.
+  Global softness for an extended solid depends on system size/ensemble:
+  do not present unnormalized supercell numbers as intrinsic material data.
+- Add available validated numbers and missing statuses to the project's
+  **single** `postprocess/periodic_cdft/comparison/periodic_cdft_report.md`
+  only. No speculative interpretation of HSAB reaction kinetics. See the
+  references document for installation list (FukuiGrid, Henkelman bader),
+  mandatory metadata schema and local regression tests.
 
 ## Things deliberately out of scope for a first cross-check
 

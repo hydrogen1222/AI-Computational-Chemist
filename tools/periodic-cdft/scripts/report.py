@@ -7,6 +7,7 @@ a planned input file; only successfully QC'd files count as computed.
 from __future__ import annotations
 import argparse
 import csv
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -18,7 +19,7 @@ FIELDS=("fplus","fminus","fzero","dual")
 def clean(v):
     return str(v if v is not None else "").replace("|",r"\|").replace("\r"," ").replace("\n"," ").strip()
 
-def summarize(preflight,grid,condensed_files):
+def summarize(preflight,grid,condensed_files,softness=None):
     if preflight.get("status")!="INPUT_GRID_PASS_SCF_MANUAL_CHECK":
         raise ValueError("VASP density preflight not passed")
     cases=preflight["states"]
@@ -102,6 +103,31 @@ def summarize(preflight,grid,condensed_files):
             "不同电荷模型不应混在一张表解释为同一物理量。"
             "Fukui 函数不能单独预测实际电解质–金属界面分解势垒。",
             ""]
+    if softness is not None:
+        if softness.get("status")!="ENERGY_MODEL_REVIEWED_NOT_PBC_CONVERGENCE_PROVEN_BY_SCRIPT":
+            raise ValueError("softness provenance does not have reviewed status")
+        keys=("I_eV","A_eV","electronegativity_eV","hardness_eV","softness_inv_eV")
+        vals=[float(softness[k]) for k in keys]
+        if not all(math.isfinite(x) for x in vals) or vals[0]<=vals[1] or vals[3]<=0 or vals[4]<=0:
+            raise ValueError("nonphysical global softness numbers")
+        if (abs(vals[2]-(vals[0]+vals[1])/2)>1e-6 or
+                abs(vals[3]-(vals[0]-vals[1]))>1e-6 or
+                abs(vals[4]-1/vals[3])>1e-6 or
+                abs(float(softness['hardness_half_gap_eV'])-vals[3]/2)>1e-6):
+            raise ValueError("global softness algebra inconsistent")
+        lines+=["## 额外的已审查能量模型：全局与局部软度","",
+                "**注意：** 这里只复述经过研究者独立审核的同体系能量输入；"
+                "脚本不替代周期性静电修正、能量对齐与尺寸收敛。","",
+                f"**物理模型/参考：** {clean(softness.get('model'))} / {clean(softness.get('reference'))}。",
+                f"**能量证据：** {clean(softness.get('source'))}。",
+                f"**I={vals[0]:.6g} eV，A={vals[1]:.6g} eV，"
+                f"chi={vals[2]:.6g} eV，eta_response={vals[3]:.6g} eV，"
+                f"eta_half={vals[3]/2:.6g} eV，S_response={vals[4]:.6g} eV^-1。**",
+                "**公式约定：** S_response=1/(I-A)，此处 s(r)=S_response*f(r)；"
+                "若文献采用 eta_half=(I-A)/2、S_half=1/eta_half，需注意倍数差异。",
+                "局部软度 s±(r)=S*f±(r)，原子软度 s_A±=S*f_A±；"
+                "若未附相应 cube/CSV 与检查记录，则不得声称已输出或校验。",
+                ""]
     if grid and grid.get("status")=="PASS_GRID_ARITHMETIC_ONLY_NOT_PBC_PHYSICS" and comparison:
         lines+=["## 可用于组会的初步结论","",
                 "在给定的统一电子数扰动与网格规范下，现有三维 Fukui 输出"
@@ -125,6 +151,7 @@ def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--preflight",type=Path,required=True)
     p.add_argument("--grid-audit",type=Path,help="Validated grid_audit JSON (optional)")
+    p.add_argument("--softness-json",type=Path,help="Optional reviewed global_indices.json from softness.py")
     p.add_argument("--condensed",action="append",type=Path,default=[],
                    help="Any validated condensed_*.csv (repeat)")
     p.add_argument("--out",type=Path,required=True)
@@ -136,7 +163,10 @@ def main(argv=None):
             raise ValueError("grid_audit not passed")
         if a.out.exists() or not a.out.parent.is_dir():
             raise ValueError("report path exists or parent missing; refusing overwrite")
-        report=summarize(pre,grid,a.condensed)
+        soft=json.loads(a.softness_json.read_text(encoding="utf-8")) if a.softness_json else None
+        if soft and soft.get("source_preflight_sha256")!=hashlib.sha256(a.preflight.read_bytes()).hexdigest():
+            raise ValueError("softness evidence not bound to this preflight.json")
+        report=summarize(pre,grid,a.condensed,soft)
         a.out.write_text(report,encoding="utf-8")
         print(f"中文报告：{a.out}")
         return 0
