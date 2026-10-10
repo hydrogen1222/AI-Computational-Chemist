@@ -117,9 +117,12 @@ Fukui over a fixed Bader basin (basins shift with density).
 
 Read **`references/global-local-softness.md`** BEFORE claiming any periodic
 electronegativity, chemical hardness, global softness, local softness, or
-atomic condensed softness. In the declared half-gap convention,
-`chi=(I+A)/2`, `eta=(I-A)/2`, `S=1/eta`,
-`s±(r)=S*f±(r)`, `s_A±=S*f_A±`.
+atomic condensed softness. To retain the chain-rule definition
+`s(r)=(d rho(r)/d mu)_v=S*f(r)`, the executable uses the
+**response-consistent** `eta=I-A`, `S=1/(I-A)` convention and also
+reports `eta_half=(I-A)/2` as a separate, explicitly named chemistry
+convention. `chi=(I+A)/2`, `s±(r)=S*f±(r)`, `s_A±=S*f_A±`.
+**Never conflate `S=1/eta_half` with `(dN/dmu)_v`; it differs by two.**
 The space/atom dual softness is `S*(f+−f−)`, not a new independently
 measured property. There is no model-independent `atomic chi` obtained
 from Bader/Hirshfeld/DDEC6 charges, and local hardness must **not** be
