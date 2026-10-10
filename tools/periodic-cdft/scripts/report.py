@@ -78,7 +78,7 @@ def summarize(preflight,grid,condensed_files,softness=None):
             required={"atom_index","element","f_plus","f_minus","f_zero","dual"}
             if not required.issubset(entries[0]):
                 raise ValueError(f"{file.name}: condensed CSV missing columns")
-            lines.append(f"**来源：** \`{clean(file)}\`（{len(entries)} 个原子）")
+            lines.append(f"**来源：** `{clean(file)}`（{len(entries)} 个原子）")
             lines+=["",
                 "| 原子序号 | 元素 | f_A+ | f_A− | f_A0 | Δf_A |",
                 "|---:|---|---:|---:|---:|---:|"]
