@@ -335,34 +335,43 @@ SCF/localization/PBC evidence, reproducible commands and scientifically
 qualified interpretation to that **single** report, not extra Markdown
 files in the research root.
 
-## 3b. Optional PPT-ready Chinese summary (one slide)
+## 3b. Concise results report by default (no extra slide file)
 
-The existing `report.py` emits detailed scientific evidence. To avoid
-copying long audit logs into slides, use the separate **non-computational**
-`ppt_summary.py` on the **same** QC-passed inputs. It reports f+/f-/f0
-and dual, same-grid engine agreement, and condensed f_A indices by a
-small set of nonredundant atomic charge models. It preserves negative
-values, marks missing calculations, and does not claim physical reaction
-mechanisms. It does not derive a physical local softness without validated
-global softness.
+The existing \`scripts/report.py\` CLI now writes **one short Chinese
+research-results report** by default, still named \`periodic_cdft_report.md\`.
+The same source \`preflight.json\`, \`grid_audit.json\` and validated
+\`condensed_*.csv\` are required. It reports which spatial f+/f-/f0/dual
+actually passed QC, pointwise agreement for matching finite differences,
+and element-mean condensed f_A values from representative population
+partitions (Hirshfeld/CM5, DDEC6 and Bader when present). Original CSVs
+retain all per-atom values and independent variants; no data are deleted.
 
-```bash
-python tools/periodic-cdft/scripts/ppt_summary.py \
-  --preflight /project/Li2S/postprocess/periodic_cdft/comparison/preflight.json \
-  --grid-audit /project/Li2S/postprocess/periodic_cdft/comparison/grid_audit_round2.json \
-  --condensed /project/Li2S/postprocess/periodic_cdft/comparison/condensed_chargemol_h.csv \
-  --condensed /project/Li2S/postprocess/periodic_cdft/comparison/condensed_ddec6.csv \
-  --condensed /project/Li2S/postprocess/periodic_cdft/comparison/condensed_bader.csv \
+Example for the validated Li2S datasets:
+
+\`\`\`bash
+python tools/periodic-cdft/scripts/report.py \
+  --preflight postprocess/periodic_cdft/comparison/preflight.json \
+  --grid-audit postprocess/periodic_cdft/comparison/grid_audit_round2.json \
+  --condensed postprocess/periodic_cdft/comparison/condensed_chargemol_h.csv \
+  --condensed postprocess/periodic_cdft/comparison/condensed_ddec6.csv \
+  --condensed postprocess/periodic_cdft/comparison/condensed_bader.csv \
   --system Li2S \
-  --warning 'Bader equivalent Li sites: charge/basin symmetry WARN, not resolved' \
-  --out /project/Li2S/postprocess/periodic_cdft/comparison/ppt_summary.md
-```
+  --warning 'Bader equivalent Li atoms: charge/basin symmetry WARN, unresolved' \
+  --out postprocess/periodic_cdft/comparison/periodic_cdft_report.md
+\`\`\`
 
-Include the charge method label beside each atomic index and report
-`f_A0` and `dual_A` explicitly. Never interpret successful charge-sum QC
-as proof that equivalent atoms have equal basins. The agent should read
-`ppt_summary.md`, verify it against full QC and (if needed) hand-place
-the concise table on a PPT slide; no bulky root reports.
+The output destination must **not already exist**; keep the existing
+report safe and use a separately named destination for a new run, or ask
+the researcher before replacing it. Use \`--detailed\` only when a
+full numeric audit is explicitly needed; do not routinely generate
+both modes or append large logs to the default report.
+
+The report generator checks input QC before summarizing; it does **not**
+independently infer whether chemically equivalent atoms are symmetric.
+Pass observed scientific cautions with \`--warning\`, preserve signed
+values, and never imply that method-dependent condensed indices are
+unique observables. Do not calculate global/local softness from raw
+charged-PBC total energies merely to fill a report.
 
 ## 4. Failure-mode checklist and ownership
 
