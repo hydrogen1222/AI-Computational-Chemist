@@ -67,7 +67,7 @@ python tools/periodic-cdft/scripts/preflight.py \
   --manifest /project/fukui_vasp/cdft_states.json
 ```
 
-After the output has passed operator review, the agent may record a
+After the output has passed the researcher's review, the agent may record a
 machine-readable manifest fingerprint in an already-prepared output dir:
 `--write /project/fukui_vasp/postprocess/periodic_cdft/data/preflight.json`.
 No overwrites. `SCF_EDIFF_marker=false` is a warning that requires manual

@@ -1,22 +1,24 @@
 #!/usr/bin/env sh
-# Install the AICC skills for Claude Code and/or Codex.
+# Install the AICC skills for Claude Code, Codex and pi.
 set -eu
 
 usage() {
   cat <<'USAGE'
-Usage: ./install.sh [--harness claude|codex|both] [--project DIR] [--force] [--dry-run]
+Usage: ./install.sh [--harness LIST] [--project DIR] [--force] [--dry-run]
 
 Copies the collection, rewrites tools/... knowledge/... procedures/... references
 in the copy to absolute paths, then symlinks every skill into the harness's
 skills folder. Re-run after `git pull` to update (use --force).
 
   global (default)      copy -> ~/.local/share/aicc
-                        claude -> ~/.claude/skills    codex -> ${CODEX_HOME:-~/.codex}/skills
+                        claude -> ~/.claude/skills
+                        codex  -> ${CODEX_HOME:-~/.codex}/skills
+                        pi     -> ~/.agents/skills
   --project DIR         copy -> DIR/.aicc
                         claude -> DIR/.claude/skills + DIR/CLAUDE.md
-                        codex  -> DIR/.agents/skills + DIR/AGENTS.md
+                        codex, pi -> DIR/.agents/skills + DIR/AGENTS.md
 
-  --harness   claude, codex or both (default: both)
+  --harness   comma list of claude, codex, pi, or all (default: all)
   --force     replace an existing copy and existing skill links of the same name
   --dry-run   print what would happen
 
@@ -27,7 +29,7 @@ USAGE
 die() { printf 'install.sh: %s\n' "$*" >&2; exit 1; }
 run() { printf '  %s\n' "$*"; [ "$DRY_RUN" -eq 1 ] || "$@"; }
 
-HARNESS=both PROJECT="" FORCE=0 DRY_RUN=0
+HARNESS=all PROJECT="" FORCE=0 DRY_RUN=0
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --harness) [ "$#" -ge 2 ] || die "--harness needs a value"; HARNESS="$2"; shift 2 ;;
@@ -38,8 +40,11 @@ while [ "$#" -gt 0 ]; do
     *) die "unknown option: $1 (see --help)" ;;
   esac
 done
-case "$HARNESS" in claude|codex|both) ;; *) die "--harness must be claude, codex or both" ;; esac
-wants() { [ "$HARNESS" = both ] || [ "$HARNESS" = "$1" ]; }
+[ "$HARNESS" = both ] && HARNESS=claude,codex   # older spelling
+for h in $(printf '%s' "$HARNESS" | tr ',' ' '); do
+  case "$h" in claude|codex|pi|all) ;; *) die "unknown harness '$h' (claude, codex, pi, all)" ;; esac
+done
+wants() { case ",$HARNESS," in *,all,*|*,"$1",*) return 0 ;; esac; return 1; }
 
 REPO="$(cd "$(dirname "$0")" && pwd -P)"
 [ -d "$REPO/tools" ] && [ -d "$REPO/procedures" ] || die "run from an AICC checkout"
@@ -50,10 +55,12 @@ if [ -n "$PROJECT" ]; then
   COPY="$PROJECT/.aicc"
   CLAUDE_SKILLS="$PROJECT/.claude/skills"
   CODEX_SKILLS="$PROJECT/.agents/skills"
+  PI_SKILLS="$PROJECT/.agents/skills"
 else
   COPY="${XDG_DATA_HOME:-$HOME/.local/share}/aicc"
   CLAUDE_SKILLS="$HOME/.claude/skills"
   CODEX_SKILLS="${CODEX_HOME:-$HOME/.codex}/skills"
+  PI_SKILLS="$HOME/.agents/skills"
 fi
 
 # 1. Copy the collection.
@@ -116,9 +123,15 @@ link_instructions() {  # link_instructions <file name>
 
 wants claude && link_skills "$CLAUDE_SKILLS"
 wants codex && link_skills "$CODEX_SKILLS"
+if wants pi && { ! wants codex || [ "$PI_SKILLS" != "$CODEX_SKILLS" ]; }; then
+  link_skills "$PI_SKILLS"
+fi
 if [ -n "$PROJECT" ]; then
   wants claude && link_instructions CLAUDE.md
-  wants codex && link_instructions AGENTS.md
+  if wants codex || wants pi; then link_instructions AGENTS.md; fi
+fi
+if [ -z "$PROJECT" ] && { wants codex || wants pi; }; then
+  printf 'Global installs do not set AGENTS.md; use --project DIR, or point your agent at %s/AGENTS.md\n' "$COPY"
 fi
 
 printf '\nDone. Restart the agent so it reloads skills.\n'

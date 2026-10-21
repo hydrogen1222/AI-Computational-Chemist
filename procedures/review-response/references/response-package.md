@@ -90,7 +90,7 @@ Sincerely,
 
 ## AUTHOR_INPUT_NEEDED blocks
 
-Use this marker only when a human author or operator must decide something that the
+Use this marker only when the author must decide something that the
 agent cannot honestly choose:
 
 - a result contradicts or weakens a manuscript claim;
