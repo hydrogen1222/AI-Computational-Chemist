@@ -268,22 +268,25 @@ def main(argv=None):
     p.add_argument("--system",default="周期性体系",help="Human-friendly system name")
     p.add_argument("--warning",action="append",default=[],help="Important unresolved numerical issue")
     p.add_argument("--detailed",action="store_true",help="Legacy long-form numerical audit report")
-    p.add_argument("--out",type=Path,required=True)
+    p.add_argument("--out",type=Path,required=True,help="Usually postprocess/periodic_cdft/report.md")
+    p.add_argument("--force",action="store_true",help="Replace an existing report (the report only; data are never overwritten)")
     a=p.parse_args(argv)
     try:
         pre=json.loads(a.preflight.read_text(encoding="utf-8"))
         grid=json.loads(a.grid_audit.read_text(encoding="utf-8")) if a.grid_audit else None
         if grid and grid.get("status")!="PASS_GRID_ARITHMETIC_ONLY_NOT_PBC_PHYSICS":
             raise ValueError("grid_audit not passed")
-        if a.out.exists() or not a.out.parent.is_dir():
-            raise ValueError("report path exists or parent missing; refusing overwrite")
+        if not a.out.parent.is_dir():
+            raise ValueError(f"report folder missing: {a.out.parent}")
+        if a.out.exists() and not a.force:
+            raise ValueError("report exists; pass --force to regenerate it")
         soft=json.loads(a.softness_json.read_text(encoding="utf-8")) if a.softness_json else None
         if soft and soft.get("source_preflight_sha256")!=hashlib.sha256(a.preflight.read_bytes()).hexdigest():
             raise ValueError("softness evidence not bound to this preflight.json")
         report=(summarize(pre,grid,a.condensed,soft) if a.detailed else
                 summarize_readable(pre,grid,a.condensed,soft,a.system,a.warning))
         a.out.write_text(report,encoding="utf-8")
-        print(f"中文报告：{a.out}")
+        print(f"报告：{a.out}")
         return 0
     except (ValueError,OSError,KeyError,TypeError,json.JSONDecodeError) as exc:
         print(f"PERIODIC CDFT REPORT FAILED: {exc}",file=sys.stderr)

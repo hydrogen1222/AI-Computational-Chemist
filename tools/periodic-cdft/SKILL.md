@@ -61,8 +61,15 @@ Fukui over a fixed Bader basin (basins shift with density).
    grid or electron count. For *real* runs, verify source SCF convergence,
    wavefunction/occupation and spin manually as well; parser-only checks
    cannot establish physical validity.
-2. Create isolated result directories **under the research project**:
-   `postprocess/periodic_cdft/{multiwfn,critic2,fukuigrid,comparison}/`.
+2. Use one output folder **under the research project**:
+
+   ```text
+   postprocess/periodic_cdft/
+     report.md     the only file the user needs to open
+     data/         preflight.json, grid_audit.json, condensed_*.csv, softness/
+     work/         multiwfn/, critic2/, fukuigrid/ — cubes, inputs, logs
+   ```
+
    Keep originals read-only, stage symlinks or copies only after conflict
    checks, record executable paths, versions, local command/script and logs.
 3. Using the SAME validated N±δ VASP densities, run:
@@ -104,14 +111,13 @@ Fukui over a fixed Bader basin (basins shift with density).
    Compare condensed indices **within the same population model across
    three states**, not across arbitrary charge conventions. Include
    volume/unit normalization and grid conservation in the Chinese report.
-7. Deliver concise Chinese `periodic_cdft_report.md` under the project's
-   single `postprocess/periodic_cdft/comparison/` folder: purpose, exact
+7. Deliver the concise Chinese `postprocess/periodic_cdft/report.md`: purpose, exact
    case and filenames, method names/δN, all requested available results,
    QC/integrals/side-by-side figures, scientifically qualified findings,
    `NOT_AVAILABLE`/failed statuses, and reproducible commands.
    Use `scripts/report.py` with the validated preflight/grid-audit
    JSON and condensed CSVs to generate **one concise Chinese scientific
-   results report** (`comparison/periodic_cdft_report.md`, default).
+   results report** (`report.md`; `--force` regenerates it after new data).
    Readers should see what was calculated, the main numerical findings,
    method-dependent atomic Fukui values and outstanding physical limits
    without reading raw logs or dozens of per-atom tables.
@@ -161,7 +167,7 @@ invented as `1/s(r)` or `1/s_A`.
   Global softness for an extended solid depends on system size/ensemble:
   do not present unnormalized supercell numbers as intrinsic material data.
 - Add available validated numbers and missing statuses to the project's
-  **single** `postprocess/periodic_cdft/comparison/periodic_cdft_report.md`
+  **single** `postprocess/periodic_cdft/report.md`
   only. No speculative interpretation of HSAB reaction kinetics. See the
   references document for installation list (FukuiGrid, Henkelman bader),
   mandatory metadata schema and local regression tests.

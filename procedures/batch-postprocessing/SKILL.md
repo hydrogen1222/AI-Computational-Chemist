@@ -22,10 +22,20 @@ the user for shell loops, Python or menu sequences.
    Sources stay read-only; outputs go to `<run>/postprocess/<method>/`; one failing
    case does not stop the others; nothing is silently overwritten.
 5. **Validate and aggregate.** Check atom/species mapping, grids, references, return
-   codes and the tool's own quality indicators. Write CSV/JSON with each case's source
-   path, status, units and convention, under `ROOT/postprocess_summary/`.
-6. **Hand over** a short summary (trends, outliers, limits), paths to the tables, and
-   the rerun command.
+   codes and the tool's own quality indicators. Tables (with each case's source path,
+   status, units and convention) go to `data/`, previews to `figures/`.
+6. **Report.** Write one Chinese `report.md` next to them: overview table, failed
+   cases with reasons (once, up front), the key numbers with a PPT-ready sentence,
+   figures embedded, long per-atom tables collapsed in `<details>`.
+7. **Hand over** the `report.md` path, a one-line result, and the rerun command.
+   Do not list folders or individual CSVs.
+
+Output layout (charges and periodic Fukui already follow it; new helpers should too):
+
+```text
+ROOT/postprocess_summary/          or  postprocess/periodic_cdft/
+  report.md   figures/   data/         report.md   data/   work/
+```
 
 ## Where the batch tooling lives
 

@@ -5,7 +5,7 @@ import sys
 from tempfile import TemporaryDirectory
 import unittest
 
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"/"periodic-cdft"/"scripts"))
 from report import summarize, summarize_readable, main
 
 PRE={
@@ -58,8 +58,8 @@ class TestReadableReport(unittest.TestCase):
         paths=[self.make_table("chargemol_h",.36,.63),
                self.make_table("ddec6",.78,1.0),
                self.make_table("bader",.82,.90)]
-        short=summarize_readable(PRE,self.passed_grid(),paths,"Li₂S",
-                                 ["Bader 两个等价 Li 位点不一致"])
+        short=summarize_readable(PRE,self.passed_grid(),paths,system="Li₂S",
+                                 warnings=["Bader 两个等价 Li 位点不一致"])
         self.assertIn("# Li₂S｜周期性概念 DFT 结果",short)
         self.assertIn("Multiwfn、Critic2、FukuiGrid",short)
         self.assertIn("1.6e-07",short)
@@ -75,14 +75,14 @@ class TestReadableReport(unittest.TestCase):
         self.assertIn("## 同一种有限差分近似下的软件对照",detailed)
 
     def test_grid_missing_never_claims_three_engine_agreement(self):
-        text=summarize_readable(PRE,None,[],"Li₂S")
+        text=summarize_readable(PRE,None,[],system="Li₂S")
         self.assertIn("尚未获得完整的已验收网格",text)
         self.assertNotIn("软件一致性：已验收",text)
 
     def test_missing_derived_field_not_claimed(self):
         grid=self.passed_grid()
         del grid["fields"]["fukuigrid-fd:dual"]
-        short=summarize_readable(PRE,grid,[],"Li₂S")
+        short=summarize_readable(PRE,grid,[],system="Li₂S")
         self.assertNotIn("Multiwfn、Critic2、FukuiGrid",short)
         self.assertIn("Multiwfn、Critic2",short)
 
@@ -90,7 +90,7 @@ class TestReadableReport(unittest.TestCase):
         file=self.make_table("bader",.8,.9)
         file.with_suffix(".md").write_text("**质量检查：** FAIL",encoding="utf-8")
         with self.assertRaisesRegex(ValueError,"missing validated condensed report"):
-            summarize_readable(PRE,self.passed_grid(),[file],"Li₂S")
+            summarize_readable(PRE,self.passed_grid(),[file],system="Li₂S")
 
     def test_cli_defaults_to_readable_and_is_not_overwritten(self):
         import json
@@ -98,13 +98,16 @@ class TestReadableReport(unittest.TestCase):
         grid=self.p/"grid.json"
         pre.write_text(json.dumps(PRE),encoding="utf-8")
         grid.write_text(json.dumps(self.passed_grid()),encoding="utf-8")
-        out=self.p/"periodic_cdft_report.md"
+        out=self.p/"report.md"
         opts=["--preflight",str(pre),"--grid-audit",str(grid),
               "--system","Li₂S","--out",str(out)]
         self.assertEqual(main(opts),0)
         self.assertIn("## 主要结果",out.read_text(encoding="utf-8"))
         self.assertNotIn("## 同一种有限差分近似下的软件对照",out.read_text(encoding="utf-8"))
         self.assertEqual(main(opts),1)
+        out.write_text("stale",encoding="utf-8")
+        self.assertEqual(main(opts+["--force"]),0)
+        self.assertIn("## 主要结果",out.read_text(encoding="utf-8"))
         detailed=self.p/"detail.md"
         opts[-1]=str(detailed)
         self.assertEqual(main(opts+["--detailed"]),0)

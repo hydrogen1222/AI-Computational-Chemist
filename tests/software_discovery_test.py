@@ -96,8 +96,8 @@ class DiscoveryTests(unittest.TestCase):
         except ImportError:
             self.skipTest("matplotlib is optional")
         out = self.root / "postprocess_summary"
-        out.mkdir()
-        with (out / "ddec6_elements.csv").open("w", newline="") as fh:
+        (out / "data").mkdir(parents=True)
+        with (out / "data" / "ddec6_elements.csv").open("w", newline="") as fh:
             writer = csv.DictWriter(fh, fieldnames=["case", "element", "n_atoms",
                 "mean_charge_e", "min_charge_e", "max_charge_e", "mean_sbo",
                 "min_sbo", "max_sbo"])
@@ -106,7 +106,7 @@ class DiscoveryTests(unittest.TestCase):
                 "mean_charge_e":"0.6", "min_charge_e":"0.3", "max_charge_e":"0.9",
                 "mean_sbo":"0.1", "min_sbo":"0.08", "max_sbo":"0.12"})
         all_types = ["Na-S", "Na-P", "F-S", "P-S", "Cl-S", "Na-F"]
-        with (out / "ddec6_bond_types.csv").open("w", newline="") as fh:
+        with (out / "data" / "ddec6_bond_types.csv").open("w", newline="") as fh:
             writer = csv.DictWriter(fh, fieldnames=["case", "element_pair",
                 "n_periodic_bonds", "mean_bond_order", "min_bond_order",
                 "max_bond_order"])
@@ -119,14 +119,14 @@ class DiscoveryTests(unittest.TestCase):
                            "--items-per-figure","2"],
                            capture_output=True,text=True,check=False)
         self.assertEqual(r.returncode, 0, r.stderr+r.stdout)
-        dest = out/"ppt_figures"
-        for stem in ("demo_charges", "demo_bond_orders",
-                     "demo_bond_orders_part02", "demo_bond_orders_part03"):
+        dest = out/"figures"
+        for stem in ("ddec6_demo_charges", "ddec6_demo_bond_orders",
+                     "ddec6_demo_bond_orders_part02", "ddec6_demo_bond_orders_part03"):
             self.assertTrue((dest/(stem+".png")).is_file(),stem)
             self.assertTrue((dest/(stem+".svg")).is_file(),stem)
-        self.assertEqual(len(list(dest.glob("demo_bond_orders*.png"))),3)
+        self.assertEqual(len(list(dest.glob("ddec6_demo_bond_orders*.png"))),3)
         # Editable text labels for ALL bond classes, including the last class.
-        labels = "\n".join(f.read_text() for f in dest.glob("demo_bond_orders*.svg"))
+        labels = "\n".join(f.read_text() for f in dest.glob("ddec6_demo_bond_orders*.svg"))
         for typ in all_types:
             self.assertIn(typ, labels)
 

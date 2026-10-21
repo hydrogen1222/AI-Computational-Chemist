@@ -15,6 +15,11 @@ One agent, on-demand skills. Start from the scientific question, not the input f
 3. **Criticize twice.** A geometry audit (composition, contacts, images, vacuum) and a
    scientific audit (does this model test the claim?). Passing one is not passing both.
 4. **State limits.** Say what the result can and cannot support; label exploratory choices.
+5. **One file to open.** Every analysis ends in a single `report.md` (Chinese,
+   figures embedded) with only `figures/` and `data/` beside it; a modeling task
+   ends in `models/model.md`. The hand-over
+   message gives that one path and the key result — never a list of folders or
+   files for the user to dig through.
 
 ## Integrity
 

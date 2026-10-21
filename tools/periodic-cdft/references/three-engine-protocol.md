@@ -69,7 +69,7 @@ python tools/periodic-cdft/scripts/preflight.py \
 
 After the output has passed operator review, the agent may record a
 machine-readable manifest fingerprint in an already-prepared output dir:
-`--write /project/fukui_vasp/postprocess/periodic_cdft/comparison/preflight.json`.
+`--write /project/fukui_vasp/postprocess/periodic_cdft/data/preflight.json`.
 No overwrites. `SCF_EDIFF_marker=false` is a warning that requires manual
 review, NOT permission to proceed. Source CHGCAR/POTCAR never leave machine.
 
@@ -94,13 +94,13 @@ difference engines pointwise and checks `∫f±≈1`, `∫f0≈1`,
 
 ```bash
 python tools/periodic-cdft/scripts/grid_audit.py \
-  --cube critic2:fplus:/project/fukui_vasp/postprocess/periodic_cdft/critic2/fplus.cube \
-  --cube critic2:fminus:/project/fukui_vasp/postprocess/periodic_cdft/critic2/fminus.cube \
-  --cube critic2:fzero:/project/fukui_vasp/postprocess/periodic_cdft/critic2/fzero.cube \
-  --cube critic2:dual:/project/fukui_vasp/postprocess/periodic_cdft/critic2/dual.cube \
-  --cube multiwfn:fplus:/project/fukui_vasp/postprocess/periodic_cdft/multiwfn/fplus.cube \
-  --cube multiwfn:fminus:/project/fukui_vasp/postprocess/periodic_cdft/multiwfn/fminus.cube \
-  --out /project/fukui_vasp/postprocess/periodic_cdft/comparison/grid_audit.json
+  --cube critic2:fplus:/project/fukui_vasp/postprocess/periodic_cdft/work/critic2/fplus.cube \
+  --cube critic2:fminus:/project/fukui_vasp/postprocess/periodic_cdft/work/critic2/fminus.cube \
+  --cube critic2:fzero:/project/fukui_vasp/postprocess/periodic_cdft/work/critic2/fzero.cube \
+  --cube critic2:dual:/project/fukui_vasp/postprocess/periodic_cdft/work/critic2/dual.cube \
+  --cube multiwfn:fplus:/project/fukui_vasp/postprocess/periodic_cdft/work/multiwfn/fplus.cube \
+  --cube multiwfn:fminus:/project/fukui_vasp/postprocess/periodic_cdft/work/multiwfn/fminus.cube \
+  --out /project/fukui_vasp/postprocess/periodic_cdft/data/grid_audit.json
 ```
 
 Add analogous `fukuigrid-fd` or `fukuigrid-interp` cubes when
@@ -128,9 +128,9 @@ generate its validated one-shot four-field input by:
 ```bash
 python tools/periodic-cdft/scripts/make_critic2.py \
   --root /project/fukui_vasp \
-  --preflight /project/fukui_vasp/postprocess/periodic_cdft/comparison/preflight.json \
+  --preflight /project/fukui_vasp/postprocess/periodic_cdft/data/preflight.json \
   --plus-label p010 --minus-label m010 \
-  --workdir /project/fukui_vasp/postprocess/periodic_cdft/critic2
+  --workdir /project/fukui_vasp/postprocess/periodic_cdft/work/critic2
 ```
 Use explicit `--execute` only after the researcher authorized local
 postprocessing and the installed syntax has been confirmed, then check
@@ -256,13 +256,13 @@ rather than additional electronic SCF runs.
 for the SAME population model:
 ```bash
 python tools/periodic-cdft/scripts/condensed.py \
-  --preflight postprocess/periodic_cdft/comparison/preflight.json \
+  --preflight postprocess/periodic_cdft/data/preflight.json \
   --method bader \
-  --neutral 00_N/postprocess_summary/bader_atoms.csv \
-  --plus plus_010/postprocess_summary/bader_atoms.csv \
-  --minus minus_010/postprocess_summary/bader_atoms.csv \
+  --neutral 00_N/postprocess_summary/data/bader_atoms.csv \
+  --plus plus_010/postprocess_summary/data/bader_atoms.csv \
+  --minus minus_010/postprocess_summary/data/bader_atoms.csv \
   --delta-plus 0.1 --delta-minus 0.1 \
-  --output postprocess/periodic_cdft/comparison/condensed_bader.csv
+  --output postprocess/periodic_cdft/data/condensed_bader.csv
 ```
 Other methods:
 `ddec6`, `chargemol-h`, `chargemol-cm5`,
@@ -288,7 +288,7 @@ from Fukui maps.
 ## 3. What the comparison report must include
 
 AICC's agent is responsible for publishing a **plain Chinese,
-source-traceable** `postprocess/periodic_cdft/comparison/periodic_cdft_report.md`,
+source-traceable** `postprocess/periodic_cdft/report.md`,
 with these report-level components in this one file (no extra Markdown
 sprayed into the repository root):
 
@@ -321,10 +321,10 @@ plus checked condensed f_A CSVs. Example:
 
 ```bash
 python tools/periodic-cdft/scripts/report.py \
-  --preflight /project/fukui_vasp/postprocess/periodic_cdft/comparison/preflight.json \
-  --grid-audit /project/fukui_vasp/postprocess/periodic_cdft/comparison/grid_audit.json \
-  --condensed /project/fukui_vasp/postprocess/periodic_cdft/comparison/condensed_bader.csv \
-  --out /project/fukui_vasp/postprocess/periodic_cdft/comparison/periodic_cdft_report.md
+  --preflight /project/fukui_vasp/postprocess/periodic_cdft/data/preflight.json \
+  --grid-audit /project/fukui_vasp/postprocess/periodic_cdft/data/grid_audit.json \
+  --condensed /project/fukui_vasp/postprocess/periodic_cdft/data/condensed_bader.csv \
+  --out /project/fukui_vasp/postprocess/periodic_cdft/report.md
 ```
 
 Omit `--grid-audit` or `--condensed` if unavailable. The generated
@@ -338,7 +338,7 @@ files in the research root.
 ## 3b. Concise results report by default (no extra slide file)
 
 The existing `scripts/report.py` CLI now writes **one short Chinese
-research-results report** by default, still named `periodic_cdft_report.md`.
+research-results report** by default, written to `postprocess/periodic_cdft/report.md`.
 The same source `preflight.json`, `grid_audit.json` and validated
 `condensed_*.csv` are required. It reports which spatial f+/f-/f0/dual
 actually passed QC, pointwise agreement for matching finite differences,
@@ -350,14 +350,14 @@ Example for the validated Li2S datasets:
 
 ```bash
 python tools/periodic-cdft/scripts/report.py \
-  --preflight postprocess/periodic_cdft/comparison/preflight.json \
-  --grid-audit postprocess/periodic_cdft/comparison/grid_audit_round2.json \
-  --condensed postprocess/periodic_cdft/comparison/condensed_chargemol_h.csv \
-  --condensed postprocess/periodic_cdft/comparison/condensed_ddec6.csv \
-  --condensed postprocess/periodic_cdft/comparison/condensed_bader.csv \
+  --preflight postprocess/periodic_cdft/data/preflight.json \
+  --grid-audit postprocess/periodic_cdft/data/grid_audit_round2.json \
+  --condensed postprocess/periodic_cdft/data/condensed_chargemol_h.csv \
+  --condensed postprocess/periodic_cdft/data/condensed_ddec6.csv \
+  --condensed postprocess/periodic_cdft/data/condensed_bader.csv \
   --system Li2S \
   --warning 'Bader equivalent Li atoms: charge/basin symmetry WARN, unresolved' \
-  --out postprocess/periodic_cdft/comparison/periodic_cdft_report.md
+  --out postprocess/periodic_cdft/report.md
 ```
 
 The output destination must **not already exist**; keep the existing

@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import argparse
 import csv
-from charge_report import generate as generate_charge_report
+from charge_report import write_report
+import layout
 import math
 from pathlib import Path
 import re
@@ -237,8 +238,7 @@ def make_plots(folder: Path, elements):
         print("NOTE: matplotlib unavailable; CSV and Markdown were generated")
         return
     import hashlib
-    dest = folder / "ppt_figures"
-    dest.mkdir(exist_ok=True)
+    dest = layout.figures_dir(folder, create=True)
     plt.rcParams["svg.fonttype"] = "none"
     cases = sorted({r["case"] for r in elements})
     methods = [("hirshfeld_mean_e","Hirshfeld"), ("cm5_mean_e","CM5"),
@@ -266,7 +266,7 @@ def make_plots(folder: Path, elements):
             ax.grid(axis="y",alpha=.15)
             ax.set_axisbelow(True)
             suffix = hashlib.sha256(case.encode()).hexdigest()[:8]
-            stem = re.sub(r"[^a-zA-Z0-9_.-]","_",case)[:65] + "_" + suffix
+            stem = "hirshfeld_" + re.sub(r"[^a-zA-Z0-9_.-]","_",case)[:65] + "_" + suffix
             if page > 1:
                 stem += f"_part{page:02d}"
             for ext, kw in ((".svg",{}),(".png",{"dpi":300})):
@@ -312,20 +312,19 @@ def main(argv=None):
                              "expected_net_charge_e":opts.net_charge if opts.net_charge is not None else "",
                              "source_log":str(run)})
             print(f"ERROR {name}: {e}")
-    output = root / "postprocess_summary"
-    output.mkdir(exist_ok=True)
-    csv_out(output / "hirshfeld_cases.csv", CASES, statuses)
-    csv_out(output / "hirshfeld_atoms.csv", ATOMS, atoms)
-    csv_out(output / "hirshfeld_elements.csv", ELEMENTS, elements)
-    report(output / "hirshfeld_summary.md", statuses, elements, opts.net_charge)
+    output = layout.summary_dir(root, create=True)
+    data = layout.data_dir(output)
+    csv_out(data / "hirshfeld_cases.csv", CASES, statuses)
+    csv_out(data / "hirshfeld_atoms.csv", ATOMS, atoms)
+    csv_out(data / "hirshfeld_elements.csv", ELEMENTS, elements)
+    report(data / "hirshfeld_notes.md", statuses, elements, opts.net_charge)
+    make_plots(output, elements)
+    print(f"Wrote {len(atoms)} atoms and {len(elements)} element groups")
     try:
-        path = generate_charge_report(output, "hirshfeld")
-        print(f"中文报告：{path}")
+        print(f"报告：{write_report(output)}")
     except (OSError, ValueError, KeyError) as exc:
         failures += 1
         print(f"ERROR: Chargemol H/CM5 中文报告生成失败：{exc}", file=sys.stderr)
-    make_plots(output, elements)
-    print(f"Wrote {len(atoms)} atoms and {len(elements)} element groups to {output}")
     return 1 if failures else 0
 
 

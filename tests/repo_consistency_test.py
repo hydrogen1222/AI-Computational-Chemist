@@ -23,6 +23,7 @@ REMOVED_STRINGS = [
     "tools/chargemol", "tools/vasp/scripts/batch_", "tools/vasp/scripts/charge_report",
     "FORK_DISABLED", "aicc doctor", "aicc skill", "hpc-submit", "rsess",
     "research-orchestrator", "comp-chem-workflow", "STRUCTURE.md",
+    "ppt_figures", "_report_cn.md", "periodic_cdft/comparison",
 ]
 TEXT_SUFFIXES = {".md", ".py", ".sh", ".yml", ".yaml", ".json", ".txt"}
 REF_RE = re.compile(r"`((?:procedures|tools|knowledge)/[^`\s<>*]+\.(?:md|py))`")

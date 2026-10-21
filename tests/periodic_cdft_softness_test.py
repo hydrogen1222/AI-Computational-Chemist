@@ -7,7 +7,7 @@ import tempfile
 import unittest
 import sys
 
-sys.path.insert(0,str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"/"periodic-cdft"/"scripts"))
 from softness import run
 
 

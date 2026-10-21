@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import argparse
 import csv
-from charge_report import generate as generate_charge_report
+from charge_report import write_report
+import layout
 import math
 import os
 import importlib.util
@@ -380,8 +381,8 @@ def main(argv=None):
                         "bond_qc_status": bo_qc_status,
                         "source": str(run), "chargemol_dir": outdir})
     if opt.execute or opt.collect_only:
-        out = root / "postprocess_summary"
-        out.mkdir(exist_ok=True)
+        out = layout.summary_dir(root, create=True)
+        data = layout.data_dir(out)
         for name, keys, rows in [
             ("ddec6_cases.csv", HEADER, status),
             ("ddec6_atoms.csv", ATOMS, atoms),
@@ -389,8 +390,8 @@ def main(argv=None):
             ("ddec6_elements.csv", ELEMENTS, els),
             ("ddec6_bond_types.csv", BOND_TYPES, types),
         ]:
-            write_csv(out/name, keys, rows)
-        (out/"ddec6_summary.md").write_text(
+            write_csv(data/name, keys, rows)
+        (data/"ddec6_notes.md").write_text(
             "# DDEC6 analysis — slide-ready summary\n\n"
             f"Cases: {len(dirs)}; passed: {len(dirs)-errors}; failed: {errors}.\n\n"
             "Reported q is **DDEC6 net atomic charge (e)**, positive = electron-deficient.\n"
@@ -420,7 +421,7 @@ def main(argv=None):
             encoding="utf-8")
         # Add genuinely human-readable numbers to the overview without replacing
         # full precision atom/pair CSVs. This is for screening/slide drafting only.
-        with (out / "ddec6_summary.md").open("a", encoding="utf-8") as md:
+        with (data / "ddec6_notes.md").open("a", encoding="utf-8") as md:
             md.write("\n## Case QC (all cases)\n\n"
                      "| Case | Status | N atoms | Σq (e) | Charge-balance Δ (e) |\n"
                      "|---|---|---:|---:|---:|\n")
@@ -451,13 +452,6 @@ def main(argv=None):
                      "the minimum and maximum, **not** confidence intervals. "
                      "Specify the model composition, sample sizes, and any "
                      "comparison controls before presenting trends.\n")
-        try:
-            report = generate_charge_report(out, "ddec6")
-            print(f"中文报告：{report}")
-        except (OSError, ValueError, KeyError) as exc:
-            errors += 1
-            print(f"ERROR: DDEC6 中文报告生成失败：{exc}", file=sys.stderr)
-        print(f"Outputs: {out}")
         if importlib.util.find_spec("matplotlib") is not None:
             plotter = Path(__file__).with_name("plot_ddec6.py")
             if plotter.is_file():
@@ -471,9 +465,17 @@ def main(argv=None):
                 else:
                     print(fig.stdout.strip())
         else:
-            print("NOTE: CSV and Markdown ready; install matplotlib to add PPT PNG/SVG charts.")
+            print("NOTE: install matplotlib to add charts to the report.")
+        try:
+            report = write_report(out)
+        except (OSError, ValueError, KeyError) as exc:
+            errors += 1
+            report = None
+            print(f"ERROR: DDEC6 中文报告生成失败：{exc}", file=sys.stderr)
 
     print(f"Passed {len(dirs)-errors}/{len(dirs)}; failed {errors}")
+    if (opt.execute or opt.collect_only) and report:
+        print(f"报告：{report}")
     return 1 if errors else 0
 
 
