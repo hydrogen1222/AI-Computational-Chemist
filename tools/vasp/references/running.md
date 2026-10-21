@@ -16,18 +16,22 @@ k-mesh by accident.
 ## Global policies
 
 **POTCAR / PAW potential choice** — Record the licensed POTCAR root, functional
-family, and element-to-potential mapping before generating inputs. For new PBE PAW
-work in this local workflow, the fallback mapping is the standard no-suffix potential
-for each element (`Fe`, `Ti`, `O`, etc.) only after checking that no paper, user
-instruction, benchmark, element-specific guidance, or project convention calls for a
-different variant. Treat this as a local reproducibility default, not a universal VASP
-recommendation. Use suffix variants such as `_pv`, `_sv`, `_d`, or harder/softer
-alternatives when the source method requires them, semicore states are chemically
-important, element-specific guidance or a convergence/validation test supports the
-choice, or a project/group convention explicitly sets them. Do not mix suffix choices
-inside a compared energy expression. Whether POTCAR is built by VASPKIT or by
-concatenating files directly, independently check POSCAR species order against POTCAR
-`TITEL` lines and record the mapping; never commit or print POTCAR contents.
+family, and element-to-potential mapping before generating inputs. Priority:
+the source paper's set → the project's `locked_parameters.md` → the **Materials
+Project PBE set** (pymatgen `MPRelaxSet.yaml`, the de-facto standard for solid-state
+work and what most database energies use). Key MP choices:
+
+| semicore (`_sv`, `_pv`, `_d`) | Li_sv, Na_pv, K_sv, Mg_pv, Ca_sv, Sr_sv, Ba_sv, Ga_d, Ge_d, In_d, Sn_d, Ti_pv, V_pv, Cr_pv, Mn_pv, Fe_pv, Ni_pv, Cu_pv, Y_sv, Zr_sv, Nb_pv |
+|---|---|
+| standard | P, S, Se, Cl, Br, I, O, F, N, B, Si, Al, Sb, Bi, Zn, Ag, Co, La |
+
+Plain `Li` (1 valence e⁻) or `Na` differs from this set and from most sulfide/oxide
+electrolyte literature; use it only with a recorded reason. `check_inputs.py` flags
+labels that differ from the MP set. Never mix variants inside one compared energy
+expression. Whether POTCAR is built by VASPKIT or by concatenating files, check
+POSCAR species order against POTCAR `TITEL` lines and record the mapping; never
+commit or print POTCAR contents. ENCUT must respect the largest ENMAX of the chosen
+set (semicore potentials raise it).
 
 **ENCUT** — explicit, never default. ≥ 1.3 × largest ENMAX in POTCAR for cell relaxations (`ISIF=3`); 520 eV is a common fixed value for oxide databases (Materials Project convention). Fixed-cell runs: 400–520 eV typical; keep identical across any energies you compare.
 

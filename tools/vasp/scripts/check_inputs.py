@@ -4,23 +4,28 @@
 # ///
 """VASP preflight: validate POSCAR/INCAR/KPOINTS/POTCAR consistency.
 
-Usage: check_inputs.py [--strict-performance] [RUNDIR]
+Usage: check_inputs.py [--strict-performance] [--lock FILE | --no-lock] [--profile NAME] [RUNDIR]
 
 Checks (stdlib only, no pymatgen needed):
   - POSCAR parses; species line present; atom counts sane
-  - POTCAR species (TITEL) match POSCAR species in order
+  - POTCAR species (TITEL) match POSCAR species in order; labels that differ from
+    the Materials Project PBE set (e.g. Li instead of Li_sv) are flagged
   - MAGMOM length == total atoms; LDAUL/LDAUU/LDAUJ length == n species
   - KPOINTS exists or KSPACING set; ENCUT explicit; KSPACING/KPOINTS sanity warnings
   - slab-like cells warn unless ISYM=0, to avoid symmetry-constrained surfaces
   - ISMEAR=-5 not combined with NSW>0
   - CPU-like production relax/static jobs use local default NPAR=4 or warn
   - GPU/OpenACC jobs do not carry CPU NPAR/NCORE by default
+  - if a locked_parameters.md is found in RUNDIR or a parent folder (up to the
+    project/git root), check_locked_params.py runs too and a mismatch fails preflight;
+    --lock FILE points at a specific lock, --no-lock skips it
 Exit code 0 = pass (warnings allowed), 1 = hard failure. With
 --strict-performance, performance warnings also fail preflight.
 """
 import math
 import os
 import re
+import subprocess
 import sys
 
 errors, warnings = [], []
@@ -49,6 +54,37 @@ def parse_incar(path):
             k, v = line.split("=", 1)
             tags[k.strip().upper()] = v.strip()
     return tags
+
+
+# Materials Project PBE POTCAR choices (pymatgen MPRelaxSet.yaml) for elements where the
+# semicore/no-semicore choice matters most. Other elements: the MP label equals the symbol.
+MP_POTCAR = {
+    "Li": "Li_sv", "Na": "Na_pv", "K": "K_sv", "Rb": "Rb_sv", "Cs": "Cs_sv",
+    "Mg": "Mg_pv", "Ca": "Ca_sv", "Sr": "Sr_sv", "Ba": "Ba_sv",
+    "Ga": "Ga_d", "Ge": "Ge_d", "In": "In_d", "Sn": "Sn_d",
+    "Ti": "Ti_pv", "V": "V_pv", "Cr": "Cr_pv", "Mn": "Mn_pv", "Fe": "Fe_pv",
+    "Ni": "Ni_pv", "Cu": "Cu_pv", "Y": "Y_sv", "Zr": "Zr_sv", "Nb": "Nb_pv",
+    "Ta": "Ta_pv", "W": "W_pv",
+    "P": "P", "S": "S", "Se": "Se", "Cl": "Cl", "Br": "Br", "I": "I", "O": "O",
+    "F": "F", "N": "N", "B": "B", "Si": "Si", "Al": "Al", "Sb": "Sb", "Bi": "Bi",
+    "Zn": "Zn", "Ag": "Ag", "Co": "Co", "La": "La",
+}
+
+
+def find_lock(rundir):
+    """Nearest locked_parameters.md in rundir or its parents, stopping at a git root."""
+    d = os.path.abspath(rundir)
+    for _ in range(8):
+        cand = os.path.join(d, "locked_parameters.md")
+        if os.path.isfile(cand):
+            return cand
+        if os.path.isdir(os.path.join(d, ".git")):
+            return None
+        parent = os.path.dirname(d)
+        if parent == d:
+            return None
+        d = parent
+    return None
 
 
 def warn(msg, *, performance=False):
@@ -128,13 +164,31 @@ def main():
     if "-h" in args or "--help" in args:
         print(__doc__.strip())
         sys.exit(0)
+    usage = "usage: check_inputs.py [--strict-performance] [--lock FILE | --no-lock] [--profile NAME] [RUNDIR]"
     strict_performance = False
-    if "--strict-performance" in args:
-        strict_performance = True
-        args.remove("--strict-performance")
-    if any(a.startswith("-") for a in args):
-        raise SystemExit("usage: check_inputs.py [--strict-performance] [RUNDIR]")
-    d = args[0] if args else "."
+    lock_path, lock_profile, use_lock = None, None, True
+    rest = []
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a == "--strict-performance":
+            strict_performance = True
+        elif a == "--no-lock":
+            use_lock = False
+        elif a in ("--lock", "--profile") and i + 1 < len(args):
+            if a == "--lock":
+                lock_path = args[i + 1]
+            else:
+                lock_profile = args[i + 1]
+            i += 1
+        elif a.startswith("-"):
+            raise SystemExit(usage)
+        else:
+            rest.append(a)
+        i += 1
+    if len(rest) > 1:
+        raise SystemExit(usage)
+    d = rest[0] if rest else "."
     f = lambda name: os.path.join(d, name)
 
     # --- POSCAR ---
@@ -177,19 +231,26 @@ def main():
             errors.append("POSCAR could not be parsed")
 
     # --- POTCAR ---
-    pot_species = []
+    pot_species, pot_labels = [], []
     if os.path.isfile(f("POTCAR")):
         for line in open(f("POTCAR"), errors="ignore"):
             if "TITEL" in line:
-                # e.g. 'TITEL  = PAW_PBE Fe_pv 02Aug2007' -> Fe
-                m = re.search(r"=\s*\S+\s+([A-Z][a-z]?)", line)
+                # e.g. 'TITEL  = PAW_PBE Fe_pv 02Aug2007' -> Fe, Fe_pv
+                m = re.search(r"=\s*\S+\s+(([A-Z][a-z]?)\S*)", line)
                 if m:
-                    pot_species.append(m.group(1))
+                    pot_labels.append(m.group(1))
+                    pot_species.append(m.group(2))
         if species and pot_species:
             if species != pot_species:
                 errors.append(f"species order mismatch: POSCAR {species} != POTCAR {pot_species}")
             else:
                 print(f"ok: species order {species} matches POTCAR")
+        off_default = [f"{lab} (MP: {MP_POTCAR[el]})" for el, lab in zip(pot_species, pot_labels)
+                       if el in MP_POTCAR and lab != MP_POTCAR[el]]
+        if off_default:
+            warn("POTCAR differs from the Materials Project PBE set for "
+                 + ", ".join(off_default)
+                 + " - fine if locked or justified; keep it identical across compared energies")
     else:
         warn("POTCAR missing (fine if generated at submit time - verify mapping)")
 
@@ -349,6 +410,24 @@ def main():
             warn(f"CPU-like production-size VASP job uses NPAR={npar}; local default is "
                  "NPAR=4. Keep a non-default value only with a site benchmark or "
                  "task-specific rationale", performance=True)
+
+    # --- locked parameters ---
+    if use_lock:
+        lock = lock_path or find_lock(d)
+        if lock:
+            checker = os.path.join(os.path.dirname(os.path.abspath(__file__)), "check_locked_params.py")
+            cmd = [sys.executable, checker, d, "--lock", lock]
+            if lock_profile:
+                cmd += ["--profile", lock_profile]
+            r = subprocess.run(cmd, capture_output=True, text=True)
+            for line in (r.stdout + r.stderr).strip().splitlines():
+                print(f"lock: {line}")
+            if r.returncode == 1:
+                errors.append(f"settings do not match {lock} (see 'lock:' lines)")
+            elif r.returncode != 0:
+                errors.append(f"could not check {lock} (see 'lock:' lines)")
+        else:
+            print("note: no locked_parameters.md found; settings not checked against a lock")
 
     # --- report ---
     for w in warnings:

@@ -120,6 +120,8 @@ read-only parsers and requested bounded post-processing on completed data.
 | Need | Load |
 |---|---|
 | Construct, enumerate, convert, inspect geometry | `tools/structure-prep/SKILL.md` |
+| Explicit interfaces (Li/Na metal \| electrolyte, crystal \| crystal) | `tools/structure-prep/references/interfaces.md` |
+| Disordered sites, defect/dopant supercells, charged defects, glasses | `tools/structure-prep/references/disorder-defects.md` |
 | Human scientific model audit | `tools/structure-prep/references/model-review.md` |
 | VASP/CP2K/ORCA/Gaussian/etc. input methods | respective `tools/<engine>/SKILL.md` |
 | Published paper to model requirements | `procedures/literature-to-calculation/SKILL.md` |

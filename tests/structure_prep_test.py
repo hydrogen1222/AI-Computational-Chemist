@@ -93,6 +93,29 @@ class StructurePrep(unittest.TestCase):
         self.assertIn(r.returncode, (0, 1), r.stdout + r.stderr)   # 2 = could not read
         self.assertIsInstance(json.loads(audit.read_text()), dict)
 
+    def test_interface_list_then_build(self):
+        film = self.d / "POSCAR_film"
+        film.write_text(NACL.replace("5.64", "5.75"))               # ~2 % mismatch
+        r = run("build_interface.py", self.bulk, film, "--sub-miller", 0, 0, 1,
+                "--film-miller", 0, 0, 1, "--max-area", 80)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("listing only", r.stdout)
+        self.assertFalse((self.d / "interfaces").exists())         # listing writes nothing
+        match = next(int(line.split()[0]) for line in r.stdout.splitlines()
+                     if line.strip() and line.split()[0].isdigit())
+        out = self.d / "iface"
+        r = run("build_interface.py", self.bulk, film, "--sub-miller", 0, 0, 1,
+                "--film-miller", 0, 0, 1, "--max-area", 80, "--termination", 0,
+                "--match", match, "--sub-layers", 2, "--film-layers", 2, "--out", out)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        summary = json.loads((out / "interface_summary.json").read_text())
+        cand = summary["candidates"][0]
+        self.assertTrue((out / cand["poscar"]).is_file())
+        self.assertEqual(summary["strained_side"], "film")
+        self.assertGreater(sum(cand["atoms_per_side"]["film"].values()), 0)
+        self.assertGreater(sum(cand["atoms_per_side"]["substrate"].values()), 0)
+        self.assertLess(cand["von_mises_strain"], 0.05)
+
     def test_audit_fails_overlapping_atoms(self):
         bad = self.d / "POSCAR_bad"
         bad.write_text(NACL.replace("0.5 0.5 0.5\n", "0.02 0.0 0.0\n"))   # Cl almost on Na

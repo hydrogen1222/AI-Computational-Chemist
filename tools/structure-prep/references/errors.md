@@ -6,7 +6,7 @@
 |---|---|---|
 | RDKit `EmbedMolecule` returns -1 | hard 3D embedding (macrocycles, fused systems) | `params.useRandomCoords=True`, more attempts (`maxAttempts=100`); check the SMILES valence first |
 | MMFF "missing parameters" | exotic atom types | fall back to UFF (the scripts do); flag that the geometry is rougher |
-| CIF loads with occupancy warnings | partially occupied / disordered sites | a calculation needs an *ordered* structure: enumerate orderings (pymatgen `OrderDisorderedStructureTransformation`) or ask which configuration — never silently round occupancies |
+| CIF loads with occupancy warnings | partially occupied / disordered sites | a calculation needs an *ordered* structure: enumerate orderings (`disorder-defects.md`: xtalkit, or pymatgen `OrderDisorderedStructureTransformation`) or ask which configuration — never silently round occupancies |
 | Space group changes with symprec | structure slightly distorted (relaxed coordinates) | report both; use loose symprec (1e-2) for "intended" symmetry, tight (1e-5) for "actual" |
 | Slab has odd stoichiometry / is polar | termination choice | enumerate `get_slabs()`, check `is_polar()`; polar slabs need dipole correction downstream or reconstruction — a scientific decision |
 | Supercell breaks intended magnetic/defect order | site enumeration after replication | build order *after* the supercell, on enumerated symmetry-distinct sites |

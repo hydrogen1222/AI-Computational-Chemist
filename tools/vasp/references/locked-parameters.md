@@ -4,9 +4,9 @@
 
 The lock is the project's single list of settings that change the physics of every
 energy: plane-wave cutoff, functional, smearing, k-point density, and POTCARs. The
-user signs it; agents only read it. `scripts/check_locked_params.py` compares each run
-directory against it before submission, so a changed setting stops the run instead of
-relying on an agent to notice.
+user signs it; agents only read it. `scripts/check_inputs.py` finds it in the run
+directory or any parent folder and runs `scripts/check_locked_params.py` automatically,
+so a changed setting fails preflight instead of relying on an agent to notice.
 
 ## File format
 

@@ -103,7 +103,7 @@ downloader; which entry represents the phase is a scientific choice.
   reference lattice constants for validation from the experimental source.
 - Always ordered. An experimentally disordered phase (partial occupancies, mixed sites)
   appears as one ordering chosen by the database. If the disorder matters, start from
-  the experimental CIF and enumerate orderings (see `errors.md`).
+  the experimental CIF and enumerate orderings (see `disorder-defects.md`).
 - Versioned. Data and IDs change between releases; record the release.
 
 **Choosing among polymorphs** (one formula, several structures):
