@@ -1,16 +1,7 @@
 # Scientific Visualization and Figure Choice
 
-**Current drawing authority:** For creation, revision or submission of a
-figure, load `tools/plotting/SKILL.md` (vendored from Stormy-drawing,
-style version 0.5.0). Its font, canvas, axes, legend, palette, one-figure-per-
-directory reproducibility and QA rules supersede conflicting older AICC
-instructions below. The guidance below remains useful for selecting *which
-scientific object/observable* to visualize and for evidence provenance;
-it does **not** override Stormy-drawing aesthetic rules. Automated
-multi-panel assemblies in older report workflows are legacy/optional,
-not the default finished-figure workflow. Domain-specific axis/normalization
-requirements remain scientific checks even if the plot style changes.
-
+This note is about *what* to show and how to keep it auditable. Plot styling
+(fonts, palette, canvas, figure folders) follows the Stormy-drawing plotting skill.
 
 > Covers: choosing appropriate tools and minimum quality standards for computational-chemistry figures, including atomistic structure renders, volumetric charge-density figures, molecular wavefunction-style plots, and numerical plots.
 
@@ -58,7 +49,7 @@ Avoid default viewer screenshots for final figures unless the exact view and sty
 
 ## What humans read: relative energies and data-on-the-structure
 
-These are presentation rules for the final report, learned from real reviewer feedback. They are enforced by `tools/report/references/validation.md`.
+These are presentation rules for results handed to humans, learned from real reviewer feedback.
 
 - **Report relative energies, never bare total energies.** A DFT total energy (TOTEN, hundreds of eV) is meaningless to a reader; humans read *differences* — adsorption energy, binding energy, reaction energy (ΔE/ΔG), and barriers. Convert before reporting and state the reference state (gas-phase molecule, clean slab, bulk metal, or the appropriate μ reservoir). A results table of total energies is a workflow artifact, not a deliverable.
 - **Pair every quantitative claim with the figure that shows it.** A Bader charge, an oxidation state, a key bond length is shown *on the structure* — atoms colored by the quantity with a colorbar, and the few decisive atoms labeled with their value — not presented only as a number in a table. The structure figure is the evidence; the table is the backup. (`tools/ovito` `--color-by`.)

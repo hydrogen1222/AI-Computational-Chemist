@@ -123,7 +123,7 @@ Always report the pairwise cutoffs used to create bonds. They are figure paramet
 
 ## Model figures for a report: orthographic top + side, atoms colored by a property
 
-The default for a model figure handed to humans (see `tools/report` and `knowledge/scientific-visualization.md`): use the **relaxed final structure** and render an **orthographic top + side pair**, never perspective. For VASP relaxation products, render from `CONTCAR` rather than the input `POSCAR`. Use `POSCAR` only when it is explicitly a copy of the final `CONTCAR`, or when a non-VASP workflow has an equivalent final structure file with recorded provenance. The `scripts/ovito_render.py` helper takes the view and projection directly:
+The default for a model figure handed to humans (see `knowledge/scientific-visualization.md`): use the **relaxed final structure** and render an **orthographic top + side pair**, never perspective. For VASP relaxation products, render from `CONTCAR` rather than the input `POSCAR`. Use `POSCAR` only when it is explicitly a copy of the final `CONTCAR`, or when a non-VASP workflow has an equivalent final structure file with recorded provenance. The `scripts/ovito_render.py` helper takes the view and projection directly:
 
 ```bash
 # orthographic top and side views of the same relaxed model

@@ -2,7 +2,7 @@
 
 > Covers: converting DFT energies/free energies into rate constants, elementary-step rates, reaction mechanisms, RDS/TDTS/TDI analysis, BEP relations, volcano curves, and microkinetic-model inputs.
 
-Tool-agnostic science and practice — the bridge from computed thermochemistry to kinetics; the same formalism applies whichever code produced the energies. Starting points to adapt, not fixed rules. It does not replace a microkinetic solver: for CatMAP execution use `tools/catmap`.
+Tool-agnostic science and practice — the bridge from computed thermochemistry to kinetics; the same formalism applies whichever code produced the energies. Starting points to adapt, not fixed rules. It does not replace a microkinetic solver such as CatMAP.
 
 ## Required inputs
 
@@ -166,7 +166,7 @@ Prepare:
 - reaction expressions with reversible steps and transition states;
 - descriptor names/ranges if scaling or volcano maps are needed.
 
-Then switch to the `catmap` skill for file formats, setup parameters, execution, and output validation.
+Then follow the CatMAP documentation for file formats, setup parameters, execution, and output validation.
 
 ## Validation checklist
 

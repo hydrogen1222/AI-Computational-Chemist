@@ -5,74 +5,25 @@
 Each task below is a post-processing run from a converged static. Keep settings consistent across
 the runs you compare. The *meaning* of every output lives in the knowledge doc above.
 
-## Hirshfeld and CM5 from a previous Chargemol run
+## Atomic charges (Bader, DDEC6, Hirshfeld/CM5, Hirshfeld-I)
 
-Chargemol DDEC6 first computes an ordinary, **noniterative Hirshfeld**
-charge partition and usually writes CM5 to its
-`VASP_DDEC_analysis.output`. The script
-`scripts/collect_hirshfeld.py` extracts these logged values, aligns
-them to CHGCAR atom order, checks charge closure where the total charge
-is specified, and writes comparative tables and PPT charts. It does not
-recompute density and it is **not Hirshfeld-I**.
-
-VASP can print Hirshfeld/Hirshfeld-I charges with TS/TS-HI
-`IVDW=2/20` or `IVDW=21`, but those tags also change dispersion
-energies/forces and may change self-consistent density or relaxed
-geometry. Do not introduce them as a silent post-processing switch
-to an otherwise plain-PBE calculation.
-
-## DDEC6 charge and bond order (Chargemol)
-
-For DDEC6 atomic net charges and bond orders, use
-`tools/chargemol/SKILL.md` and `scripts/batch_ddec6.py`.
-Require CHGCAR, AECCAR0, AECCAR2 and POTCAR from the same converged
-VASP density, plus a separately installed Chargemol binary and reference
-densities. The agent should first auto-detect both (PATH, ~/apps, /opt/apps,
-etc.); only request paths if detection fails or is ambiguous. The batch creates a Chinese `ddec6_report_cn.md` with actual charges,
-all printed bond categories, SBO, check states and conservative PPT
-interpretation text. Pymatgen provides a parser/wrapper, **not** an independent
-DDEC6 engine. Preserve periodic translation vectors in pair BOs.
-
-## Bader charge
-
-All-electron reference, then partition:
+VASP only produces the densities; partitioning and batch analysis live in
+`tools/charges/SKILL.md`. Write the density files from one converged static:
 
 ```ini
 LCHARG = .TRUE.
-LAECHG = .TRUE.
+LAECHG = .TRUE.     # AECCAR0/AECCAR2 for Bader (CHGCAR_sum) and DDEC6
 PREC   = Accurate
 ```
 
-```bash
-chgsum.pl AECCAR0 AECCAR2
-bader CHGCAR -ref CHGCAR_sum
-uv run scripts/bader_summary.py RUNDIR        # per-element mean q (= ZVAL - N_Bader) + the per-atom spread
-```
+Do **not** use `bader CHGCAR` alone for a charge-state claim: plain `CHGCAR`
+is valence-only. For magnetic runs, `chgsplit.pl CHGCAR` separates total and
+magnetization components for a spin-density plot.
 
-`scripts/bader_summary.py` reads `ACF.dat` + POSCAR/CONTCAR + POTCAR `ZVAL` (or `--zval "Pt:10,O:6"`) and reports net charge per element with the **per-atom spread** — the spread is the point: when it exceeds the difference between the structures you are comparing, the charge is a weak oxidation-state discriminator (`knowledge/electronic-structure.md`). Use it to feed the atoms-colored-by-charge figure too.
-
-Do **not** use `bader CHGCAR` alone for a charge-state claim (plain `CHGCAR` is valence-only; it
-omits core density). Preserve `ACF.dat`, `BCF.dat`, `AVF.dat`, `CHGCAR_sum`, the POTCAR `ZVAL`
-counts, and the static structure. Reported ionic charge ≈ `ZVAL − Bader_electrons` (a relative,
-model-dependent number — see the knowledge doc; it is not a formal oxidation state). For magnetic
-runs, `chgsplit.pl CHGCAR` separates total and magnetization components for a spin-density plot.
-
-For many existing VASP directories, use
-`tools/vasp/scripts/batch_bader.py ROOT` for a read-only audit,
-`--execute` after permission to run `chgsum.pl` and `bader`, or
-`--collect-only` to aggregate existing `ACF.dat` files.
-It additionally creates `bader_summary.md` with Chinese, quantitative,
-PPT-quotable conclusions, all element/atom rows, paths, sign convention
-and quality checks. If a reliable cell charge is known, pass optional
-`--net-charge 0` (replace 0 with the *actual* charge); otherwise
-charge conservation is NOT_CHECKED, never automatically marked PASS.
-It writes per-case statuses and per-atom/per-element CSV under
-`ROOT/postprocess_summary/`, while new Bader working files remain in
-`<run>/postprocess/bader/`. Original density files are never overwritten.
-This is the preferred route when the user does not want manual analysis.
-The Bader/chgsum binary paths are resolved automatically through
-`scripts/software_locator.py`; explicit `--bader-bin` and `--chgsum-bin`
-are optional fallbacks, not normally required.
+VASP can print Hirshfeld/Hirshfeld-I charges with TS/TS-HI `IVDW=2/20` or
+`IVDW=21`, but those tags also change dispersion energies/forces and may change
+the density or relaxed geometry. Never switch them on as silent post-processing
+of an otherwise plain-PBE calculation.
 
 ## Charge-density difference
 

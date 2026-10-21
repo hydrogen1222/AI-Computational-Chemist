@@ -17,7 +17,7 @@
 - **Gaussian/GaussView ESP plots** — http://sobereva.com/253 — useful for quick comparison with Multiwfn-generated ESP surfaces.
 - **VMD force/vector and vibration visualization from Gaussian** — http://sobereva.com/567 and http://sobereva.com/568 — use when cube/vector rendering leaves Multiwfn and enters VMD.
 
-- **Official periodic Hirshfeld/CM5/Hirshfeld-I tutorial (June 2024)** — http://sobereva.com/712 — includes VASP CHGCAR Nval, menu paths, periodic grids and ionic radial references. See `references/periodic-stockholder.md`.
+- **Official periodic Hirshfeld/CM5/Hirshfeld-I tutorial (June 2024)** — http://sobereva.com/712 — includes VASP CHGCAR Nval, menu paths, periodic grids and ionic radial references. See `tools/charges/references/periodic-stockholder.md`.
 
 ## Related toolchain
 

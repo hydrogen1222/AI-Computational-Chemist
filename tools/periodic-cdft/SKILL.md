@@ -124,8 +124,8 @@ Fukui over a fixed Bader basin (basins shift with density).
    Neither format may invent values or call nonvalidated periodic
    electronegativity/hardness/softness PASS.
    Quantitative statements must be generated from actual measured files;
-   do **not** publish placeholder output as a result. Plotting final
-   figures follows `tools/plotting/SKILL.md`.
+   do **not** publish placeholder output as a result. Final figures go
+   through the Stormy-drawing plotting skill.
 
 ## Additional global and local softness (validated energy models only)
 

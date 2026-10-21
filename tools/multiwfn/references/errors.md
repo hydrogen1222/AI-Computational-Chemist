@@ -23,7 +23,7 @@
 
 - The **first line of the work-copy CHGCAR** should start with
   `Nval` then the exact species/ZVAL pairs in CHGCAR order.
-  Use `scripts/prepare_periodic_chgcar.py`, not hand-edited
+  Use `tools/charges/scripts/prepare_periodic_chgcar.py`, not hand-edited
   pseudopotential assumptions. The Li_sv dataset generally
   has ZVAL=3 whereas ordinary Li may use ZVAL=1.
 - An apparent sign reversal between Multiwfn and Chargemol Hirshfeld

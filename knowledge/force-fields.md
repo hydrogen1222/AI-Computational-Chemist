@@ -2,7 +2,7 @@
 
 > Covers: bonded/non-bonded force-field structure; atom types, charges, 1-4 interactions and combination rules; water/ion compatibility; custom-molecule parameterization; polarizable, reactive and coarse-grained alternatives; and validation/mixing rules.
 
-Tool-agnostic science and practice. How a specific code stores and runs a force field lives in its tool skill (`tools/gromacs`, `tools/lammps`, etc.). A force field is a coupled empirical model, not a bag of independently swappable parameters.
+Tool-agnostic science and practice. How a specific code stores and runs a force field lives in its tool skill (e.g. `tools/lammps`). A force field is a coupled empirical model, not a bag of independently swappable parameters.
 
 ## What a classical force field represents
 
