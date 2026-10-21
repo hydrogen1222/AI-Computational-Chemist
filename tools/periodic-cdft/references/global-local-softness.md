@@ -34,7 +34,7 @@ Reference starting points:
 
 `scripts/softness.py` never extracts energies from raw OUTCAR. First verify externally derived vertical integer `I,A` values for **the same system used in preflight and the Fukui grids**, including the charge corrections and common reference. A researcher must review the energy model; an agent cannot self-certify physical validity.
 
-Create `postprocess/periodic_cdft/comparison/validated_ia.json` with **real** evidence (schema only; the values below are not real data and must not be pasted into production):
+Create `postprocess/periodic_cdft/data/validated_ia.json` with **real** evidence (schema only; the values below are not real data and must not be pasted into production):
 
 ```json
 {
@@ -56,17 +56,17 @@ The `I_eV` and `A_eV` fields above are **placeholders**: the command will reject
 With approved evidence and a `grid_audit.json` that actually passed, run:
 
 ```bash
-mkdir -p /project/Li2S/postprocess/periodic_cdft/local_softness
+mkdir -p /project/Li2S/postprocess/periodic_cdft/data/softness
 python tools/periodic-cdft/scripts/softness.py \
-  --evidence /project/Li2S/postprocess/periodic_cdft/comparison/validated_ia.json \
-  --preflight /project/Li2S/postprocess/periodic_cdft/comparison/preflight.json \
-  --grid-audit /project/Li2S/postprocess/periodic_cdft/comparison/grid_audit.json \
+  --evidence /project/Li2S/postprocess/periodic_cdft/data/validated_ia.json \
+  --preflight /project/Li2S/postprocess/periodic_cdft/data/preflight.json \
+  --grid-audit /project/Li2S/postprocess/periodic_cdft/data/grid_audit.json \
   --engine critic2 \
-  --condensed /project/Li2S/postprocess/periodic_cdft/comparison/condensed_ddec6.csv \
-  --output-dir /project/Li2S/postprocess/periodic_cdft/local_softness
+  --condensed /project/Li2S/postprocess/periodic_cdft/data/condensed_ddec6.csv \
+  --output-dir /project/Li2S/postprocess/periodic_cdft/data/softness
 ```
 
-Use whichever verified engine/condensed charge method is present; `--condensed` can repeat. Prerequisite: the matching `condensed_*.md` has a PASS marker, all four `fplus/fminus/fzero/dual` cubes appear in audited fields, and the destination exists and has no conflicting outputs. Output: `global_indices.json`, four signed `*_s_*.cube`, and optional `softness_*.csv`. Atomic sums should match global softness and the spatial cubes' integrals after scaling. No source files are overwritten. To include audited energy numbers in the **same single Chinese report**, rerun `scripts/report.py` with `--softness-json /project/Li2S/postprocess/periodic_cdft/local_softness/global_indices.json` and a **new, non-existing** `--out` path; do not overwrite an existing report. This report option is optional and never creates energy numbers by itself.
+Use whichever verified engine/condensed charge method is present; `--condensed` can repeat. Prerequisite: the matching `condensed_*.md` has a PASS marker, all four `fplus/fminus/fzero/dual` cubes appear in audited fields, and the destination exists and has no conflicting outputs. Output: `global_indices.json`, four signed `*_s_*.cube`, and optional `softness_*.csv`. Atomic sums should match global softness and the spatial cubes' integrals after scaling. No source files are overwritten. To include audited energy numbers in the **same single Chinese report**, rerun `scripts/report.py` with `--softness-json /project/Li2S/postprocess/periodic_cdft/data/softness/global_indices.json` and a **new, non-existing** `--out` path; do not overwrite an existing report. This report option is optional and never creates energy numbers by itself.
 
 **For the 3-atom Li2S N±0.1 proof-of-software case, no validated integer I/A is available.** Expected behavior: report `NOT_VALIDATED_FOR_CHARGED_PBC`; do not create fictional softness or insist on extra expensive calculations just to make every column numerical. Agent should add vetted outputs, methodological limitations and any missing status to the **single existing project comparison report**, rather than scattering root Markdown files.
 
@@ -80,6 +80,6 @@ Use whichever verified engine/condensed charge method is present; `--condensed` 
 
 ## Regression test
 
-`python3 -m unittest discover -s tools/periodic-cdft/tests -p 'test_softness.py' -v`
+`python3 tests/periodic_cdft_softness_test.py -v`
 
 The tests use only small synthetic cubes and CSVs; they verify I/A algebra, conservation, matching fingerprints, missing approvals, faulty charge grids, invalid gaps and overwrite refusal. They also check the response-consistent factor-of-two against the separately reported half-gap hardness. Synthetic numbers do not constitute a scientific validation of periodic Li2S hardness or softness.

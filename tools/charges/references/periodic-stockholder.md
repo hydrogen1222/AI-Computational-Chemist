@@ -114,21 +114,19 @@ It also reads existing Chargemol first-step Hirshfeld/CM5 from
 `VASP_DDEC_analysis.output` plus final DDEC6 charges, when available,
 without rerunning Chargemol.
 
-**Output:** under `CALC_ROOT/postprocess_summary`:
+**Output:** a Multiwfn section in `CALC_ROOT/postprocess_summary/report.md`.
 The human-facing Chinese report is required even when the user only
 requests numerical results. Do not hand off CSVs alone. Any failed
 H-I iteration is invalid as a reported charge and must remain
 an explicit method failure rather than a speculative numerical result.
-- `multiwfn_report_cn.md` — actual Chinese, presentation-ready
-  case descriptions, full element/atom comparisons, QC and status
-  interpretation; never quote a nonconverged H-I number.
-- `multiwfn_atoms.csv` — every atom with H, CM5, H-I from
+- The report section has case descriptions, element/atom comparisons, QC
+  and status interpretation; it never quotes a nonconverged H-I number.
+- `data/multiwfn_atoms.csv` — every atom with H, CM5, H-I from
   Multiwfn beside existing Chargemol H, CM5 and DDEC6 values;
-- `multiwfn_elements.csv` — per-element means/min/max;
-- `multiwfn_qc.csv` — method-by-method status, charge closure and logs;
-- `multiwfn_charge_comparison.md` — all-atom readable comparison;
-- `ppt_figures/*_pageNN.{svg,png}` — 16:9 vector/300-dpi figures
-  when matplotlib is installed.
+- `data/multiwfn_elements.csv` — per-element means/min/max;
+- `data/multiwfn_qc.csv` — method-by-method status, charge closure and logs;
+- `data/multiwfn_notes.md` — all-atom technical comparison;
+- `figures/multiwfn_*_pageNN.{png,svg}` when matplotlib is installed.
 
 ## Interpretation, not overvalidation
 

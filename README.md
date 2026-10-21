@@ -20,6 +20,11 @@ trimmed to the codes I use. Upstream citation: [CITATION.cff](CITATION.cff); lic
 Each skill is `SKILL.md` (trigger + route map), `references/` (load only what the task
 needs) and `scripts/`.
 
+Every analysis hands back **one `report.md`** (Chinese, figures embedded) with `figures/`
+and `data/` beside it — e.g. all charge methods on a calculation root merge into
+`ROOT/postprocess_summary/report.md`; periodic Fukui results go to
+`postprocess/periodic_cdft/report.md`.
+
 ## Install
 
 ```bash

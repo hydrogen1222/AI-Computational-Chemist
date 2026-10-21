@@ -11,6 +11,7 @@ import csv
 import hashlib
 from pathlib import Path
 import re
+import layout
 
 
 def args(argv=None):
@@ -73,7 +74,7 @@ def draw(folder, case, values, charge, page, pages):
     ax.text(0.99, -0.14,
             "Chargemol DDEC6 | min–max across atoms/printed bonds, NOT statistical error",
             transform=ax.transAxes, ha="right", va="top", fontsize=9)
-    name = safe_name(case) + "_" + suffix + (f"_part{page:02d}" if page>1 else "")
+    name = "ddec6_" + safe_name(case) + "_" + suffix + (f"_part{page:02d}" if page>1 else "")
     for ext, kwargs in ((".svg", {}), (".png", {"dpi": 300})):
         fig.savefig(folder / (name + ext), bbox_inches="tight", **kwargs)
     plt.close(fig)
@@ -88,8 +89,8 @@ def main(argv=None):
     except ImportError as e:
         raise SystemExit("Install matplotlib into the analysis environment to create PNG/SVG") from e
     try:
-        charges = read_rows(opt.summary / "ddec6_elements.csv")
-        bonds = read_rows(opt.summary / "ddec6_bond_types.csv")
+        charges = read_rows(layout.find_data(opt.summary, "ddec6_elements.csv"))
+        bonds = read_rows(layout.find_data(opt.summary, "ddec6_bond_types.csv"))
     except FileNotFoundError as e:
         raise SystemExit(f"missing DDEC6 CSV: {e}") from e
 
@@ -103,8 +104,7 @@ def main(argv=None):
             print(f"WARNING: explicitly limited to {opt.max_cases}/{len(cases)} models")
         cases = cases[:opt.max_cases]
 
-    destination = opt.summary / "ppt_figures"
-    destination.mkdir(exist_ok=True)
+    destination = layout.figures_dir(opt.summary, create=True)
     pages_created = 0
     for case in cases:
         for is_charge, all_rows, key in (

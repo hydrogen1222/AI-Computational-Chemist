@@ -55,7 +55,7 @@ class ReadableCharges(unittest.TestCase):
         self.add_bader()
         result=self.run_report("--methods","bader")
         self.assertEqual(result.returncode,0,result.stderr+result.stdout)
-        report=(self.output/"bader_summary.md").read_text()
+        report=(self.output/"report.md").read_text()
         for needed in ("可以放进 PPT","Li 的平均净电荷为 +0.8000 e",
                        "S 的平均净电荷为 -1.6000 e","原子电荷","净电荷",
                        "晶胞电荷核对","缺少 ACF.dat"):
@@ -63,7 +63,10 @@ class ReadableCharges(unittest.TestCase):
                 self.assertIn("missing ACF.dat",report)
             else:
                 self.assertIn(needed,report)
-        self.assertIn("本例没有合格电荷",report)
+        self.assertIn("未通过的案例",report)
+        overview,_,body=report.partition("## AIM / Bader")
+        self.assertIn("missing ACF.dat",overview)  # failure reason shown once, up front
+        self.assertNotIn("missing ACF.dat",body)
         self.assertIn("AECCAR0+AECCAR2",report)
         self.assertNotIn("Hirshfeld-I 已收敛",report)
 
@@ -74,7 +77,7 @@ class ReadableCharges(unittest.TestCase):
         p.write_text(s)
         r=self.run_report("--methods","bader")
         self.assertEqual(r.returncode,0,r.stderr)
-        text=(self.output/"bader_summary.md").read_text()
+        text=(self.output/"report.md").read_text()
         self.assertIn("未验证",text)
         self.assertNotIn("已按给定目标检查",text)
 
@@ -99,7 +102,7 @@ class ReadableCharges(unittest.TestCase):
         ])
         r=self.run_report("--methods","ddec6")
         self.assertEqual(r.returncode,0,r.stderr)
-        text=(self.output/"ddec6_report_cn.md").read_text()
+        text=(self.output/"report.md").read_text()
         for typ in ("Li-S","S-S","Li-Li"):self.assertIn(typ,text)
         self.assertIn("METRIC_NOT_REPORTED",text)
         self.assertIn("守恒未检查",text)
@@ -119,7 +122,7 @@ class ReadableCharges(unittest.TestCase):
                  hirshfeld_net_charge_e=".087865",cm5_net_charge_e="",ddec6_net_charge_e="-1.382809")])
         r=self.run_report("--methods","hirshfeld")
         self.assertEqual(r.returncode,0,r.stderr)
-        text=(self.output/"hirshfeld_report_cn.md").read_text()
+        text=(self.output/"report.md").read_text()
         self.assertIn("普通 Hirshfeld",text)
         self.assertIn("不包含 Hirshfeld-I",text)
         self.assertIn("—",text)
@@ -151,7 +154,7 @@ class ReadableCharges(unittest.TestCase):
         ])
         r=self.run_report("--methods","multiwfn")
         self.assertEqual(r.returncode,0,r.stderr)
-        text=(self.output/"multiwfn_report_cn.md").read_text()
+        text=(self.output/"report.md").read_text()
         self.assertIn("S-3.rad",text)
         self.assertIn("不可引用",text)
         self.assertNotIn("-2.080905",text)
@@ -160,11 +163,12 @@ class ReadableCharges(unittest.TestCase):
         self.assertIn("参考密度",text)
 
     def test_cli_skip_absent_and_fail_on_partial_inputs(self):
-        r=self.run_report("--only-present")
-        self.assertEqual(r.returncode,0,r.stderr)
+        r=self.run_report()
+        self.assertEqual(r.returncode,1)
+        self.assertIn("没有任何电荷结果表",r.stderr)
         self.assertEqual(list(self.output.glob("*.md")),[])
         (self.output/"bader_cases.csv").write_text("case,status\nx,OK\n")
-        r=self.run_report("--only-present")
+        r=self.run_report()
         self.assertEqual(r.returncode,1)
         self.assertIn("缺少 CSV",r.stderr)
 

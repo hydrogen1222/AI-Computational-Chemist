@@ -39,8 +39,9 @@ python tools/charges/scripts/batch_bader.py ROOT --collect-only  # ACF.dat alrea
 - Without POTCAR metadata, pass **verified** valence counts via `--zval`; never guess.
 - `--net-charge` only when the cell charge is verified; otherwise conservation is
   `NOT_CHECKED`, never PASS.
-- Working files go to `<run>/postprocess/bader/`; tables and the Chinese
-  `bader_summary.md` to `ROOT/postprocess_summary/`. Originals are never touched;
-  `--force` overwrites generated Bader outputs only.
+- Working files go to `<run>/postprocess/bader/`; the Bader section of
+  `ROOT/postprocess_summary/report.md` and its tables in `data/` are written
+  for you. Originals are never touched; `--force` overwrites generated Bader
+  outputs only.
 - `bader`/`chgsum.pl` are found via `scripts/software_locator.py`;
   `--bader-bin` / `--chgsum-bin` are fallbacks.

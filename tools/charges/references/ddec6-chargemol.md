@@ -20,10 +20,9 @@ for read-only discovery and adds `--collect-only` to write full per-atom,
 per-element, and charge-method-comparison tables. Add `--net-charge 0`
 when the original system is confirmed neutral, to verify charge closure.
 
-- Output: `hirshfeld_report_cn.md` (presentation-ready Chinese explanations),
-  `hirshfeld_atoms.csv`, `hirshfeld_elements.csv`,
-  `hirshfeld_cases.csv`, `hirshfeld_summary.md`, and 16:9
-  `ppt_figures/*_charge_methods.{svg,png}` if Matplotlib is available.
+- Output: a Hirshfeld/CM5 section in `postprocess_summary/report.md`;
+  tables `data/hirshfeld_{cases,atoms,elements}.csv` and `data/hirshfeld_notes.md`;
+  `figures/hirshfeld_*_charge_methods.{png,svg}` if Matplotlib is available.
 - Compare **ordinary Hirshfeld**, CM5 and DDEC6 calculated from the
   same density, with distinct column labels and no inferred oxidation states.
 - This does **not** produce iterative Hirshfeld-I. Do not relabel the
@@ -129,12 +128,12 @@ bond classes appear. Use the full raw BO table for detailed analysis.
 
 - Original density and POTCAR files are never modified. Chargemol work goes
   under each run's postprocess/chargemol/ and is never silently overwritten.
-- Under CALC_ROOT/postprocess_summary/: ddec6_cases.csv (case QC,
-  including `contact_exchange_error_e` and `bond_qc_status`),
-  ddec6_atoms.csv (q and SBO per atom), ddec6_bonds.csv (pairs with image
-  vectors), ddec6_elements.csv (element means and min-max),
-  ddec6_bond_types.csv (bond type means and min-max), ddec6_summary.md,
-  and ppt_figures/*.svg + *.png if Matplotlib is installed.
+- `CALC_ROOT/postprocess_summary/report.md` gains a DDEC6 section with the
+  figures embedded. Tables go to `data/`: ddec6_cases.csv (case QC, including
+  `contact_exchange_error_e` and `bond_qc_status`), ddec6_atoms.csv (q and SBO
+  per atom), ddec6_bonds.csv (pairs with image vectors), ddec6_elements.csv,
+  ddec6_bond_types.csv, and the English technical note ddec6_notes.md.
+  Charts go to `figures/ddec6_*.{png,svg}` when Matplotlib is installed.
 - PPT charts depict **range**, not measurement or statistical uncertainty.
   These figures do not by themselves validate the model or cross-case
   comparability. Keep source paths and all per-case errors in exported CSVs.

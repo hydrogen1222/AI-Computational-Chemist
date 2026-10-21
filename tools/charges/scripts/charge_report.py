@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Generate source-traceable Chinese atomic charge reports from existing CSVs.
+"""Write the single Chinese charge report, postprocess_summary/report.md.
 
-Bader, Chargemol DDEC6, Chargemol noniterative Hirshfeld/CM5 and Multiwfn.
+Covers every method whose tables are present (Bader, Chargemol DDEC6,
+Chargemol noniterative Hirshfeld/CM5, Multiwfn) and embeds their figures.
 No DFT or analysis binaries are executed. Existing CSVs are not modified.
+
+    python charge_report.py ROOT/postprocess_summary
 """
 from __future__ import annotations
 
@@ -13,17 +16,19 @@ import math
 from pathlib import Path
 import sys
 
+import layout
+
 FILES = {
     "bader": ("bader_cases.csv", "bader_elements.csv", "bader_atoms.csv"),
     "ddec6": ("ddec6_cases.csv", "ddec6_elements.csv", "ddec6_atoms.csv", "ddec6_bond_types.csv"),
     "hirshfeld": ("hirshfeld_cases.csv", "hirshfeld_elements.csv", "hirshfeld_atoms.csv"),
     "multiwfn": ("multiwfn_qc.csv", "multiwfn_elements.csv", "multiwfn_atoms.csv"),
 }
-REPORTS = {
-    "bader": "bader_summary.md",
-    "ddec6": "ddec6_report_cn.md",
-    "hirshfeld": "hirshfeld_report_cn.md",
-    "multiwfn": "multiwfn_report_cn.md",
+TITLES = {
+    "bader": "AIM / Bader",
+    "ddec6": "Chargemol DDEC6 原子电荷与键级",
+    "hirshfeld": "Chargemol 普通 Hirshfeld 与 CM5",
+    "multiwfn": "Multiwfn 周期性 Hirshfeld / CM5 与 Chargemol 对照",
 }
 
 
@@ -80,28 +85,28 @@ def summary_sentence(rows, key, method):
 
 
 def header(title, method, inputs, count):
-    sources="、".join(inputs)
-    return (f"# {title}｜原子电荷汇报稿\n\n"
-            f"**计算方法：** {method}。\n\n"
-            f"**数据来源：** {sources}（{count} 个案例）。报告由已有 CSV 生成，未重新计算电子密度。\n\n"
-            "**符号与边界：** 净原子电荷 q 的单位为 e；正值表示按该方法分配后电子亏损，"
-            "负值表示电子富集。原子部分电荷不是形式氧化态；"
-            "不同方法和芯价参考密度下的数值不应无条件混用。\n\n"
-            "**阅读顺序：** 先看每例状态和电荷核对，再看可供 PPT 使用的文字，"
-            "最后是完整元素及原子列表。方法检查未通过时不生成定量结论。\n\n")
+    sources="、".join("data/"+name for name in inputs)
+    return (f"# {title}\n\n"
+            f"**方法：** {method}。\n\n"
+            f"**数据：** {sources}（{count} 个案例）。\n\n")
+
+
+def details(label, body):
+    """Long per-atom tables stay complete but collapsed."""
+    return f"<details><summary>{label}</summary>\n\n{body}</details>\n\n"
 
 
 def render_bader(items):
     cases,elements,atoms=items
     byel,byatom=by_case(elements),by_case(atoms)
-    text=header("AIM / Bader", "Bader 分区；q = POTCAR ZVAL − Bader 区域价电子数。"
+    text=header(TITLES["bader"], "Bader 分区；q = POTCAR ZVAL − Bader 区域价电子数。"
         "若执行计算，以 AECCAR0+AECCAR2 构建分区参考密度",
         FILES["bader"],len(cases))
     for c in cases:
         case=c["case"]
-        text+=f"## 案例：{safe(case)}\n\n**状态：** {safe(c['status'])}；{safe(c.get('detail',''))}。\n\n"
         if c["status"]!="OK":
-            text+="**本例没有合格电荷，不能汇报数值。**\n\n";continue
+            continue  # listed in the overview with its reason
+        text+=f"## 案例：{safe(case)}\n\n**状态：** {safe(c['status'])}；{safe(c.get('detail',''))}。\n\n"
         er,ar=byel[case],byatom[case]
         if not er or not ar:
             text+="**本例缺少有效元素/原子数据，不能汇报数值。**\n\n";continue
@@ -119,10 +124,10 @@ def render_bader(items):
             [[r["element"],r["count"],fmt(r["mean_q_e"],4,True),
               fmt(r["min_q_e"],4,True),fmt(r["max_q_e"],4,True),
               fmt(r["spread_e"],4)] for r in er])
-        text+="**逐原子电荷（全部）：**\n\n"+table(
+        text+=details("逐原子电荷（全部）",table(
             ["编号","元素","ZVAL / e","区域价电子数","q / e"],
             [[r["atom_index"],r["element"],fmt(r["zval"]),fmt(r["bader_electrons"],5),
-              fmt(r["net_charge_e"],5,True)] for r in ar])
+              fmt(r["net_charge_e"],5,True)] for r in ar]))
         text+=f"**原始 Bader ACF 路径：** {safe(c.get('acf_path',''))}。\n\n"
     text+=("## 解读限制\n\n"
            "元素均值不能代替不等价晶位的逐原子分析。需核验 VASP 密度网格、"
@@ -134,15 +139,15 @@ def render_bader(items):
 def render_ddec6(items):
     cases,elements,atoms,bondtypes=items
     el,at,bo=by_case(elements),by_case(atoms),by_case(bondtypes)
-    text=header("Chargemol DDEC6 原子电荷与键级",
+    text=header(TITLES["ddec6"],
         "DDEC6 净电荷、原子键级和 SBO、跨晶胞成对 BO；"
         "BO 和 SBO 为无量纲，均不等于 ICOHP 或整数 Lewis 键级",
         FILES["ddec6"],len(cases))
     for c in cases:
         case=c["case"]
-        text+=f"## 案例：{safe(case)}\n\n**状态：** {safe(c['status'])}；{safe(c.get('detail',''))}。\n\n"
         if c["status"]!="OK":
-            text+="**该例分析失败，不引用 DDEC6 电荷或键级。**\n\n";continue
+            continue  # listed in the overview with its reason
+        text+=f"## 案例：{safe(case)}\n\n**状态：** {safe(c['status'])}；{safe(c.get('detail',''))}。\n\n"
         er,ar,br=el[case],at[case],bo[case]
         if not er or not ar:
             text+="**缺少有效原子或元素数据。**\n\n";continue
@@ -164,11 +169,11 @@ def render_ddec6(items):
             ["元素对","不重复周期键条数","平均 BO","最小～最大 BO"],
             [[r["element_pair"],r["n_periodic_bonds"],fmt(r["mean_bond_order"],5),
               fmt(r["min_bond_order"],5)+" ～ "+fmt(r["max_bond_order"],5)] for r in br])
-        text+="**全部原子电荷与键级：**\n\n"+table(
+        text+=details("全部原子电荷与键级",table(
             ["编号","元素","q / e","SBO","已打印 SBO 贡献","未打印残差"],
             [[r["atom_index_1based"],r["element"],fmt(r["ddec6_net_charge_e"],5,True),
               fmt(r["sum_bond_orders"],5),fmt(r.get("sbo_from_printed_pairs"),5),
-              fmt(r.get("sbo_unprinted_remainder"),5)] for r in ar])
+              fmt(r.get("sbo_unprinted_remainder"),5)] for r in ar]))
         text+=f"**Chargemol 原始输出路径：** {safe(c.get('chargemol_dir',''))}。\n\n"
     text+=("## 科学注意事项\n\n"
            "周期镜像自身键对于其原子的 SBO 可以计入两次；未打印的微弱键贡献"
@@ -180,14 +185,14 @@ def render_ddec6(items):
 def render_hirshfeld(items):
     cases,elements,atoms=items
     el,at=by_case(elements),by_case(atoms)
-    text=header("Chargemol 普通 Hirshfeld 与 CM5",
+    text=header(TITLES["hirshfeld"],
         "读取 Chargemol 初始非迭代 Hirshfeld 分区和 CM5；不包含 Hirshfeld-I",
         FILES["hirshfeld"],len(cases))
     for c in cases:
         case=c["case"]
-        text+=f"## 案例：{safe(case)}\n\n**状态：** {safe(c['status'])}；{safe(c.get('detail',''))}。\n\n"
         if c["status"]!="OK":
-            text+="**该案例无合格电荷。**\n\n";continue
+            continue  # listed in the overview with its reason
+        text+=f"## 案例：{safe(case)}\n\n**状态：** {safe(c['status'])}；{safe(c.get('detail',''))}。\n\n"
         er,ar=el[case],at[case]
         if not er or not ar:
             text+="**缺少原子/元素数据。**\n\n";continue
@@ -201,10 +206,10 @@ def render_hirshfeld(items):
             [[r["element"],r["count"],fmt(r["hirshfeld_mean_e"],5,True),
               fmt(r["hirshfeld_min_e"],5,True)+" ～ "+fmt(r["hirshfeld_max_e"],5,True),
               fmt(r.get("cm5_mean_e"),5,True),fmt(r.get("ddec6_mean_e"),5,True)] for r in er])
-        text+="**全部原子：**\n\n"+table(
+        text+=details("全部原子",table(
             ["编号","元素","Hirshfeld / e","CM5 / e","DDEC6 / e"],
             [[r["atom_index_1based"],r["element"],fmt(r["hirshfeld_net_charge_e"],6,True),
-              fmt(r.get("cm5_net_charge_e"),6,True),fmt(r.get("ddec6_net_charge_e"),6,True)] for r in ar])
+              fmt(r.get("cm5_net_charge_e"),6,True),fmt(r.get("ddec6_net_charge_e"),6,True)] for r in ar]))
         text+=f"**来源日志：** {safe(c.get('source_log',''))}。\n\n"
     text+=("## 与 Multiwfn 比较的边界\n\n"
            "Chargemol 和 Multiwfn 虽都使用普通 Hirshfeld/CM5 名称，"
@@ -217,7 +222,7 @@ def render_hirshfeld(items):
 def render_multiwfn(items):
     qc,elements,atoms=items
     byqc,el,at=by_case(qc),by_case(elements),by_case(atoms)
-    text=header("Multiwfn 周期性 Hirshfeld / CM5 与 Chargemol 对照",
+    text=header(TITLES["multiwfn"],
         "Multiwfn 普通 Hirshfeld、CM5、Hirshfeld-I；"
         "读取同案例 Chargemol 非迭代 Hirshfeld/CM5 与 DDEC6 作为独立对照",
         FILES["multiwfn"],len(byqc))
@@ -250,7 +255,7 @@ def render_multiwfn(items):
               fmt(r["min_q_e"],5,True)+" ～ "+fmt(r["max_q_e"],5,True)] for r in er])
         def cell(r,method,key):
             return fmt(r.get(key),6,True) if method in passed else "不可引用"
-        text+="**全部逐原子对照：**\n\n"+table(
+        text+=details("全部逐原子对照",table(
             ["编号","元素","Multiwfn H","Multiwfn CM5","Multiwfn H-I（待验收）",
              "Chargemol H","Chargemol CM5","DDEC6","ΔH：Multiwfn−Chargemol","ΔCM5：Multiwfn−Chargemol"],
             [[r["atom_1based"],r["element"],
@@ -261,7 +266,7 @@ def render_multiwfn(items):
               fmt(r.get("chargemol_cm5_e"),6,True),
               fmt(r.get("chargemol_ddec6_e"),6,True),
               cell(r,"hirshfeld","delta_hirshfeld_e") if r.get("chargemol_hirshfeld_e") else "—",
-              cell(r,"cm5","delta_cm5_e") if r.get("chargemol_cm5_e") else "—"] for r in ar])+"\n"
+              cell(r,"cm5","delta_cm5_e") if r.get("chargemol_cm5_e") else "—"] for r in ar]))
         text+=("**交叉比较解释：** 仅将同名的 H–H、CM5–CM5 作为有符号差值诊断；"
                "不同参考密度与芯价电子约定可造成数值/符号差异，不意味着其中一方一定错误。\n\n")
     text+=("## 验收边界\n\n"
@@ -280,38 +285,96 @@ RENDER={
 }
 
 
-def generate(folder,method):
-    if method not in FILES:raise ValueError(f"unknown method {method}")
-    inputs=[folder/name for name in FILES[method]]
-    missing=[p.name for p in inputs if not p.is_file()]
-    if missing:raise FileNotFoundError("缺少 CSV：" + ", ".join(missing))
-    data=[csv_rows(p) for p in inputs]
-    if not data[0]:raise ValueError("没有案例/QC 记录")
-    output=folder/REPORTS[method]
-    output.write_text(RENDER[method](data),encoding="utf-8")
-    return output
+def load(folder,method):
+    """Rows for one method, or None when its tables are absent."""
+    paths=[layout.find_data(folder,name) for name in FILES[method]]
+    if not paths[0].is_file():
+        return None
+    missing=[p.name for p in paths if not p.is_file()]
+    if missing:raise FileNotFoundError(f"{method} 缺少 CSV：" + ", ".join(missing))
+    data=[csv_rows(p) for p in paths]
+    if not data[0]:raise ValueError(f"{method} 没有案例/QC 记录")
+    return data
+
+
+def tally(method,data):
+    """(cases, passed, failures) for the overview table."""
+    if method=="multiwfn":
+        by=by_case(data[0])
+        ok=[c for c,rows in by.items() if any(r["status"]=="OK" for r in rows)]
+        bad=[(c,"; ".join(f"{r['method']}: {r.get('detail','')}" for r in rows if r["status"]!="OK"))
+             for c,rows in by.items() if c not in ok]
+        return len(by),len(ok),bad
+    cases=data[0]
+    bad=[(c["case"],c.get("detail","")) for c in cases if c["status"]!="OK"]
+    return len(cases),len(cases)-len(bad),bad
+
+
+def demote(markdown):
+    return "\n".join("#"+line if line.startswith("#") else line for line in markdown.split("\n"))
+
+
+def figure_block(folder,method):
+    figs=layout.figures_for(folder,method+"_")
+    if not figs:
+        return ""
+    lines=["**图（PNG 供阅读，同名 SVG 可编辑；为快速预览，正式出图用 Stormy-drawing）：**",""]
+    lines+=[f"![{f.stem}](figures/{f.name})" for f in figs]
+    return "\n".join(lines)+"\n\n"
+
+
+def write_report(folder,methods=None):
+    """Regenerate folder/report.md from every method whose tables exist."""
+    folder=Path(folder)
+    sections,overview,problems=[],[],[]
+    for method in methods or list(FILES):
+        data=load(folder,method)
+        if data is None:
+            continue
+        n,ok,bad=tally(method,data)
+        overview.append([TITLES[method],n,ok,len(bad)])
+        problems+=[f"- {TITLES[method]} / {safe(c)}：{safe(d)}" for c,d in bad]
+        sections.append(demote(RENDER[method](data))+"\n"+figure_block(folder,method))
+    if not sections:
+        raise FileNotFoundError(f"{folder} 中没有任何电荷结果表")
+    text=("# 原子电荷分析报告\n\n"
+          "**符号约定：** 净原子电荷 q 的单位为 e；正值表示按该方法分配后电子亏损，"
+          "负值表示电子富集。部分电荷不是形式氧化态；不同方法的数值不能混用。"
+          "本报告由已有表格生成，未重新计算电子密度。\n\n"
+          "## 总览\n\n"+table(["方法","案例","通过","失败"],overview))
+    if problems:
+        text+="**未通过的案例**（没有合格结果，下文不汇报其数值）：\n\n"+"\n".join(problems)+"\n\n"
+    text+=("**怎么读：** 每个方法下先看案例状态和电荷核对，再看“可以放进 PPT 的结果描述”。"
+           "逐原子数据折叠在各案例末尾；完整表格在 data/，图在 figures/。\n\n")
+    text+="\n".join(sections)
+    # Paths inside the calculation root are shown relative to it.
+    root=str(folder.resolve().parent)
+    if root not in ("","/"):
+        text=text.replace(root+"/","")
+    out=folder/layout.REPORT
+    out.write_text(text,encoding="utf-8")
+    return out
+
+
+def generate(folder,method=None):
+    """Compatibility wrapper used by the batch scripts."""
+    return write_report(folder)
 
 
 def main(argv=None):
-    p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("folder",type=Path,help="Existing postprocess_summary folder")
-    p.add_argument("--methods",nargs="+",choices=list(FILES),default=list(FILES))
-    p.add_argument("--only-present",action="store_true",help="Skip missing method families")
+    p=argparse.ArgumentParser(description=__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("folder",type=Path,help="ROOT/postprocess_summary")
+    p.add_argument("--methods",nargs="+",choices=list(FILES),help="Limit to these methods")
+    p.add_argument("--only-present",action="store_true",help=argparse.SUPPRESS)  # always on now
     options=p.parse_args(argv)
     folder=options.folder.expanduser().resolve()
     if not folder.is_dir():p.error(f"summary directory missing: {folder}")
-    errors=0
-    for method in options.methods:
-        if options.only_present and not (folder/FILES[method][0]).is_file():
-            print(f"SKIP {method}: 无案例 CSV")
-            continue
-        try:
-            dest=generate(folder,method)
-            print(f"REPORT {method}: {dest}")
-        except (OSError,ValueError,KeyError) as exc:
-            print(f"ERROR {method}: {exc}",file=sys.stderr)
-            errors+=1
-    return 1 if errors else 0
+    try:
+        print(f"报告：{write_report(folder,options.methods)}")
+        return 0
+    except (OSError,ValueError,KeyError) as exc:
+        print(f"ERROR: {exc}",file=sys.stderr)
+        return 1
 
 
 if __name__=="__main__":

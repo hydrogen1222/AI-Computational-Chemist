@@ -13,7 +13,8 @@ from __future__ import annotations
 import argparse
 import csv
 import math
-from charge_report import generate as generate_charge_report
+from charge_report import write_report
+import layout
 import re
 import shutil
 from software_locator import find_executable
@@ -300,26 +301,28 @@ def main(argv=None):
                         "expected_net_charge_e": opts.net_charge if opts.net_charge is not None else "",
                         "charge_balance_error_e": round(delta_q, 7) if isinstance(delta_q, float) else delta_q})
 
+    report = None
     if opts.execute or opts.collect_only:
-        dest = root / "postprocess_summary"
-        dest.mkdir(parents=True, exist_ok=True)
-        write_csv(dest / "bader_cases.csv",
+        dest = layout.summary_dir(root, create=True)
+        data = layout.data_dir(dest)
+        write_csv(data / "bader_cases.csv",
                   ["case", "status", "detail", "acf_path", "sum_bader_q_e",
                    "expected_net_charge_e", "charge_balance_error_e"], summary)
-        write_csv(dest / "bader_atoms.csv",
+        write_csv(data / "bader_atoms.csv",
                   ["case", "atom_index", "element", "bader_electrons", "zval",
                    "net_charge_e", "acf_path"], all_atoms)
-        write_csv(dest / "bader_elements.csv",
+        write_csv(data / "bader_elements.csv",
                   ["case", "element", "count", "mean_q_e", "min_q_e",
                    "max_q_e", "spread_e", "acf_path"], all_elems)
         try:
-            report = generate_charge_report(dest, "bader")
-            print(f"中文报告：{report}")
+            report = write_report(dest)
         except (OSError, ValueError, KeyError) as exc:
             failures += 1
             print(f"ERROR: Bader 人类可读报告生成失败：{exc}", file=sys.stderr)
-        print(f"CSV: {dest} (cases, atoms, elements)")
+            report = None
     print(f"Completed {len(cases) - failures}/{len(cases)}; failed {failures}")
+    if report:
+        print(f"报告：{report}")
     return 1 if failures else 0
 
 

@@ -70,15 +70,15 @@ class HirshfeldExtractionTest(unittest.TestCase):
         result = self.cmd("--collect-only", "--net-charge", "0")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         out = self.root / "postprocess_summary"
-        with (out / "hirshfeld_atoms.csv").open() as fh:
+        with (out / "data" / "hirshfeld_atoms.csv").open() as fh:
             rows = list(csv.DictReader(fh))
         self.assertEqual(len(rows), 2)
         self.assertAlmostEqual(float(rows[0]["hirshfeld_net_charge_e"]), 0.204737)
         self.assertAlmostEqual(float(rows[0]["cm5_net_charge_e"]), 0.420172)
         self.assertAlmostEqual(float(rows[0]["ddec6_net_charge_e"]), 0.843200)
         self.assertAlmostEqual(float(rows[1]["hirshfeld_net_charge_e"]), -0.204737)
-        self.assertIn("not Hirshfeld-I", (out / "hirshfeld_summary.md").read_text())
-        human = (out / "hirshfeld_report_cn.md").read_text(encoding="utf-8")
+        self.assertIn("not Hirshfeld-I", (out / "data/hirshfeld_notes.md").read_text())
+        human = (out / "report.md").read_text(encoding="utf-8")
         self.assertIn("可以放进 PPT", human)
         self.assertIn("普通 Hirshfeld", human)
         self.assertIn("不包含 Hirshfeld-I", human)
@@ -89,7 +89,7 @@ class HirshfeldExtractionTest(unittest.TestCase):
         r = self.cmd("--collect-only")
         self.assertEqual(r.returncode, 1)
         self.assertIn("noniterative Hirshfeld block absent", r.stdout)
-        with (self.root / "postprocess_summary/hirshfeld_cases.csv").open() as fh:
+        with (self.root / "postprocess_summary/data/hirshfeld_cases.csv").open() as fh:
             rows = list(csv.DictReader(fh))
         self.assertEqual(rows[0]["status"], "ERROR")
 
@@ -105,7 +105,7 @@ class HirshfeldExtractionTest(unittest.TestCase):
         p.write_text(LOG.replace("The computed CM5 net atomic charges are:\n    0.420172    -0.420172\n",""))
         r = self.cmd("--collect-only")
         self.assertEqual(r.returncode, 0, r.stdout+r.stderr)
-        with (self.root / "postprocess_summary/hirshfeld_atoms.csv").open() as fh:
+        with (self.root / "postprocess_summary/data/hirshfeld_atoms.csv").open() as fh:
             rows = list(csv.DictReader(fh))
         self.assertEqual(rows[0]["cm5_net_charge_e"], "")
 
@@ -121,7 +121,7 @@ class HirshfeldExtractionTest(unittest.TestCase):
             self.skipTest("matplotlib optional")
         r = self.cmd("--collect-only", "--net-charge", "0")
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        dest = self.root / "postprocess_summary/ppt_figures"
+        dest = self.root / "postprocess_summary/figures"
         self.assertTrue(list(dest.glob("*_charge_methods.svg")))
         self.assertTrue(list(dest.glob("*_charge_methods.png")))
 
@@ -132,7 +132,7 @@ class HirshfeldExtractionTest(unittest.TestCase):
         self.assertEqual(r.returncode, 1)
         self.assertIn("OK nacl", r.stdout)
         self.assertIn("ERROR bad", r.stdout)
-        with (self.root / "postprocess_summary/hirshfeld_elements.csv").open() as fh:
+        with (self.root / "postprocess_summary/data/hirshfeld_elements.csv").open() as fh:
             els = list(csv.DictReader(fh))
         self.assertEqual({x["case"] for x in els}, {"nacl"})
 

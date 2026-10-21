@@ -109,18 +109,18 @@ class PeriodicCharges(unittest.TestCase):
         r=self.call(COLLECT,"--net-charge","0")
         self.assertEqual(r.returncode,0,r.stdout+r.stderr)
         output=self.root/"postprocess_summary"
-        with (output/"multiwfn_atoms.csv").open() as f:
+        with (output/"data"/"multiwfn_atoms.csv").open() as f:
             rows=list(csv.DictReader(f))
         self.assertEqual(len(rows),3)
         self.assertAlmostEqual(float(rows[0]["multiwfn_hirshfeld_e"]),.08786)
         self.assertAlmostEqual(float(rows[0]["multiwfn_cm5_e"]),-.2472)
         self.assertAlmostEqual(float(rows[0]["multiwfn_hirshfeld_i_e"]),-1.8)
         self.assertAlmostEqual(float(rows[0]["chargemol_ddec6_e"]),-1.382809)
-        with (output/"multiwfn_qc.csv").open() as f:
+        with (output/"data"/"multiwfn_qc.csv").open() as f:
             quality=list(csv.DictReader(f))
         self.assertEqual({row["status"] for row in quality},{"OK"})
-        self.assertIn("Hirshfeld-I", (output/"multiwfn_charge_comparison.md").read_text())
-        human = (output / "multiwfn_report_cn.md").read_text(encoding="utf-8")
+        self.assertIn("Hirshfeld-I", (output/"data"/"multiwfn_notes.md").read_text())
+        human = (output / "report.md").read_text(encoding="utf-8")
         self.assertIn("可以放进 PPT", human)
         self.assertIn("逐方法质量状态", human)
 
@@ -130,7 +130,7 @@ class PeriodicCharges(unittest.TestCase):
         file.write_text(file.read_text().replace("Atom 1(S)", "Atom 1(Li)"))
         r=self.call(COLLECT,"--net-charge","0")
         self.assertEqual(r.returncode,1)
-        with (self.root/"postprocess_summary/multiwfn_atoms.csv").open() as f:
+        with (self.root/"postprocess_summary/data/multiwfn_atoms.csv").open() as f:
             rows=list(csv.DictReader(f))
         self.assertEqual(rows[0]["multiwfn_hirshfeld_i_e"],"")
         self.assertTrue(rows[0]["multiwfn_hirshfeld_e"])
@@ -141,7 +141,7 @@ class PeriodicCharges(unittest.TestCase):
         r=self.call(COLLECT,"--net-charge","0")
         self.assertEqual(r.returncode,1)
         self.assertIn("2/3 Multiwfn methods read",r.stdout)
-        with (self.root/"postprocess_summary/multiwfn_qc.csv").open() as f:
+        with (self.root/"postprocess_summary/data/multiwfn_qc.csv").open() as f:
             q=list(csv.DictReader(f))
         self.assertIn("ERROR",{row["status"] for row in q})
 
@@ -151,7 +151,7 @@ class PeriodicCharges(unittest.TestCase):
             atom_log(self.species,[-1.8,0.9,0.5]))
         r=self.call(COLLECT,"--net-charge","0")
         self.assertEqual(r.returncode,1)
-        with (self.root/"postprocess_summary/multiwfn_qc.csv").open() as f:
+        with (self.root/"postprocess_summary/data/multiwfn_qc.csv").open() as f:
             q=list(csv.DictReader(f))
         self.assertTrue(any("charge sum" in x["detail"] for x in q))
 
@@ -163,7 +163,7 @@ class PeriodicCharges(unittest.TestCase):
         self.add_logs()
         r=self.call(COLLECT,"--net-charge","0")
         self.assertEqual(r.returncode,0,r.stdout+r.stderr)
-        pic=self.root/"postprocess_summary"/"ppt_figures"
+        pic=self.root/"postprocess_summary"/"figures"
         self.assertTrue(list(pic.glob("*.svg")))
         self.assertTrue(list(pic.glob("*.png")))
 

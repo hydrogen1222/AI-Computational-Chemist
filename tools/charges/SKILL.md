@@ -41,20 +41,32 @@ fails or finds several candidates.
   Keep atom/element mapping to the original CHGCAR.
 - **Read-only by default.** Every batch script previews first; `--execute`
   (running bader/Chargemol) needs explicit approval. Original files are never
-  modified; outputs go to `<run>/postprocess/<method>/` and
-  `ROOT/postprocess_summary/`.
-- **Never CSV-only.** Every batch ends with a short Chinese report
-  (`*_report_cn.md` / `bader_summary.md`): one PPT-quotable paragraph, full
-  element and site tables, sign/units, QC status, provenance, and what the
-  numbers cannot prove. Regenerate reports from existing CSVs without
-  recomputing:
+  modified.
 
-```bash
-python tools/charges/scripts/charge_report.py ROOT/postprocess_summary --only-present
+## What the user gets
+
+Every batch writes to the same place, and running several methods on one root
+merges them into **one report**:
+
+```text
+ROOT/postprocess_summary/
+  report.md    open this — overview, failed cases with reasons, per-method
+               PPT-ready sentence, element tables, figures embedded,
+               per-atom tables collapsed
+  figures/     <method>_*.png (read) and .svg (edit)
+  data/        all CSV tables + English technical notes
 ```
 
-Charts written by these scripts are quick previews. Finished figures go through
-the Stormy-drawing plotting skill.
+Per-run working files stay in `<run>/postprocess/<method>/`. When handing over,
+give the user the `report.md` path and a one-line result — not a file list.
+Regenerate the report from existing tables without recomputing:
+
+```bash
+python tools/charges/scripts/charge_report.py ROOT/postprocess_summary
+```
+
+Charts are quick previews; finished figures go through the Stormy-drawing
+plotting skill.
 
 ## Related
 

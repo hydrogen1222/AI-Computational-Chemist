@@ -66,20 +66,20 @@ class DDEC6Tests(unittest.TestCase):
         self.assertEqual(r.returncode, 1, r.stderr + r.stdout)
         self.assertIn("element/order mismatch", r.stdout)
         out = self.root / "postprocess_summary"
-        with (out / "ddec6_atoms.csv").open() as fh:
+        with (out / "data" / "ddec6_atoms.csv").open() as fh:
             atoms = list(csv.DictReader(fh))
         self.assertEqual(len(atoms), 2)
         self.assertEqual([float(a["ddec6_net_charge_e"]) for a in atoms], [0.7, -0.7])
         self.assertEqual([float(a["sum_bond_orders"]) for a in atoms], [0.3, 0.3])
-        with (out / "ddec6_bonds.csv").open() as fh:
+        with (out / "data" / "ddec6_bonds.csv").open() as fh:
             bonds = list(csv.DictReader(fh))
         self.assertEqual(len(bonds), 1)  # reverse bonds de-duplicated
         self.assertEqual(bonds[0]["element_i"], "Na")
         self.assertEqual(bonds[0]["element_j"], "S")
         self.assertEqual(bonds[0]["translation_a"], "0")
         self.assertAlmostEqual(float(bonds[0]["ddec6_bond_order"]), 0.3)
-        self.assertIn("Charge sum check: enabled", (out / "ddec6_summary.md").read_text())
-        human = (out / "ddec6_report_cn.md").read_text(encoding="utf-8")
+        self.assertIn("Charge sum check: enabled", (out / "data/ddec6_notes.md").read_text())
+        human = (out / "report.md").read_text(encoding="utf-8")
         self.assertIn("可以放进 PPT", human)
         self.assertIn("Na 的平均净电荷为 +0.7000 e", human)
         self.assertIn("Na-S", human)
@@ -90,7 +90,7 @@ class DDEC6Tests(unittest.TestCase):
             "2\nmock\nNa 0 0 0 0.7\nS 3 3 3 -0.7\n")
         r = self.run_batch("--collect-only")
         self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
-        with (self.root / "postprocess_summary/ddec6_cases.csv").open() as fh:
+        with (self.root / "postprocess_summary/data/ddec6_cases.csv").open() as fh:
             rows = list(csv.DictReader(fh))
         self.assertEqual({x["charge_balance_error_e"] for x in rows}, {"NOT_CHECKED"})
 
@@ -178,12 +178,12 @@ class DDEC6Tests(unittest.TestCase):
         r = self.run_batch('--collect-only', '--net-charge', '0',
                            '--manifest', self.manifest('upstream_fixture'))
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        with (self.root / 'postprocess_summary/ddec6_bonds.csv').open() as fh:
+        with (self.root / 'postprocess_summary/data/ddec6_bonds.csv').open() as fh:
             bonds = list(csv.DictReader(fh))
         self.assertEqual(len(bonds), 2)  # Na-Cl and periodic Cl-Cl, no mirrored duplicates
         self.assertEqual({(b['element_i'], b['element_j']) for b in bonds},
                          {('Na', 'Cl'), ('Cl', 'Cl')})
-        with (self.root / 'postprocess_summary/ddec6_atoms.csv').open() as fh:
+        with (self.root / 'postprocess_summary/data/ddec6_atoms.csv').open() as fh:
             atoms = list(csv.DictReader(fh))
         self.assertAlmostEqual(float(atoms[0]['ddec6_net_charge_e']), 0.8432)
         self.assertAlmostEqual(float(atoms[1]['sum_bond_orders']), 0.901058)
@@ -210,7 +210,7 @@ class DDEC6Tests(unittest.TestCase):
         file.write_text("The maximum error in the summed contact exchange is   0.000230\n")
         result = self.run_batch("--collect-only", "--manifest", self.manifest("a"))
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
-        with (self.root / "postprocess_summary/ddec6_cases.csv").open() as fh:
+        with (self.root / "postprocess_summary/data/ddec6_cases.csv").open() as fh:
             row = next(csv.DictReader(fh))
         self.assertEqual(row["bond_qc_status"], "PASS")
         self.assertAlmostEqual(float(row["contact_exchange_error_e"]), 0.000230)
@@ -218,7 +218,7 @@ class DDEC6Tests(unittest.TestCase):
     def test_missing_chargemol_log_is_not_reported_as_qc_pass(self):
         result = self.run_batch("--collect-only", "--manifest", self.manifest("a"))
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
-        with (self.root / "postprocess_summary/ddec6_cases.csv").open() as fh:
+        with (self.root / "postprocess_summary/data/ddec6_cases.csv").open() as fh:
             row = next(csv.DictReader(fh))
         self.assertEqual(row["bond_qc_status"], "LOG_MISSING")
 
@@ -231,10 +231,12 @@ class DDEC6Tests(unittest.TestCase):
             "2\nmock\nNa 0 0 0 0.7\nS 3 3 3 -0.7\n")
         r = self.run_batch("--collect-only", "--net-charge", "0")
         self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
-        out = self.root / "postprocess_summary/ppt_figures"
-        self.assertTrue((out / "a_charges.svg").is_file())
-        self.assertTrue((out / "a_bond_orders.png").is_file())
-        self.assertGreater((out / "a_charges.png").stat().st_size, 10000)
+        out = self.root / "postprocess_summary/figures"
+        self.assertTrue((out / "ddec6_a_charges.svg").is_file())
+        self.assertTrue((out / "ddec6_a_bond_orders.png").is_file())
+        self.assertGreater((out / "ddec6_a_charges.png").stat().st_size, 10000)
+        report = (self.root / "postprocess_summary/report.md").read_text(encoding="utf-8")
+        self.assertIn("](figures/ddec6_a_charges.png)", report)
 
 
 if __name__ == "__main__":

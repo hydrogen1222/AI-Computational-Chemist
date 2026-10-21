@@ -17,7 +17,8 @@ from prepare_periodic_chgcar import valence_metadata,manifest_cases
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from batch_ddec6 import xyz_properties,CHARGE_FILE
 from collect_hirshfeld import read_first_partition,find_log
-from charge_report import generate as generate_charge_report
+from charge_report import write_report
+import layout
 
 NUM=r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[EeDd][+-]?\d+)?"
 ATOM=re.compile(r"Atom\s+(\d+)\(\s*([A-Z][a-z]?)\s*\)\s*:\s*("+NUM+r")")
@@ -117,7 +118,7 @@ def plot(folder,rows):
             ax.set_title(f"Population methods — {case} [{page}]\n"
                          "Distinct density-partition/reference conventions",loc="left")
             ax.legend();ax.grid(axis="y",alpha=.15)
-            stem=re.sub(r"[^a-zA-Z0-9_.-]","_",case)[:55] + "_" + hashlib.sha256(case.encode()).hexdigest()[:7]+f"_page{page:02d}"
+            stem="multiwfn_"+re.sub(r"[^a-zA-Z0-9_.-]","_",case)[:55] + "_" + hashlib.sha256(case.encode()).hexdigest()[:7]+f"_page{page:02d}"
             for ext,kw in ((".svg",{}),(".png",{"dpi":300})):
                 fig.savefig(folder/(stem+ext),bbox_inches="tight",**kw)
             plt.close(fig)
@@ -189,12 +190,12 @@ def main(argv=None):
             print(f"ERROR {name}: {e}")
             quality.append(dict(case=name,method="preflight",status="ERROR",detail=str(e),
                                 charge_sum_e="",expected_charge_e="",log=""))
-    folder=root/"postprocess_summary"
-    folder.mkdir(exist_ok=True)
-    write_csv(folder/"multiwfn_atoms.csv",FIELDS,rows)
-    write_csv(folder/"multiwfn_elements.csv",ELEMS,elements)
-    write_csv(folder/"multiwfn_qc.csv",QC,quality)
-    with (folder/"multiwfn_charge_comparison.md").open("w",encoding="utf-8") as f:
+    folder=layout.summary_dir(root,create=True)
+    data=layout.data_dir(folder)
+    write_csv(data/"multiwfn_atoms.csv",FIELDS,rows)
+    write_csv(data/"multiwfn_elements.csv",ELEMS,elements)
+    write_csv(data/"multiwfn_qc.csv",QC,quality)
+    with (data/"multiwfn_notes.md").open("w",encoding="utf-8") as f:
         f.write("# Multiwfn periodic atomic charges\n\n"
                 "Multiwfn H, CM5 and H-I use the original VASP valence CHGCAR "
                 "with POTCAR-derived Nval. Chargemol comparisons use separate "
@@ -217,14 +218,13 @@ def main(argv=None):
         f.write("\nMethod-dependent charges are not oxidation states. "
                 "For Hirshfeld-I, confirm genuine iterative convergence from "
                 "its complete Multiwfn log. No MBIS is computed.\n")
+    plot(layout.figures_dir(folder),rows)
+    print(f"Failed or missing methods: {failures}")
     try:
-        report = generate_charge_report(folder, "multiwfn")
-        print(f"中文报告：{report}")
+        print(f"报告：{write_report(folder)}")
     except (OSError, ValueError, KeyError) as exc:
         failures += 1
         print(f"ERROR: Multiwfn 中文报告生成失败：{exc}", file=sys.stderr)
-    plot(folder/"ppt_figures",rows)
-    print(f"Output: {folder}; failed or missing methods: {failures}")
     return 1 if failures else 0
 
 
