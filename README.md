@@ -1,6 +1,6 @@
 # AI Computational Chemist (AICC)
 
-Agent skills for computational materials and chemistry: turn a scientific question
+Agent skills (Claude Code, Codex, pi) for computational materials and chemistry: turn a scientific question
 into defensible atomistic models, prepare inputs for the codes, and batch-analyze
 finished calculations. The researcher runs all production jobs.
 
@@ -28,11 +28,13 @@ and `data/` beside it — e.g. all charge methods on a calculation root merge in
 ## Install
 
 ```bash
-./install.sh                          # global, Claude Code + Codex
-./install.sh --harness claude         # one harness only
-./install.sh --project /path/to/proj  # project-local, also links CLAUDE.md / AGENTS.md
+./install.sh                          # global: Claude Code, Codex and pi
+./install.sh --harness pi             # one harness (claude, codex, pi; comma list allowed)
+./install.sh --project /path/to/proj  # project-local skills + CLAUDE.md / AGENTS.md (recommended)
 ./install.sh --force                  # refresh after git pull
 ```
+
+Pi reads `~/.agents/skills` and a trusted project's `.agents/skills` plus its root `AGENTS.md`.
 
 Figures come from [Stormy-drawing](https://github.com/hydrogen1222/Stormy-drawing),
 installed separately. No scientific software, POTCARs or binaries are included.

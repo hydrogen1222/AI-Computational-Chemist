@@ -37,5 +37,6 @@ jobs:
           for s in scientific-modeling batch-postprocessing structure-prep charges periodic-cdft vasp cp2k; do
             test -f "$tmp/.claude/skills/$s/SKILL.md"
             test -f "$tmp/.codex/skills/$s/SKILL.md"
+            test -f "$tmp/.agents/skills/$s/SKILL.md"
           done
           test -f "$tmp/.claude/skills/charges/scripts/batch_bader.py"

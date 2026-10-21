@@ -6,7 +6,7 @@ Keep this operational. The science of what a charge/orbital/bonding claim means 
 
 ## Verified current-version integration facts (narrow smoke test)
 
-An operator-supplied **ORCA 6.1.1 / Multiwfn 2026.10.1** p-benzoquinone
+A researcher-supplied **ORCA 6.1.1 / Multiwfn 2026.10.1** p-benzoquinone
 three-charge-state example has been inspected using its real inputs, ORCA
 outputs, converted wavefunctions and Multiwfn commands/logs. It is a
 **tool-chain smoke test only** (the deliberately inexpensive B97-3c + def2-SVP
