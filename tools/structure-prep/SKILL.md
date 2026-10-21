@@ -1,6 +1,6 @@
 ---
 name: structure-prep
-description: Build and audit real atomistic structures from CIF/POSCAR/XYZ/PDB/SMILES and trusted sources: supercells, interfaces, slabs, terminations, defects, substitutions, adsorbates and molecular conformers.
+description: Build and audit real atomistic structures from CIF/POSCAR/XYZ/SMILES and trusted sources — slabs and terminations, lattice-matched interfaces, disorder enumeration, defect/dopant supercells, adsorbates, glasses and molecular conformers.
 ---
 
 # Atomic Structure Preparation
@@ -27,9 +27,11 @@ RDKit for finite molecules. The user does **not** need to write code.
 | Situation | Read / run |
 |---|---|
 | Source, convert, build, edit, and database access | `references/running.md` |
-| Validate geometry after each transformation | `references/validation.md`; `scripts/audit_structure.py` |
+| Validate geometry after each transformation | `references/validation.md`; `scripts/audit_structure.py` (build time), `scripts/check_distances.py` (before/after relaxation, no pymatgen) |
 | Scientific/model-adequacy critique | `references/model-review.md` |
 | Build slabs and adsorbates | `scripts/make_slab.py`, `scripts/place_adsorbate.py` |
+| Interfaces (metal \| electrolyte, crystal \| crystal): lattice matching, strain, terminations | `references/interfaces.md`; `scripts/build_interface.py` |
+| Partial occupancy → ordered configurations (xtalkit), defect/dopant supercells, charged defects, glasses | `references/disorder-defects.md` |
 | Doping, substitution, vacancy, interstitial | `scripts/dope_structure.py` |
 | Format conversion / SMILES to XYZ | `scripts/convert_structure.py`, `scripts/smiles_to_xyz.py` |
 | Geometry or structure-generation failure | `references/errors.md` |

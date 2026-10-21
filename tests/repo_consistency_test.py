@@ -28,6 +28,7 @@ REMOVED_STRINGS = [
     "research-orchestrator", "comp-chem-workflow", "STRUCTURE.md",
     "ppt_figures", "_report_cn.md", "periodic_cdft/comparison",
     "this fork", "Fork rule", "docs/locked_parameters", "cluster guide",
+    "tools/vasp/scripts/check_distances", "standard no-suffix potential",
 ]
 TEXT_SUFFIXES = {".md", ".py", ".sh", ".yml", ".yaml", ".json", ".txt"}
 REF_RE = re.compile(r"`((?:procedures|tools|knowledge)/[^`\s<>*]+\.(?:md|py))`")

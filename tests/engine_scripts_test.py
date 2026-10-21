@@ -141,6 +141,72 @@ class LockedParams(unittest.TestCase):
             self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
 
 
+class InputPreflight(unittest.TestCase):
+    """check_inputs.py: lock file found automatically, MP POTCAR labels flagged."""
+    script = T / "vasp/scripts/check_inputs.py"
+
+    def setup_run(self, d, incar=LockedParams.GOOD, potcar=POTCAR, lock=True):
+        run_dir = Path(d, "project", "calc", "run")
+        run_dir.mkdir(parents=True)
+        (run_dir / "INCAR").write_text(incar)
+        (run_dir / "KPOINTS").write_text("Auto\n0\nGamma\n6 6 6\n")
+        (run_dir / "POSCAR").write_text(POSCAR)
+        (run_dir / "POTCAR").write_text(potcar)
+        if lock:
+            Path(d, "project", "locked_parameters.md").write_text(LOCK)
+        return run_dir
+
+    def test_lock_in_parent_folder_is_used(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = run(self.script, self.setup_run(d))
+            self.assertEqual(r.returncode, 0, r.stdout)
+            self.assertIn("lock: RESULT: OK", r.stdout)
+
+    def test_lock_mismatch_fails_preflight(self):
+        with tempfile.TemporaryDirectory() as d:
+            rd = self.setup_run(d, incar=LockedParams.GOOD.replace("ENCUT = 520", "ENCUT = 400"))
+            r = run(self.script, rd)
+            self.assertEqual(r.returncode, 1, r.stdout)
+            self.assertIn("ENCUT", r.stdout)
+            self.assertEqual(run(self.script, rd, "--no-lock").returncode, 0)
+
+    def test_no_lock_is_noted_not_failed(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = run(self.script, self.setup_run(d, lock=False))
+            self.assertEqual(r.returncode, 0, r.stdout)
+            self.assertIn("no locked_parameters.md found", r.stdout)
+
+    def test_non_mp_potcar_is_flagged(self):
+        with tempfile.TemporaryDirectory() as d:
+            rd = self.setup_run(d, potcar=POTCAR.replace("Na_pv", "Na"), lock=False)
+            r = run(self.script, rd)
+            self.assertEqual(r.returncode, 0, r.stdout)          # a warning, not a failure
+            self.assertIn("Na (MP: Na_pv)", r.stdout)
+
+
+class DistanceCheck(unittest.TestCase):
+    script = ROOT / "tools/structure-prep/scripts/check_distances.py"
+    LI2S = ("Li2S\n1.0\n5.7 0 0\n0 5.7 0\n0 0 5.7\nLi S\n2 2\nDirect\n"
+            "0.25 0.25 0.25\n0.75 0.75 0.75\n0 0 0\n0.5 0.5 0.5\n")
+
+    def write(self, d, name, text):
+        p = Path(d, name)
+        p.write_text(text)
+        return p
+
+    def test_clean_collision_and_reference(self):
+        with tempfile.TemporaryDirectory() as d:
+            ok = self.write(d, "ok.vasp", self.LI2S)
+            r = run(self.script, ok)
+            self.assertEqual(r.returncode, 0, r.stdout)
+            self.assertIn("1.652", r.stdout)                     # 0.7 x Pyykko(Li+S)
+            bad = self.write(d, "bad.vasp", self.LI2S.replace("0.75 0.75 0.75", "0.05 0.0 0.0"))
+            self.assertEqual(run(self.script, bad).returncode, 1)
+            squeezed = self.write(d, "sq.vasp", self.LI2S.replace("0.25 0.25 0.25", "0.18 0.18 0.18"))
+            r = run(self.script, squeezed, "--reference", ok)
+            self.assertEqual(r.returncode, 3, r.stdout)          # yellow: Li-S much shorter than bulk
+
+
 CP2K_OK = textwrap.dedent("""\
      *** SCF run converged in    14 steps ***
      ENERGY| Total FORCE_EVAL ( QS ) energy [a.u.]:          -34.123456789012

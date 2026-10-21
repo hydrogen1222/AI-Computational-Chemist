@@ -6,7 +6,10 @@
 
 Run `uv run scripts/check_inputs.py RUNDIR`. It verifies:
 
-- POSCAR species order == POTCAR order (the silent killer of VASP results)
+- POSCAR species order == POTCAR order (the silent killer of VASP results); POTCAR labels
+  that differ from the Materials Project PBE set are flagged
+- the run matches the project's `locked_parameters.md`, found automatically in RUNDIR or a
+  parent folder (`--lock FILE` to name one, `--no-lock` to skip); a mismatch fails preflight
 - MAGMOM length == atom count; LDAUL/LDAUU/LDAUJ lengths == species count; LMAXMIX present with +U
 - KPOINTS exists or KSPACING set; ENCUT explicit; KSPACING is not silently too dense
   or smoke-test coarse for the declared task; explicit slab KPOINTS obey the local
@@ -36,23 +39,11 @@ Selective dynamics: if the slab is supposed to have fixed layers, open POSCAR an
 
 ### Geometry sanity before submission
 
-Run `tools/vasp/scripts/check_distances.py` before spending walltime on a generated
-structure. Geometry sanity has higher scientific priority than a merely complete input
-set: a missing file usually stops the job, while a bad structure can run and produce a
-misleading result.
-
-Interpret the default thresholds as warning screens, not universal bond-length laws:
-
-- **RED:** a pair below `0.7 × (r_cov,i + r_cov,j)`. This is an emergency collision
-  screen. Stop before submission and report the atom pair, distance, and POSCAR path.
-- **YELLOW:** an element-pair contact at least 15 % shorter than the corresponding
-  contact in the trusted project reference. This is a project-relative anomaly. Record
-  the pair and distance and inspect it before continuing.
-
-The 15 % threshold is an engineering warning threshold, not a physical constant.
-Intended bond formation, bond breaking, intercalation, reaction intermediates, and
-transition paths can legitimately trigger YELLOW; in those cases the warning means
-that the short contact must be inspected and documented, not automatically rejected.
+Run `tools/structure-prep/scripts/check_distances.py POSCAR [--reference BULK_CONTCAR]`
+before submitting and on the CONTCAR afterwards (stdlib only). RED (`< 0.7 ×` the Pyykkö
+covalent-radius sum) means stop; YELLOW (a pair ≥ 15 % shorter than in the trusted
+reference) means inspect and record. Thresholds and how they relate to the stricter
+build-time audit: `tools/structure-prep/references/validation.md` ("Two distance checks").
 
 ## Post-run
 

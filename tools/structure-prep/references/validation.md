@@ -84,6 +84,23 @@ Hard checks:
 
 For adsorbate placement, report at least the adsorbate-anchor distance, the nearest adsorbate-surface distance, and the closest unintended atom pair. If those distances are uncertain, make a quick structure render or neighbor table before proceeding. A visually plausible figure is not enough; it must agree with the numerical neighbor check.
 
+## Two distance checks — which one, and why the thresholds differ
+
+Both use the same Pyykkö/Atsumi single-bond covalent radii (`scripts/covalent_radii.py`).
+
+| | `audit_structure.py` | `check_distances.py` |
+|---|---|---|
+| When | right after *building* a model (slab, adsorbate, defect, interface) | any POSCAR before submitting; every CONTCAR after relaxing |
+| Needs | pymatgen | stdlib only (works on a login node) |
+| Fails at | `< 0.95 ×` radius sum (0.95–1.00 recorded as "compressed") | RED `< 0.7 ×` radius sum; YELLOW `≥ 15 %` shorter than the same pair in `--reference` |
+| Also checks | vacuum, slab tilt, fixed layers, adsorbate–surface and image distances, model size | lattice drift against `--lattice-ref` |
+
+A built model has no reason to contain compressed contacts, so the build gate is
+strict. After relaxation, real ionic and multiple bonds can sit well below single-bond
+sums, so only gross collisions are RED and chemistry changes are caught relative to the
+relaxed bulk instead. Neither threshold is a bond-length law; deliberate short contacts
+(TS guesses, intended bonds) are recorded, not "fixed".
+
 ## Scientific model review (no workflow gate)
 
 Geometry checks and scientific justification are distinct. Before treating an

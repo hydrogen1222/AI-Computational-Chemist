@@ -18,10 +18,10 @@ test -f ~/.vaspkit && sed -n '1,120p' ~/.vaspkit
 Module names can be case- and version-sensitive, so check the local module tree instead of assuming `module load vaspkit` works. Important `~/.vaspkit` fields vary by release, but usually include the VASP version switch, pseudopotential roots such as `PBE_PATH`, Python path, plotting settings, and the utilities path. The official installation guide describes copying the shipped environment template to `~/.vaspkit` and editing local paths.
 
 Never store licensed pseudopotentials in this repository. Record only path, functional family, and POTCAR `TITEL` lines in run notes.
-For new PBE PAW work, follow the VASP skill's local fallback only after checking the
-source method, element-specific guidance, semicore physics, validation evidence, and
-project convention; suffix variants such as `_pv`, `_sv`, or `_d` are required when
-that evidence calls for them.
+VASPKIT's POTCAR generator follows its own recommended list, which is not always the
+Materials Project set. After generating POTCAR (task 103) compare the `TITEL` labels with the POTCAR
+policy in `tools/vasp/references/running.md` (source paper → `locked_parameters.md` →
+MP PBE set, e.g. Li_sv, Na_pv) and regenerate if they differ.
 
 ## Running styles
 

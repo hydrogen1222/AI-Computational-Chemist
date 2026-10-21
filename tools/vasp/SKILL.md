@@ -20,7 +20,7 @@ description: Prepare, check and troubleshoot VASP calculations for periodic mate
 |---|---|
 | build static/relax/reaction inputs and choose global policies | `references/running.md` |
 | preflight, parse, and judge convergence | `scripts/check_inputs.py`; `scripts/parse_vasp.py`; `references/validation.md` |
-| pre-submission checks: locked settings before submission, too-close atoms before and after relaxation, same settings before combining energies | `scripts/check_locked_params.py`; `scripts/check_distances.py`; `scripts/compare_settings.py`; `references/locked-parameters.md` |
+| pre-submission checks: locked settings before submission, too-close atoms before and after relaxation, same settings before combining energies | `scripts/check_locked_params.py` (also run by `check_inputs.py` when a lock file exists); `tools/structure-prep/scripts/check_distances.py`; `scripts/compare_settings.py`; `references/locked-parameters.md` |
 | match crashes, warnings, or convergence failures | `references/errors.md` |
 | DOS, bands, PDOS, and d-band analysis | `references/dos-band.md`; `tools/vaspkit/references/dos-band.md`; `knowledge/electronic-structure.md` |
 | atomic charges and bond orders (Bader, DDEC6, Hirshfeld/CM5, Hirshfeld-I), single or batch | `tools/charges/SKILL.md` |
