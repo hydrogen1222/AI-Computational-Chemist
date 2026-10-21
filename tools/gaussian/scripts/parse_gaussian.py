@@ -20,10 +20,14 @@ HARTREE_EV = 27.211386
 def main():
     if sys.version_info < (3, 8):
         sys.exit("parse_gaussian.py targets modern Python (>=3.8); run via `uv run parse_gaussian.py` "
-                 "or load the cluster guide's Python (conda/uv/module).")
+                 "or load a newer Python (conda/uv/module).")
     if len(sys.argv) != 2:
         sys.exit(__doc__)
-    text = open(sys.argv[1], errors="ignore").read()
+    try:
+        text = open(sys.argv[1], errors="ignore").read()
+    except OSError as exc:
+        print(f"FAIL: cannot read {sys.argv[1]}: {exc.strerror}")
+        return 2
     issues = []
 
     normal = len(re.findall(r"Normal termination of Gaussian", text))
@@ -81,4 +85,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        print(__doc__.strip())
+        sys.exit(0)
+    sys.exit(main())

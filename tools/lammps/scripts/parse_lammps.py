@@ -15,7 +15,11 @@ import sys
 
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else "log.lammps"
-    lines = open(path, errors="ignore").read().splitlines()
+    try:
+        lines = open(path, errors="ignore").read().splitlines()
+    except OSError as exc:
+        print(f"FAIL: cannot read {path}: {exc.strerror}")
+        return 2
     issues, segments = [], []
     header, rows = None, []
     in_run = False
@@ -77,4 +81,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        print(__doc__.strip())
+        sys.exit(0)
+    sys.exit(main())

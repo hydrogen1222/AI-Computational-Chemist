@@ -116,7 +116,7 @@ numbers merely because they appeared in a previous installation.
 - **2**: global and condensed indices printed as text.
 - **3**: grid data (cube files) of f+, f-, f0 and the dual descriptor for plotting.
 
-Recommended practice in this fork: create and preserve the three **approved**
+Recommended practice: create and preserve the three **approved**
 ORCA inputs explicitly, rather than blindly accepting generated templates. If
 Multiwfn generates starter inputs, inspect and fix their electronic states,
 functional, basis, embedding field and filenames before using the normal route
@@ -150,7 +150,7 @@ reverse accordingly: `f_A+ = q_A(N)-q_A(N+1)` and
 `f_A- = q_A(N-1)-q_A(N)`. Never silently subtract three charge
 columns as though they were electron-population columns.
 
-**Ordinary Hirshfeld** is the declared reference partition in this fork
+**Ordinary Hirshfeld** is the declared reference partition here
 (and is useful for reproducing the original Multiwfn tutorial).
 Hirshfeld-I may be added as a **separate, labeled** sensitivity check
 if the installed Multiwfn version and files support it; it does not

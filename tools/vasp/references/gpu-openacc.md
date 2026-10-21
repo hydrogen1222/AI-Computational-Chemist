@@ -14,7 +14,7 @@ Do not submit a CPU-only VASP MPI build to a GPU partition. For GPU nodes, use t
 
 ## Launch template — one MPI rank per GPU
 
-All bracketed values come from the cluster guide; never hardcode partition, module, or GPU-type names in committed files.
+All bracketed values come from your cluster's documentation; never hardcode partition, module, or GPU-type names in committed files.
 
 ```bash
 #!/bin/bash

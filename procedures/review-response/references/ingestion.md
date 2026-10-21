@@ -1,11 +1,11 @@
 # PDF ingestion for review-response
 
-> Load this when: extracting text from manuscript/SI/reviewer-report PDFs at
-> Phase 0 — especially locating the computational methods section (mode A vs B)
+> Load this when: extracting text from manuscript/SI/reviewer-report PDFs during
+> intake — especially locating the computational methods section (mode A vs B)
 > and finding computation-related comments in long review files.
 
 The collection ships no extractor — use the system tool (poppler `pdftotext`;
-any text extractor works, the Phase 0 ingestion contract in `SKILL.md` is what
+any text extractor works, the intake step in `SKILL.md` is what
 matters). Two probes cover the routine cases:
 
 ```bash

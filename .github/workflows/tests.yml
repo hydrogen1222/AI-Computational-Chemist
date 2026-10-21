@@ -13,11 +13,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pip install 'matplotlib>=3.8,<4'
+      - run: python -m pip install 'matplotlib>=3.8,<4' pymatgen
       - name: Unit and consistency tests
         run: |
           sh -n install.sh
-          for t in tests/*_test.py; do echo "== $t"; python "$t"; done
+          fail=0
+          for t in tests/*_test.py; do
+            echo "== $t"
+            if out=$(python "$t" 2>&1); then
+              echo "$out" | tail -n 3
+            else
+              echo "$out"
+              msg=$(echo "$out" | tail -n 30 | sed -e 's/%/%25/g' | sed -e ':a;N;$!ba;s/\n/%0A/g')
+              echo "::error title=$t failed::$msg"
+              fail=1
+            fi
+          done
+          exit $fail
       - name: Clean install
         run: |
           tmp="$(mktemp -d)"

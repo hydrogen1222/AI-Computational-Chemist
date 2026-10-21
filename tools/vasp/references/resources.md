@@ -5,7 +5,7 @@
 - **VASP wiki** — https://www.vasp.at/wiki/ — the authoritative reference for every INCAR tag, with physics context. First stop for any tag question; the per-tag pages (e.g. ISMEAR, LDAUU, IBRION) include defaults and interactions between tags.
 - **VASP manual / documentation portal** — https://www.vasp.at/documentation/ — release notes matter when behavior differs between versions (5.x vs 6.x symmetry errors, ML-FF features).
 - **VASP forum** — https://www.vasp.at/forum/ — searchable history of error reports; good when an error string isn't in our errors.md.
-- **VTST tools** — https://theory.cm.utexas.edu/vtsttools/ — climbing-image NEB, dimer method, and helper scripts. VTST requires a VASP build compiled with the VTST patches; record the site's VTST-enabled module/binary and script paths in the private cluster guide.
+- **VTST tools** — https://theory.cm.utexas.edu/vtsttools/ — climbing-image NEB, dimer method, and helper scripts. VTST requires a VASP build compiled with the VTST patches; record the site's VTST-enabled module/binary and script paths in the private cluster documentation.
 - **Bader analysis code** — https://theory.cm.utexas.edu/henkelman/code/bader/ — usage and the AECCAR workflow our charge-analysis setup targets.
 - **LOBSTER / COHP** — bonding analysis from a VASP wavefunction is its own skill: see `tools/lobster` (operation) and `knowledge/bonding-analysis.md` (science); program at http://www.cohp.de/.
 - **Materials Project docs** — https://docs.materialsproject.org/methodology/ — the source of the GGA+U values and parameter conventions cited in u-values-magmom.md; consult when matching MP-derived data.

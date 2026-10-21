@@ -116,7 +116,7 @@ The loop stops when the exploration conditions relevant to the target produce fe
 | GemNet-OC | directional message passing model developed around Open Catalyst datasets | catalyst benchmark performance and pretrained OC models | primarily OC ecosystem/model training; deployment as general MD potential needs care |
 | EquiformerV2 | equivariant transformer architecture used in Open Catalyst models | strong universal/foundation model behavior for catalysis/materials screening | expensive inference/training; fine-tuning and deployment workflows differ from MD engines |
 
-This file is the common science layer. Program-specific operation belongs in `tools/<program>/`, because commands, data formats, model packaging, LAMMPS/ASE interfaces, and failure modes differ substantially.
+This file is the common science layer. Program-specific operation belongs in `tools/deepmd` and `tools/mlp`, because commands, data formats, model packaging, LAMMPS/ASE interfaces, and failure modes differ substantially.
 
 ## Diffusive/Transport DPMD Practice
 

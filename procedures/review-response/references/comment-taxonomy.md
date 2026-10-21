@@ -1,6 +1,6 @@
 # Computational Review Comment Taxonomy
 
-> Load this in Phase 2 before planning calculations. It adapts reviewer-response
+> Load this during triage, before planning calculations. It adapts reviewer-response
 > action mapping to AICC's computational workflow. The goal is to answer the
 > reviewer question that was actually asked, not merely an adjacent computable
 > question.

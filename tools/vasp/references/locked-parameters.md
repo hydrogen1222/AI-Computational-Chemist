@@ -1,6 +1,6 @@
-# Locked parameters (fork)
+# Locked parameters
 
-> Load this when: writing or changing a project's `docs/locked_parameters.md`, choosing between a convergence test and a cited value, or reading a `check_locked_params.py` failure.
+> Load this when: writing or changing a project's `locked_parameters.md`, choosing between a convergence test and a cited value, or reading a `check_locked_params.py` failure.
 
 The lock is the project's single list of settings that change the physics of every
 energy: plane-wave cutoff, functional, smearing, k-point density, and POTCARs. The
@@ -10,7 +10,7 @@ relying on an agent to notice.
 
 ## File format
 
-Plain markdown at `docs/locked_parameters.md` in new projects, readable in any markdown viewer (older projects may retain their original root-level path until deliberately migrated):
+Plain markdown, usually `locked_parameters.md` at the project root (pass its path with `--lock`):
 
 - `## <profile>` starts a profile; the first profile is the default.
 - `- KEY = VALUE` inside a profile is a locked value. Every other line is free text for
@@ -31,7 +31,7 @@ Plain markdown at `docs/locked_parameters.md` in new projects, readable in any m
 # 锁定参数
 
 截断能和 k 点来自 001_convergence_test_Li6PS5Cl：每原子能量变化小于 1 meV。
-Stormy 签字，T+2h10m。
+用户确认：<日期>。
 
 ## pbe
 - ENCUT = 520

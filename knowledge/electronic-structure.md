@@ -105,7 +105,7 @@ The novelty test for Na3PS4 is whether a **validated** local descriptor
 explains or predicts independent Na-contact and moisture-reaction
 energies/barriers across controlled dopants, not the existence of a
 Fukui function in a crystalline material.
-In this fork the initially robust baseline remains periodic
+The initially robust baseline remains periodic
 VASP; ORCA is an optional, independently validated advanced
 stage. No cross-code absolute-total-energy subtraction.
 

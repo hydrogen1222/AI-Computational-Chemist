@@ -1,15 +1,13 @@
-# os
+# os / python
 .DS_Store
-
-# python
 __pycache__/
 *.pyc
 
-# licensed - never commit
+# licensed data — never commit
 POTCAR*
 *.chk
 
-# bulky calculation binaries
+# bulky calculation outputs
 WAVECAR*
 CHGCAR*
 CHG
@@ -20,22 +18,10 @@ PROCAR*
 Gau-*
 core.*
 
-# local manual copies (linked, not versioned)
-manuals/
+# private machine settings (scheduler, modules, paths)
+site-config*.yaml
+cluster-*.md
 
-# private site/cluster settings — never commit them.
-# The researcher manages their own scheduler/environment configurations;
-# these ignore patterns prevent accidental disclosure of local machine details.
-site-config.yaml
-site-config.*.yaml
-/cluster-guides/
-/cluster-guide*.md
-.cluster-agents.md
-cluster-agents*.md
-
-# local test/scratch area - never committed
-test/
-
-# private development and manuscript material
+# local scratch
 /dev/
 /.claude/

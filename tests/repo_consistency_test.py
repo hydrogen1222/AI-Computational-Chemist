@@ -7,13 +7,16 @@ Run: python tests/repo_consistency_test.py
 from __future__ import annotations
 
 import re
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
 REMOVED_PATHS = [
-    "aicc", "benchmark", "STRUCTURE.md", "FORK_DISABLED_SKILLS.txt",
+    "aicc", "benchmark", "STRUCTURE.md", "FORK_DISABLED_SKILLS.txt", "agent.md",
+    "procedures/review-response/examples", "procedures/review-response/manifest.yaml",
     "tools/catmap", "tools/gromacs", "tools/report", "tools/plotting",
     "tools/chargemol", "tools/hpc-submit", "tools/rsess",
     "procedures/research-orchestrator", "procedures/comp-chem-workflow",
@@ -24,6 +27,7 @@ REMOVED_STRINGS = [
     "FORK_DISABLED", "aicc doctor", "aicc skill", "hpc-submit", "rsess",
     "research-orchestrator", "comp-chem-workflow", "STRUCTURE.md",
     "ppt_figures", "_report_cn.md", "periodic_cdft/comparison",
+    "this fork", "Fork rule", "docs/locked_parameters", "cluster guide",
 ]
 TEXT_SUFFIXES = {".md", ".py", ".sh", ".yml", ".yaml", ".json", ".txt"}
 REF_RE = re.compile(r"`((?:procedures|tools|knowledge)/[^`\s<>*]+\.(?:md|py))`")
@@ -73,6 +77,32 @@ class RepoConsistency(unittest.TestCase):
                 if not (ROOT / target).exists():
                     broken.append(f"{path.relative_to(ROOT)} -> {target}")
         self.assertEqual([], broken, "\n".join(broken))
+
+    def test_skill_relative_references_resolve(self):
+        rel = re.compile(r"`((?:references|scripts)/[^`\s<>*]+\.(?:md|py))`")
+        broken = []
+        for skill in skill_files():
+            for path in [skill, *skill.parent.glob("references/*.md")]:
+                for target in rel.findall(path.read_text(encoding="utf-8", errors="replace")):
+                    if not (skill.parent / target).exists():
+                        broken.append(f"{path.relative_to(ROOT)} -> {target}")
+        self.assertEqual([], broken, "\n".join(broken))
+
+    def test_no_empty_placeholder_folders(self):
+        lonely = [d for d in (ROOT / "tools").glob("*/examples")
+                  if [p.name for p in d.iterdir()] == ["README.md"]]
+        self.assertEqual([], lonely, "examples/ folders with only a README")
+
+    def test_every_script_answers_help(self):
+        failures = []
+        for script in sorted((ROOT / "tools").glob("*/scripts/*.py")):
+            if script.name in {"layout.py", "covalent_radii.py"}:
+                continue  # import-only modules
+            r = subprocess.run([sys.executable, str(script), "--help"], capture_output=True,
+                               text=True, timeout=120, cwd=ROOT)
+            if r.returncode != 0 or "Traceback" in r.stderr:
+                failures.append(f"{script.relative_to(ROOT)}: rc={r.returncode} {r.stderr[-200:]}")
+        self.assertEqual([], failures, "\n".join(failures))
 
     def test_researcher_owns_job_execution(self):
         doc = (ROOT / "AGENTS.md").read_text(encoding="utf-8")

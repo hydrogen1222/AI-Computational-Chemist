@@ -1,11 +1,11 @@
 ---
 name: vaspkit
-description: Use VASPKIT to generate VASP helper inputs and post-process VASP outputs, including KPOINTS, band paths, DOS/band data, charge-density differences, planar averages, Bader charge coloring helpers, real-space wavefunctions, partial/orbital charge density, work functions, elastic/EOS summaries, thermochemistry/free-energy corrections, AIMD trajectory post-processing (MSD, diffusion, VACF, VDOS, RDF/trajectory conversion), and batch analysis.
+description: Use VASPKIT to generate VASP inputs (KPOINTS, band paths) and post-process outputs — DOS/bands, charge-density differences, planar averages, work functions, real-space wavefunctions, elastic/EOS, thermochemistry, and AIMD trajectories (MSD, diffusion, RDF, VACF/VDOS).
 ---
 
 # VASPKIT
 
-Use this skill when VASP data already exist or VASP helper inputs must be generated with VASPKIT. In this fork, VASPKIT is the preferred routine helper for VASP input generation and common post-processing when it is installed and configured. It saves repetitive manual work; it does not replace the `vasp` skill's method selection, locked settings, convergence checks, or provenance rules.
+Use this skill when VASP data already exist or VASP helper inputs must be generated with VASPKIT. VASPKIT is the preferred routine helper for VASP input generation and common post-processing when it is installed and configured. It saves repetitive manual work; it does not replace the `vasp` skill's method selection, locked settings, convergence checks, or provenance rules.
 
 ## Required inputs
 
@@ -29,7 +29,6 @@ Use this skill when VASP data already exist or VASP helper inputs must be genera
 | AIMD post-processing: MSD/diffusion, VACF, VDOS, RDF/trajectory conversion, frame cuts and fit windows | `references/aimd-postprocessing.md`; pair with `tools/vasp/references/aimd.md` |
 | task fails, menu input hangs, output files are empty, plots look shifted | `references/errors.md` |
 | official docs, feature list, citation, VASP links | `references/resources.md` |
-| example contribution rules | `examples/README.md` |
 
 ## Workflow
 
@@ -42,11 +41,11 @@ Use this skill when VASP data already exist or VASP helper inputs must be genera
 
 ## Symmetry sanity check
 
-For routine VASP preparation in this fork, VASPKIT task 601 may be run before
+For routine VASP preparation, VASPKIT task 601 may be run before
 submission to record the space group recognized for the current `POSCAR`. This is a
 structure sanity check, not an INCAR generator for symmetry policy.
 
-- Record the recognized space group in the ledger or preparation record.
+- Record the recognized space group in the model notes or preparation record.
 - Do not automatically map P1/high symmetry to `ISYM=-1/0/2`; ordinary relax/static
   calculations normally leave `ISYM` at VASP's default unless the approved method says
   otherwise.

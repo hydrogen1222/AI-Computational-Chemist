@@ -1,11 +1,11 @@
 ---
 name: mlp
-description: Umbrella routing for machine-learning interatomic potential workflows. Use for general MLP method choice and cross-program validation; route DeePMD-kit/DPMD operation to `deepmd`, and keep MACE, NequIP, GPUMD/NEP, LASP, GemNet-OC, EquiformerV2, and other programs in separate tool skills when detailed commands are needed.
+description: Machine-learning interatomic potentials other than DeePMD (MACE and foundation/pretrained models, NequIP, NEP and others) — method choice, dataset contracts, fine-tuning, validation and active learning. DeePMD-kit operation lives in `deepmd`.
 ---
 
 # Machine-Learning Potentials
 
-Covers MLP-wide routing and legacy generic notes. DeePMD-kit/DPMD now lives in `tools/deepmd`; future MACE, NequIP, GPUMD/NEP, LASP, GemNet-OC, EquiformerV2 content should live in their own tool skills. MD deployment mechanics live in `lammps`; DFT label generation in `vasp` or `cp2k`; tool-agnostic MLP science lives in `knowledge/machine-learning-potentials.md`.
+Method choice and validation for any MLP, plus operating notes for MACE and pretrained models. DeePMD-kit lives in `tools/deepmd`; MD deployment in `tools/lammps`; DFT labels in `tools/vasp` or `tools/cp2k`; the science in `knowledge/machine-learning-potentials.md`.
 
 ## Where to find what
 
@@ -13,11 +13,10 @@ Covers MLP-wide routing and legacy generic notes. DeePMD-kit/DPMD now lives in `
 |---|---|
 | DeePMD-kit/DPMD dataset prep, `input.json`, `dp train/freeze/test`, model deviation | `tools/deepmd/` |
 | general MLP concepts, dataset design, symmetry/equivariance, program taxonomy | `knowledge/machine-learning-potentials.md` |
-| generic dataset contracts, provisional MACE notes, deployment, active-learning loop | `references/running.md` |
+| dataset contracts, MACE training/fine-tuning, deployment, active-learning loop | `references/running.md` |
 | is this model production-ready? held-out errors, physics checks, distribution coverage | `references/validation.md` |
 | which pretrained/foundation checkpoint to use; adding a newly released model | `references/validation.md` ("Choosing among pretrained models") |
 | generic training failures or MACE fine-tuning problems | `references/errors.md` |
-| example contribution rules | `examples/README.md` |
 | external documentation for programs not covered by a dedicated tool skill | `references/resources.md` |
 
 ## Hard guardrails

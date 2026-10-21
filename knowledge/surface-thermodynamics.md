@@ -294,7 +294,7 @@ Thickness/coverage *convergence* (above) is a science question; *feasibility* is
 
 - Decide what actually needs the big cell. A *binding-energy contrast* between two supports/sites is largely coverage-robust and can be settled in a small cell; an isolated-adsorbate property that must avoid adsorbate–image interaction (or a specific EXAFS coordination shell, e.g. no spurious M–M neighbor) needs the larger cell — size to the observable, not to habit.
 - Cost scales steeply with magnetic + U + exact-exchange and with k-points × bands × ions; a small high-symmetry cell to fix the magnetic ground state and settings first, then one production cell, beats a speculative large run.
-- Record the scoping choice and its justification in `workflow.md` (assumptions table) so a reviewer sees why the cell size is adequate for the claim.
+- Record the scoping choice and its justification in the model note (`models/model.md`) so a reviewer sees why the cell size is adequate for the claim.
 
 ## Volatile metal-oxide reservoirs and atom trapping
 

@@ -1,6 +1,6 @@
 ---
 name: cp2k
-description: Prepare, validate, run, and troubleshoot CP2K calculations for periodic and large molecular systems. Use for Quickstep GPW/GAPW DFT, ENERGY/GEO_OPT/CELL_OPT, k-points and supercells, basis/pseudopotential/grid convergence, SCF with OT or diagonalization, DFT+U, magnetism, hybrid/HFX/ADMM/RI-HFXk, band/DOS/Molden/Multiwfn analysis, cube fields, low-dimensional electrostatics, vibrational analysis/phonons, NEB/BAND reaction paths, AIMD/PIMD/metadynamics, implicit solvent, semiempirical DFTB/xTB, QM/MM, TDDFT/XAS, NMR/EPR/GW/CDFT, and CP2K-specific errors.
+description: Prepare, check and troubleshoot CP2K (Quickstep GPW/GAPW) calculations — ENERGY/GEO_OPT/CELL_OPT, basis/potential/grid convergence, OT vs diagonalization SCF, k-points, DFT+U, hybrids/ADMM, cube and Molden output, AIMD/metadynamics, NEB, xTB/DFTB, QM/MM, TDDFT/XAS and CP2K errors.
 ---
 
 # CP2K
@@ -43,12 +43,11 @@ Task types: **single-point** (`RUN_TYPE ENERGY`), **optimization** (`GEO_OPT`, `
 | run finished: output summary, convergence checks, provenance | `uv run scripts/parse_cp2k.py`, then `references/validation.md` |
 | SCF failure, warnings, memory, unsupported k-point task, opt/MD issues | `references/errors.md` |
 | official manual, exercises, forum, Sobereva/Multiwfn tools | `references/resources.md` |
-| example contribution rules | `examples/README.md` |
 
 ## Workflow
 
 1. Decide the scientific question first; if it is code-agnostic, read the matching `knowledge/` doc before choosing CP2K settings.
-2. Build the input from `running.md` or a verified example; keep all compared energies on the same functional, basis/potential, grid, k-policy, SCF, smearing, electrostatics, and correction settings.
+2. Build the input from `running.md`; keep all compared energies on the same functional, basis/potential, grid, k-policy, SCF, smearing, electrostatics, and correction settings.
 3. Preflight: `uv run scripts/check_inputs.py input.inp`; for novel setups, run `cp2k -c input.inp` and a short smoke test.
 4. Prepare a manual launcher or batch script only with verified site settings.
    The researcher submits and monitors jobs; the agent only checks the inputs.

@@ -57,8 +57,8 @@ skills (e.g. `tools/vasp/SKILL.md` points the science of surface energy here), p
   AIMD lives in `tools/vasp` or `tools/cp2k`.
 - [machine-learning-potentials.md](machine-learning-potentials.md) — tool-agnostic MLP concepts:
   local energy models, symmetry/equivariance, dataset design, validation, active learning, and how
-  DeePMD, MACE, NequIP, GPUMD/NEP, LASP, GemNet-OC, and EquiformerV2 differ. Program operation lives
-  in separate `tools/<program>/` skills.
+  DeePMD, MACE, NequIP, GPUMD/NEP, LASP, GemNet-OC, and EquiformerV2 differ. Operation lives in
+  `tools/deepmd` (DeePMD) and `tools/mlp` (MACE and others).
 - [vibrational-phonon-analysis.md](vibrational-phonon-analysis.md) — molecular vibrations,
   phonons, imaginary modes, IR/Raman/VDOS, phonon DOS/bands, and force-constant interpretation.
 - [thermochemistry-and-free-energy.md](thermochemistry-and-free-energy.md) — electronic energies,
@@ -72,6 +72,8 @@ skills (e.g. `tools/vasp/SKILL.md` points the science of surface energy here), p
 - [hubbard-u-and-magnetism.md](hubbard-u-and-magnetism.md) — choosing a Hubbard U value (common
   database/literature sets, when +U applies) and initial magnetic moments/orderings. Engine-specific
   syntax lives in `tools/vasp`, `tools/cp2k`, or the selected code skill.
+- [volumetric-rendering.md](volumetric-rendering.md) — PyVista isosurfaces and 2D slices of
+  charge density, Δρ, spin and ELF grids; isovalue choice, image checks, what to record.
 - [scientific-visualization.md](scientific-visualization.md) — choosing figure tools and
   quality standards: OVITO for structures, PyVista/VESTA for volumetric fields, Matplotlib for
   numerical plots, and the Multiwfn+VMD path for molecule-centered fields (`tools/multiwfn`).

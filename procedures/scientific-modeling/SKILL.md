@@ -1,6 +1,6 @@
 ---
 name: scientific-modeling
-description: Use when a computational chemistry or materials research question needs physical-model selection, atomistic structure construction, competing model comparison, validation, or a reproducible candidate model package. One agent designs and builds; HPC execution is optional and user-authorized.
+description: Use when a computational chemistry or materials research question needs physical-model selection, atomistic structure construction, competing model comparison, validation, or a reproducible candidate model package. The researcher runs all production jobs.
 ---
 
 # Scientific Modeling — from question to defensible atomistic model
