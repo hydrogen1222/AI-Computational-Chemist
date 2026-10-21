@@ -50,10 +50,10 @@ skills (e.g. `tools/vasp/SKILL.md` points the science of surface energy here), p
   `tools/vasp` or `tools/cp2k`.
 - [force-fields.md](force-fields.md) — classical force-field families, charges, bonded/nonbonded
   terms, mixing rules, water/ion models, and parameter provenance. Execution lives in engine skills
-  such as `tools/gromacs` or `tools/lammps`.
+  such as `tools/lammps`.
 - [molecular-dynamics.md](molecular-dynamics.md) — MD model choice, statistical sampling,
   RDF/VACF/VDOS, MSD/diffusion, equilibration/statistics, and enhanced sampling
-  (Blue-moon/slow-growth/metadynamics). Classical MD runs in `tools/gromacs` or `tools/lammps`;
+  (Blue-moon/slow-growth/metadynamics). Classical MD runs in `tools/lammps`;
   AIMD lives in `tools/vasp` or `tools/cp2k`.
 - [machine-learning-potentials.md](machine-learning-potentials.md) — tool-agnostic MLP concepts:
   local energy models, symmetry/equivariance, dataset design, validation, active learning, and how

@@ -2,7 +2,7 @@
 
 > Covers: choosing an MD model and ensemble; timestep/constraints, PBC and long-range interactions; equilibration, uncertainty and reproducibility; interpreting RDF, H bonds, RMSD/RMSF, MSD/diffusion, VACF/VDOS, viscosity, dielectric and interface/membrane observables; and enhanced sampling/free-energy workflows.
 
-Tool-agnostic science and practice — what a trajectory means and how to design and validate it. Code operation lives in engine skills (`tools/gromacs`, `tools/lammps`, `tools/vasp/references/aimd.md`, `tools/cp2k`). Force-field model construction lives in `knowledge/force-fields.md`.
+Tool-agnostic science and practice — what a trajectory means and how to design and validate it. Code operation lives in engine skills (`tools/lammps`, `tools/vasp/references/aimd.md`, `tools/cp2k`). Force-field model construction lives in `knowledge/force-fields.md`.
 
 **MD is statistical sampling, not a single structure.** The final frame is not the result. The result is an average, distribution, slope, correlation function, transition statistic or free-energy profile over a justified ensemble, with equilibration removed and uncertainty assessed.
 

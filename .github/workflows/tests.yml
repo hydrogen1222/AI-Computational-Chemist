@@ -1,0 +1,29 @@
+name: tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install 'matplotlib>=3.8,<4'
+      - name: Unit and consistency tests
+        run: |
+          sh -n install.sh
+          for t in tests/*_test.py; do echo "== $t"; python "$t"; done
+      - name: Clean install
+        run: |
+          tmp="$(mktemp -d)"
+          HOME="$tmp" ./install.sh
+          for s in scientific-modeling batch-postprocessing structure-prep charges periodic-cdft vasp cp2k; do
+            test -f "$tmp/.claude/skills/$s/SKILL.md"
+            test -f "$tmp/.codex/skills/$s/SKILL.md"
+          done
+          test -f "$tmp/.claude/skills/charges/scripts/batch_bader.py"

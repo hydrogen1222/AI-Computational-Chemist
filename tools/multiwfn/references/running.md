@@ -47,7 +47,7 @@ Fortran process exited successfully.
 ## Periodic VASP population analysis
 
 For direct periodic density population analysis, use
-`references/periodic-stockholder.md` and the included Nval preparation
+`tools/charges/references/periodic-stockholder.md` and the included Nval preparation
 and CSV comparison scripts. Never infer PAW ZVAL from the element's
 common valence; read the actual POTCAR, e.g. Li_sv = 3. The program
 version determines the validated menu transcript. This is distinct

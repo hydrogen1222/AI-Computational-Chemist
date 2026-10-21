@@ -15,7 +15,7 @@ Multiwfn validates nothing about the upstream calculation. Start by checking the
 
 | Result | Minimum validation |
 |---|---|
-| atomic charge table | scheme named; basis/method stated; trend compared under identical settings; periodic CHGCAR uses true POTCAR ZVAL, grid and charge-closure checks (`references/periodic-stockholder.md`) |
+| atomic charge table | scheme named; basis/method stated; trend compared under identical settings; periodic CHGCAR uses true POTCAR ZVAL, grid and charge-closure checks (`tools/charges/references/periodic-stockholder.md`) |
 | spin density | open-shell or broken-symmetry state verified; sign convention and isovalue recorded |
 | MO/NTO figure | orbital/state index, occupation/transition, isovalue, and phase/color convention recorded |
 | TD spectrum | state list, oscillator/rotatory strengths, broadening, conformer weights recorded |

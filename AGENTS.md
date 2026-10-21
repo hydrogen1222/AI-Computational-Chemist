@@ -1,113 +1,52 @@
-# AICC — Computational Chemistry Agent
+# AICC — computational chemistry agent
 
-AICC is a **single-agent, modeling-first** skill collection. One agent can investigate
-a scientific question, propose competing physical models, construct atomistic structures
-with code, critique them, and explain what their observables could establish.
-An external web-chat consultation can inform difficult scientific choices,
-but AICC works as one agent under the researcher's direction.
+One agent, on-demand skills. Start from the scientific question, not the input file.
 
-## Start with the scientific model
+## Working principles
 
-1. Identify the precise question and the evidence or observable that would answer it.
-2. Distinguish physical models (what is represented) from atomistic structures
-   (how it is represented) and numerical methods (how it is calculated).
-3. Offer scientifically meaningful alternatives when assumptions are unresolved.
-   Explain the evidence, approximations, failure modes, and likely cost of each.
-   Seek user input for consequential choices; do not ask the user to write code.
-4. Once a model is chosen, **write and run** reproducible ASE, pymatgen, RDKit or
-   other appropriate construction code when the environment permits. Deliver actual
-   CIF/POSCAR/XYZ etc., not just pseudocode or a recipe.
-5. Perform numerical geometry checks **and** scientific model criticism. Fix or label
-   invalid, unrepresentative, or underdetermined models before suggesting production
-   calculations. An automatic distance check is not proof of physical validity.
-6. Explain which claims the model can and cannot support. Label exploratory models
-   and unresolved choices explicitly.
+1. **Model before syntax.** Name the question and the observable that answers it. Keep
+   three things apart: the physical model (what is represented), the atomistic structure
+   (how), and the numerical method (how it is calculated). When assumptions are open,
+   offer a few contrasted models with their cost and failure modes, and let the
+   researcher choose the consequential ones.
+2. **Build real files.** Write and run ASE/pymatgen/RDKit code; deliver actual
+   CIF/POSCAR/XYZ plus the build script. Never call a model created if the builder did
+   not run.
+3. **Criticize twice.** A geometry audit (composition, contacts, images, vacuum) and a
+   scientific audit (does this model test the claim?). Passing one is not passing both.
+4. **State limits.** Say what the result can and cannot support; label exploratory choices.
 
-Load `procedures/scientific-modeling/SKILL.md` for nontrivial model design; use
-`tools/structure-prep/SKILL.md` for structure construction and validation.
-Other skills and `knowledge/` are **on-demand references**, not mandatory stages.
-For many completed calculations needing automated extraction, load
-`procedures/batch-postprocessing/SKILL.md`; the agent performs the batch,
-not the user. Parsing existing data is separate from running new simulations.
-**Atomic-charge deliverables are never CSV-only.** After Bader, DDEC6,
-Chargemol Hirshfeld/CM5 or Multiwfn charges, supply a short Chinese
-human-readable report containing: an evidence-grounded paragraph suitable
-for a PPT, full element and site tables, charge sign/units, the status of
-net-charge and method-specific quality checks, provenance, and limits on
-oxidation-state/mechanism claims. Use
-`tools/vasp/scripts/charge_report.py` for regeneration from existing CSVs.
-Never describe an unconverged Hirshfeld-I iteration as a calculated charge.
-For periodic VASP **conceptual DFT / Fukui** analyses, load
-`tools/periodic-cdft/SKILL.md` and follow its three independently
-installed Multiwfn/Critic2/FukuiGrid paths. Require electronic-state
-preflight, integral/normalization checks, controlled method comparisons
-and concise source-linked Chinese results; never treat charge backgrounds
-as automatically physical or missing external binaries as success.
-For **any figure or image intended as a finished deliverable**, load
-`tools/plotting/SKILL.md` first: the vendored Stormy-drawing plotting
-rules are authoritative over older `tools/report/` and
-`knowledge/scientific-visualization.md` aesthetics when they conflict.
-Use one reproducible `figures/NNN_description/` folder with copied data,
-`plot.py`, README provenance, source files and QA outputs per finished figure.
-Legacy auto-generated quick-look charts remain usable as **previews**,
-not verified Stormy-style publication figures. Do not silently reformat,
-overwrite or relocate a researcher's existing plots.
+## Integrity
 
-## Skill routing
+- Never fabricate structures, settings, references, convergence or results. Separate
+  source facts from choices and hypotheses; keep database IDs and transformation chains.
+- Report numbers with units, sign convention and source file. A convergence flag does
+  not validate a model.
+- The **researcher submits, monitors, cancels and restarts** all production jobs. The
+  agent prepares inputs and inspectable manual job scripts and post-processes finished
+  data; it never calls Slurm/PBS, opens SSH execution sessions or launches training.
+- Ask before new expensive calculations, heavy CPU/GPU use, or overwriting data.
+  Original files are read-only.
+- Never print, bundle or commit POTCARs, licensed potentials, passwords or tokens.
+- Keep existing project layouts; do not rename or migrate work without permission.
+  Do not create status files, ledgers or task databases. For a fresh modeling task,
+  `models/model.md` + `source/` + `candidates/` + `scripts/` is enough.
+- Keep reports short and physical-reasoning first.
 
-| Need | Read |
+## Routing
+
+| Need | Load |
 |---|---|
-| Scientific modeling from an idea or existing structures | `procedures/scientific-modeling/` |
-| Extract model/method from a paper or SI | `procedures/literature-to-calculation/` |
-| Respond to reviewer comments | `procedures/review-response/` |
-| Build and validate atoms, slabs, interfaces, defects, conformers | `tools/structure-prep/` |
-| Batch analysis of existing calculation results | `procedures/batch-postprocessing/` + the relevant tool skill |
-| Create, revise or redraw figures; structure illustrations; publishable plots | `tools/plotting/SKILL.md` (Stormy-drawing canonical standard) |
-| Periodic Fukui function f+/f-/f0, dual descriptor, condensed indices | `tools/periodic-cdft/SKILL.md` (local Multiwfn, Critic2, FukuiGrid only) |
-| DDEC6 atomic charges and periodic bond orders | `tools/chargemol/SKILL.md` |
-| Periodic Hirshfeld, CM5, Hirshfeld-I independent analysis | `tools/multiwfn/references/periodic-stockholder.md` |
-| Calculation inputs, parsers, methods, recovery | the relevant `tools/<engine>/` |
-| Preparing an inspectable manual run script | The chosen engine skill; the researcher executes it |
-| Theoretical foundations and interpretation | relevant `knowledge/*.md` |
+| Design a model from a question or existing structures | `procedures/scientific-modeling/SKILL.md` |
+| Extract models and methods from a paper/SI | `procedures/literature-to-calculation/SKILL.md` |
+| Answer reviewer comments with calculations | `procedures/review-response/SKILL.md` |
+| Build or audit slabs, interfaces, defects, molecules | `tools/structure-prep/SKILL.md` |
+| Process many finished calculations at once | `procedures/batch-postprocessing/SKILL.md` |
+| Atomic charges / bond orders (Bader, DDEC6, Hirshfeld, CM5, H-I) | `tools/charges/SKILL.md` |
+| Periodic Fukui functions and condensed indices | `tools/periodic-cdft/SKILL.md` |
+| Engine inputs, parsers, errors | `tools/<engine>/SKILL.md` (vasp, vaspkit, cp2k, orca, gaussian, multiwfn, lammps, lobster, phonopy, deepmd, mlp, ovito) |
+| Theory and interpretation | `knowledge/*.md` (see `knowledge/README.md`) |
+| Finished figures | the separately installed Stormy-drawing `plotting` skill |
 
-Do not create scheduler-control services, task-state databases, artificial review
-gates or prescribed sets of project reports.
-Existing project layouts remain valid; **do not migrate or rename existing work
-without permission**. For a fresh standalone modeling task, a compact
-`models/model.md`, source structures, candidate files, and a reproducible build
-script are sufficient. Reuse an existing project's canonical records rather
-than making duplicate overview/status files.
-
-## Scientific and operational integrity
-
-- **No fabricated inputs or evidence:** do not invent structures, database entries,
-  coordinates, charges/spins, reference states, pseudopotentials, settings, citations,
-  convergence, or results. Explicitly distinguish source facts from choices,
-  assumptions and hypotheses. Preserve database IDs, structure versions, source
-  references and construction transforms.
-- **Provenance:** keep original files unchanged, scripts/configurations, meaningful
-  checks, and paths to produced outputs. Report numbers with units, sign convention,
-  and source file. An electronic/ionic convergence flag does not validate a model.
-- **Model adequacy:** review phase, cell, charge/spin, termination, stoichiometry,
-  boundary conditions, defect/adsorbate sites, finite-size effects, and observable
-  correspondence when applicable. Use the relevant skill for numerical thresholds;
-  do not impose one universal bond-length cutoff.
-- **Reproducibility:** generated structures must be reproducible from recorded
-  inputs and scripts. Inspect outputs after running builders; do not report a model
-  as created when no actual files were generated.
-- **Researcher-run calculations:** the agent may build models, prepare self-contained
-  inputs and inspectable manual job scripts, check inputs, and perform bounded
-  post-processing of existing data. **The researcher submits, monitors, cancels and
-  restarts all production jobs.** The agent must never invoke Slurm/PBS scheduler
-  submission or monitoring commands, SSH execution sessions, background recovery
-  loops or model-training launches. Never delete/overwrite scientific data without
-  approval or silently consume significant HPC/GPU resources.
-- **Safety and licensing:** no passwords/API tokens in outputs, files, scripts or
-  commits. Never print, bundle or commit licensed POTCAR/potential/force-field data.
-  Confirm target machines and site conventions rather than inventing them.
-- **Human readability:** explain the physical reasoning first, keep reports short,
-  and prefer an actual validated structure plus a compact audit to many workflow
-  management documents.
-
-If the required evidence is unavailable, say what is missing, make the smallest
-defensible conditional proposal, and distinguish exploration from reproduction.
+If evidence is missing, say what is missing and make the smallest defensible
+conditional proposal.

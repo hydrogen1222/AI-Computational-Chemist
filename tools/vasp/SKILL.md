@@ -23,17 +23,14 @@ description: Prepare, validate, run, and troubleshoot VASP DFT calculations for 
 | fork checks: locked settings before submission, too-close atoms before and after relaxation, same settings before combining energies | `scripts/check_locked_params.py`; `scripts/check_distances.py`; `scripts/compare_settings.py`; `references/locked-parameters.md` |
 | match crashes, warnings, or convergence failures | `references/errors.md` |
 | DOS, bands, PDOS, and d-band analysis | `references/dos-band.md`; `tools/vaspkit/references/dos-band.md`; `knowledge/electronic-structure.md` |
-| Ordinary Hirshfeld and CM5 from completed Chargemol DDEC6 logs | `tools/chargemol/SKILL.md`; `scripts/collect_hirshfeld.py` |
-| DDEC6 charges/SBO/pair BO with Chargemol and PPT figures | `tools/chargemol/SKILL.md`; `scripts/batch_ddec6.py`; `scripts/software_locator.py` |
-| batch Bader/AIM charges from many existing runs | `scripts/batch_bader.py`; `scripts/software_locator.py`; `procedures/batch-postprocessing/SKILL.md` |
-| Chinese human-readable charge reports from checked batch CSVs | `scripts/charge_report.py` (Bader, DDEC6, Chargemol H/CM5, Multiwfn) |
-| charge, Bader, spin, partial charge, work function, ELF, or fields | `references/electronic-analysis.md`; `references/volumetric-visualization.md`; `scripts/bader_summary.py`; `tools/vaspkit/references/electronic-analysis.md` |
+| atomic charges and bond orders (Bader, DDEC6, Hirshfeld/CM5, Hirshfeld-I), single or batch | `tools/charges/SKILL.md` |
+| density files for charges, spin, partial charge, work function, ELF, or fields | `references/electronic-analysis.md`; `references/volumetric-visualization.md`; `tools/vaspkit/references/electronic-analysis.md` |
 | DFT+U and magnetism | `references/u-values-magmom.md`; `knowledge/hubbard-u-and-magnetism.md` |
 | CI-NEB, Dimer, or IDPP | `references/vtst-neb-dimer.md` |
 | electrochemical CHE/VASPsol/VASPsol++ | `references/electrochemistry.md`; `knowledge/electrochemistry.md`; `knowledge/thermochemistry-and-free-energy.md` |
 | surface Pourbaix diagrams, dissolution, and phase-boundary audits | `knowledge/surface-pourbaix.md`; `references/electrochemistry.md`; `scripts/surface_pourbaix.py`; `examples/surface-pourbaix-audit/` |
 | AIMD, enhanced sampling, and trajectory analysis | `references/aimd.md`; `knowledge/molecular-dynamics.md`; `tools/vaspkit/references/aimd-postprocessing.md` |
-| surface thermodynamics, kinetics, and microkinetics | `knowledge/surface-thermodynamics.md`; `knowledge/reaction-kinetics.md`; `tools/vaspkit/references/thermochemistry.md`; `tools/catmap/SKILL.md` |
+| surface thermodynamics and kinetics | `knowledge/surface-thermodynamics.md`; `knowledge/reaction-kinetics.md`; `tools/vaspkit/references/thermochemistry.md` |
 | GPU/OpenACC settings and manual scheduler template | `references/gpu-openacc.md` |
 | COHP/COOP bonding | `tools/lobster/SKILL.md`; `knowledge/bonding-analysis.md` |
 | scientific visualization or upstream documentation | `knowledge/scientific-visualization.md`; `references/resources.md` |
