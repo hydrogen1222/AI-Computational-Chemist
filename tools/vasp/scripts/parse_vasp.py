@@ -8,7 +8,7 @@ Usage: uv run parse_vasp.py [RUNDIR] [--free-only] [--smoke]
 
 Run via `uv run` so a modern interpreter is used (the cluster's system python
 may be too old). Reports: normal termination, electronic/ionic convergence,
-final energy, max force, magnetization, and known error/warning strings.
+final energy, largest per-atom force magnitude, magnetization, and known error/warning strings.
 
   --free-only   report max force over only the unconstrained atoms, read from
                 the run's CONTCAR/POSCAR selective-dynamics flags. For a
@@ -68,7 +68,7 @@ def free_mask(d):
 def main():
     if sys.version_info < (3, 8):
         sys.exit("parse_vasp.py targets modern Python (>=3.8); run via `uv run parse_vasp.py` "
-                 "or load the cluster guide's Python (conda/uv/module).")
+                 "or load a newer Python (conda/uv/module).")
 
     args = [a for a in sys.argv[1:] if a not in ("--free-only", "--smoke")]
     free_only = "--free-only" in sys.argv[1:]
@@ -89,7 +89,7 @@ def main():
 
     for err in KNOWN_ERRORS:
         if err in text:
-            issues.append(f"error string: '{err}' (see vasp/references/errors.md)")
+            issues.append(f"error string: '{err}' (see tools/vasp/references/errors.md)")
 
     # INCAR settings actually used
     m = re.search(r"NELM\s*=\s*(\d+)", text)
@@ -141,7 +141,8 @@ def main():
     force_note = "all atoms incl. fixed"
     blocks = re.findall(r"TOTAL-FORCE \(eV/Angst\)\n -+\n((?:.+\n)+?) -+", text)
     if blocks:
-        per_atom = [max(abs(float(x)) for x in line.split()[3:6])
+        # per-atom force magnitude |F| (not the largest Cartesian component)
+        per_atom = [sum(float(x) ** 2 for x in line.split()[3:6]) ** 0.5
                     for line in blocks[-1].strip().splitlines()]
         if free_only:
             mask = free_mask(d)
@@ -173,7 +174,7 @@ def main():
     elif energy is not None:
         print(f"final energy:  {energy:.6f} eV (TOTEN, OUTCAR)")
     if max_force is not None:
-        print(f"max force:     {max_force:.4f} eV/A ({force_note})")
+        print(f"max |F|:       {max_force:.4f} eV/A ({force_note})")
     if mag:
         print(f"magnetization: {mag[-1]} mu_B")
     if nsw > 0:
@@ -191,4 +192,7 @@ def main():
 
 
 if __name__ == "__main__":
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        print(__doc__.strip())
+        sys.exit(0)
     main()

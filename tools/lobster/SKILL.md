@@ -1,6 +1,6 @@
 ---
 name: lobster
-description: Run LOBSTER to project a plane-wave (VASP) wavefunction onto a local orbital basis and compute COHP/COOP/ICOHP bonding analysis, Mulliken/Loewdin populations, and projected DOS. Use to set up the VASP static that feeds LOBSTER, write lobsterin, run lobster, and check projection (spilling) quality. For the *interpretation* of the bonding numbers, see knowledge/bonding-analysis.md.
+description: Run LOBSTER on a VASP wavefunction for COHP/COOP/ICOHP bonding analysis, Mulliken/Löwdin populations and projected DOS — prepare the VASP static, write lobsterin, check spilling. Interpretation: `knowledge/bonding-analysis.md`.
 ---
 
 # LOBSTER

@@ -143,7 +143,7 @@ changes the external potential and yields a different observable. If a
 particular ORCA QM/MM route cannot keep these inputs fixed, stop and design
 a controlled alternative; do not present the resulting difference as a
 fixed-potential Fukui function. Use the charge-state wavefunction and
-spin-density checks in Multiwfn's `references/conceptual-dft.md`.
+spin-density checks in `tools/multiwfn/references/conceptual-dft.md`.
 
 The standard `check_orca_input.py` is intended for molecular input syntax and
 an explicit `xyz`/`xyzfile` electron inventory. For `* pdbfile` embedded

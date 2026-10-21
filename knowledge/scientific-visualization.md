@@ -58,15 +58,7 @@ These are presentation rules for results handed to humans, learned from real rev
 
 ## Volumetric and density figures
 
-For `CHGCAR`, `CHGDIFF`, `PARCHG`, `ELFCAR`, spin density, and VASPKIT-generated CHGCAR-like files, use the VASP volumetric visualization workflow ([tools/vasp/references/volumetric-visualization.md](tools/vasp/references/volumetric-visualization.md)) rather than generic structure rendering. PyVista is the scripted route; VESTA is useful for manual inspection and final tuning.
-
-Rules:
-
-- define the density mathematically, e.g. `Delta rho = rho(combined) - rho(fragment A) - rho(fragment B)`;
-- use equal positive and negative isosurface magnitudes unless a documented reason exists;
-- record isovalue, colors, opacity, camera, and whether projection is orthographic;
-- for 2D slices, record atom indices defining the plane, interpolation, and color clipping;
-- never infer charge-transfer magnitude from an isosurface alone; pair it with Bader/DDEC, PDOS, work function, spin density, or COHP as appropriate.
+Charge density, Δρ, spin density, ELF and orbitals are rendered with [volumetric-rendering.md](volumetric-rendering.md) (PyVista isosurfaces and slices, isovalue choice, image checks); reading the grid is engine-specific (`tools/vasp/references/volumetric-visualization.md`, `tools/cp2k/references/volumetric-visualization.md`). Never infer charge-transfer magnitude from an isosurface alone.
 
 ## Numerical plots
 

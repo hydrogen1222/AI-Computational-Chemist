@@ -1,6 +1,6 @@
 # Response Package
 
-> Load this in Phase 5 when drafting a peer-review response package. The package is a
+> Load this when drafting a peer-review response package. The package is a
 > writing layer around accepted or explicitly limited computational evidence; it must
 > not promote exploratory results into final claims.
 

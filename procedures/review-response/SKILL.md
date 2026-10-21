@@ -1,6 +1,6 @@
 ---
 name: review-response
-description: Help an author triage computational reviewer comments, design defensible modeling/analysis to address them, evaluate evidence, and draft an honest response; execution remains optional and authorized by the user.
+description: Help an author triage computational reviewer comments, design defensible modeling/analysis to address them, evaluate evidence, and draft an honest response.
 ---
 
 # Computational Peer-Review Response

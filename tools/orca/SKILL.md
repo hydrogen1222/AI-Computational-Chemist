@@ -1,6 +1,6 @@
 ---
 name: orca
-description: Prepare, validate, run, and troubleshoot ORCA 6 molecular quantum chemistry jobs. Use for single points, geometry optimization, frequencies and thermochemistry, clusters and molecules, open-shell states, dispersion-corrected DFT, and producing wavefunction files for Multiwfn (orbitals, charges, conceptual DFT / Fukui functions).
+description: Prepare, check and troubleshoot ORCA 6 molecular quantum chemistry jobs. Use for single points, geometry optimization, frequencies and thermochemistry, clusters and molecules, open-shell states, dispersion-corrected DFT, and producing wavefunction files for Multiwfn (orbitals, charges, conceptual DFT / Fukui functions).
 ---
 
 # ORCA
@@ -34,7 +34,6 @@ relying on removed scheduler templates or inventing settings.
 | Na3PS4/solid-state local reactivity by embedded clusters | `references/running.md` ("Periodic-solid to embedded-cluster research boundary"), then `tools/multiwfn/references/conceptual-dft.md` |
 | conceptual DFT: Fukui functions, dual descriptor, global reactivity indices | `tools/multiwfn/references/conceptual-dft.md` |
 | manual pages and other sources | `references/resources.md` |
-| example rules | `examples/README.md` |
 
 ## Workflow
 

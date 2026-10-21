@@ -57,7 +57,7 @@ frequency calculations        adsorbate/local modes used in corrections
 
 Use the same surface cell and normalize all reported intercepts to the same cell, face, or number of active sites. Keep the functional, PAW datasets, ENCUT, k-point density, spin/U policy, dispersion, solvation, dipole treatment, fixed layers, and convergence thresholds consistent across every term in an energy expression. A residual slab after dissolution must be relaxed as its own state; subtracting an atomic energy from the intact slab is not a vacancy calculation.
 
-For each nominal coverage, optimize multiple arrangements when the surface permits them. Preserve the VASP directory and a ledger containing:
+For each nominal coverage, optimize multiple arrangements when the surface permits them. Preserve the VASP directory and a record containing:
 
 - state name, composition relative to the clean slab, adsorption site, and coverage;
 - final electronic energy and convergence evidence;

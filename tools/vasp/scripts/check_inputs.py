@@ -125,6 +125,9 @@ def parse_kpoints_mesh(path):
 
 def main():
     args = sys.argv[1:]
+    if "-h" in args or "--help" in args:
+        print(__doc__.strip())
+        sys.exit(0)
     strict_performance = False
     if "--strict-performance" in args:
         strict_performance = True

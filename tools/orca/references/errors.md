@@ -3,7 +3,7 @@
 > Load this when: an ORCA run stopped with an error, SCF or optimization did not converge, or results look wrong.
 
 Find the exact string in the output first; `parse_orca.py` prints the error lines. Change one thing
-at a time. Rows marked *(seen)* happened on Stormy's machines; the others come from the ORCA 6.1
+at a time. Rows marked *(seen)* were observed on real runs; the others come from the ORCA 6.1
 troubleshooting page.
 
 ## Input errors (stop within the first second)

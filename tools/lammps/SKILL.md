@@ -1,6 +1,6 @@
 ---
 name: lammps
-description: Prepare, run, and validate LAMMPS molecular dynamics. Use for classical MD (EAM, Lennard-Jones, Tersoff), reactive MD (ReaxFF), machine-learning potentials in LAMMPS (DeePMD, MACE), minimization, NVE/NVT/NPT, equilibration, and trajectory production.
+description: Prepare, check and analyze LAMMPS molecular dynamics. Use for classical MD (EAM, Lennard-Jones, Tersoff), reactive MD (ReaxFF), machine-learning potentials in LAMMPS (DeePMD, MACE), minimization, NVE/NVT/NPT, equilibration, and trajectory production.
 ---
 
 # LAMMPS
@@ -22,8 +22,7 @@ Workflow shape for every MD task: validate setup → minimize → equilibrate (v
 | inspectable manual job script | `references/running.md` plus verified local scheduler/environment details; user submits |
 | crashed, ERROR lines, lost atoms, unstable dynamics | `references/errors.md` |
 | run finished — equilibration evidence, drift bars, what may be computed | `uv run scripts/parse_lammps.py`, then `references/validation.md` |
-| validate the driving MLP or diagnose extrapolation | DeePMD/DPMD: `tools/deepmd/SKILL.md`; other architectures: `tools/mlp/SKILL.md` or their dedicated skill |
-| example contribution rules | `examples/README.md` |
+| validate the driving MLP or diagnose extrapolation | DeePMD: `tools/deepmd/SKILL.md`; MACE and others: `tools/mlp/SKILL.md` |
 | not covered locally (manual, forums, potential repositories) | `references/resources.md` |
 
 ## Hard guardrails
@@ -31,6 +30,5 @@ Workflow shape for every MD task: validate setup → minimize → equilibrate (v
 - No production observables from a trajectory whose equilibration was not verified.
 - Zero lost atoms — any loss invalidates the trajectory.
 - An MLP driving MD must be validated for the declared composition and state range.
-  Route DeePMD model deviation and QA to `deepmd`; use the matching dedicated or
-  umbrella MLP skill for other architectures.
+  Route DeePMD model deviation and QA to `deepmd`, other architectures to `mlp`.
 - Do not mix unit systems between data file, parameters, and script.

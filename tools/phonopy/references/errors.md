@@ -12,4 +12,4 @@
 | Spectrum changes a lot with `--dim` | force constants not converged in range | increase supercell until bands stop moving; report the test |
 | Symmetry-related error building displacements | input structure symmetry inconsistent (tolerance) | check `--tolerance`; use the symmetrized/primitive cell deliberately |
 
-Most phonon problems are inherited from the force calculations — debug those with `vasp/references/errors.md` first.
+Most phonon problems are inherited from the force calculations — debug those with `tools/vasp/references/errors.md` first.

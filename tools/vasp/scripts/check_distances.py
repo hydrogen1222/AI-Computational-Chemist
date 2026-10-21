@@ -26,7 +26,7 @@ Lattice (yellow): with --lattice-ref, each cell length that differs from the giv
 Run it on the starting POSCAR before submitting and on the CONTCAR after a relaxation.
 
 Exit code: 0 = clean, 1 = red line crossed (stop), 3 = yellow only (explain in the
-ledger before using the result), 2 = usage or read error.
+model notes before using the result), 2 = usage or read error.
 """
 import itertools
 import math
@@ -218,7 +218,7 @@ def main():
             print(f"  RED: {r}")
         sys.exit(1)
     if yellows:
-        print("RESULT: YELLOW - explain these in the ledger before using the structure")
+        print("RESULT: YELLOW - explain these in the model notes before using the structure")
         for y in yellows:
             print(f"  YELLOW: {y}")
         sys.exit(3)

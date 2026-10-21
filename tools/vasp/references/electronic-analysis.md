@@ -51,7 +51,7 @@ For report-level figures, do not hide the subtraction inside a one-off plotting 
 result-parsing script. The accepted figure artifact should show that the workflow read
 `tools/vasp/references/electronic-analysis.md`, recorded the density-difference source
 and sign/grid provenance, and rendered the resulting CHGCAR-like file through
-`tools/vasp/references/volumetric-visualization.md`.
+`references/volumetric-visualization.md` and `knowledge/volumetric-rendering.md`.
 
 ## Partial charge density (`PARCHG`)
 

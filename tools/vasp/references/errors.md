@@ -4,7 +4,7 @@
 
 Look up the exact string from stdout/OUTCAR before changing anything. Apply ONE fix at a time and record it; shotgun changes destroy comparability.
 
-> **Fork rule:** never change `ISMEAR` or `SIGMA` on your own, not even temporarily. Smearing changes the energy, so a run that seems to need it stops and waits for the human. Every recipe below that suggests raising `SIGMA` is a suggestion to bring to the human, not a fix to apply.
+> **Smearing rule:** never change `ISMEAR` or `SIGMA` on your own, not even temporarily. Smearing changes the energy, so a run that seems to need it stops and waits for the human. Every recipe below that suggests raising `SIGMA` is a suggestion to bring to the human, not a fix to apply.
 >
 > **Manual restart rule:** Diagnose the cause and show the researcher the
 > proposed parameter changes, affected results and source files. The agent
@@ -47,11 +47,11 @@ Look up the exact string from stdout/OUTCAR before changing anything. Apply ONE 
 ## SCF won't converge (escalation ladder)
 
 1. **Sanity-check the structure first** (distances > 0.7 Å, sensible cell, no overlapping or exploded atoms) — most "SCF problems" are geometry problems. *(If you grepped to this file for `EDDDAV` / `ZHEGV` / `BRMIX` / `Sub-Space-Matrix` / "charge sloshing" / "not converging": do this rung **before** touching ALGO / mixing / SIGMA — a broken structure defeats every electronic fix.)*
-2. Routine jobs in this fork start from `ALGO=Normal`. Delete stale WAVECAR/CHGCAR only when they may be incompatible with the current run. 
-   **Fork rule for `NELM`:** never raise `NELM` by default. First read the energy change `dE` of the last ~20 electronic steps in OSZICAR. Raise `NELM` only if `|dE|` is decreasing overall (one or two small bounces allowed), normally from 60 to 100 and at most about 120 after researcher review. If it oscillates, stalls, or diverges, do not raise `NELM` further. If only the first ionic step hit `NELM` and later steps converge, record it as a warning rather than treating it as a failed trajectory.
+2. Routine jobs start from `ALGO=Normal`. Delete stale WAVECAR/CHGCAR only when they may be incompatible with the current run. 
+   **Rule for `NELM`:** never raise `NELM` by default. First read the energy change `dE` of the last ~20 electronic steps in OSZICAR. Raise `NELM` only if `|dE|` is decreasing overall (one or two small bounces allowed), normally from 60 to 100 and at most about 120 after researcher review. If it oscillates, stalls, or diverges, do not raise `NELM` further. If only the first ionic step hit `NELM` and later steps converge, record it as a warning rather than treating it as a failed trajectory.
 3. For slab calculations, check whether dipole correction was enabled by habit: `LDIPOL=.TRUE.` with `IDIPOL=3` can make SCF much harder to converge. Unless the task needs a z-direction electrostatic-potential/work-function `LOCPOT` analysis or a deliberately documented dipole correction, remove it and restart from a clean charge density.
 4. Mixing: `AMIX=0.2 BMIX=0.0001` (slabs/magnetic add the `_MAG` pair).
-5. ~~Smearing: temporarily larger `SIGMA` to converge, then restart tighter from that WAVECAR.~~ **Forbidden as a self-fix in this fork** (see the fork rule at the top): stop and ask the human instead.
+5. ~~Smearing: temporarily larger `SIGMA` to converge, then restart tighter from that WAVECAR.~~ **Forbidden as a self-fix** (see the smearing rule at the top): stop and ask the human instead.
 6. `ALGO=All` (damped, robust, slow) — production-acceptable last resort.
 7. Magnetic systems: converge nonmagnetic first, restart spin-polarized from its WAVECAR/CHGCAR; or constrain with reasonable MAGMOM and `ICHARG=1`.
 

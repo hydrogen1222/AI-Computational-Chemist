@@ -14,7 +14,7 @@ in each directory.
 FAIL (exit 1), the energies must not be combined:
   - any tag in COMPARED_TAGS differs, including set in one run and absent in another;
   - the same element uses a different POTCAR (label or family) in two runs.
-YELLOW (exit 3), allowed but must be stated in the ledger:
+YELLOW (exit 3), allowed but must be stated in the model notes:
   - the coarsest k-point spacing differs by more than --k-tol (1/Angstrom, VASP
     KSPACING convention, default 0.05). Cells of different size often cannot have
     identical spacing; each run must still pass the project's KSPACING_MAX.
@@ -175,7 +175,7 @@ def main():
     ks = [r["k"][0] for r in runs if r["k"][0] is not None]
     if ks and max(ks) - min(ks) > ktol:
         yellows.append(f"coarsest k spacing ranges {min(ks):.3f} to {max(ks):.3f} 1/A "
-                       f"(tolerance {ktol}); state it in the ledger")
+                       f"(tolerance {ktol}); state it in the model notes")
     if len(ks) < len(runs):
         yellows.append("k spacing could not be read for every run (band path or missing file)")
 
@@ -187,7 +187,7 @@ def main():
             print(f"  YELLOW: {y}")
         sys.exit(1)
     if yellows:
-        print("RESULT: YELLOW - same physics settings; note the following in the ledger")
+        print("RESULT: YELLOW - same physics settings; note the following in the model notes")
         for y in yellows:
             print(f"  YELLOW: {y}")
         sys.exit(3)

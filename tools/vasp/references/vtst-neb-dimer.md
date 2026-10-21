@@ -6,8 +6,8 @@ Use this together with `running.md` for the underlying VASP settings and `valida
 
 ## Site setup
 
-- VTST is not only a script bundle. Transition-state methods need a VASP binary compiled with VTST support — which module/binary is VTST-enabled is a site fact: look it up in the private cluster guide (or ask the user), never assume a naming convention.
-- The helper scripts (`nebmake.pl`, `nebresults.pl`, ...) are a separate install; record their module name or path in the cluster guide too.
+- VTST is not only a script bundle. Transition-state methods need a VASP binary compiled with VTST support — which module/binary is VTST-enabled is a site fact: look it up in the private cluster documentation (or ask the user), never assume a naming convention.
+- The helper scripts (`nebmake.pl`, `nebresults.pl`, ...) are a separate install; record their module name or path in the cluster documentation too.
 - If the helper scripts are missing from the environment, consult/download VTST tools from https://theory.cm.utexas.edu/vtsttools/ after user approval.
 - Before submitting a TS job, record the exact VASP module and script module in the provenance notes.
 
