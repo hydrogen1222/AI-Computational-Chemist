@@ -84,7 +84,8 @@ class StructurePrep(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         text = slab.read_text()
         self.assertIn("Selective", text)
-        flags = [line.split()[-3:] for line in text.splitlines() if len(line.split()) >= 6]
+        flags = [line.split()[3:6] for line in text.splitlines()
+                 if len(line.split()) >= 6 and line.split()[3] in ("T", "F")]
         self.assertIn(["F", "F", "F"], flags)    # bottom layers frozen
         self.assertIn(["T", "T", "T"], flags)    # top layers free
         audit = self.d / "audit.json"
